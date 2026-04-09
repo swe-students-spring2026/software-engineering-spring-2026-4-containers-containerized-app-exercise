@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mongo Data</title>
+</head>
+<body>
+    <h1>Mongo Data</h1>
+
+    {% if records %}
+        {% for record in records %}
+            <p>
+                Timestamp: {{ record.get("timestamp", "N/A") }},
+                Label: {{ record.get("label", "N/A") }},
+                Confidence: {{ record.get("confidence", "N/A") }}
+            </p>
+        {% endfor %}
+    {% else %}
+        <p>No records found.</p>
+    {% endif %}
+</body>
+</html>
