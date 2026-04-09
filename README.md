@@ -1,6 +1,7 @@
 # Ergonomics & Posture Monitor
 
-[![CI Subsystems](https://github.com/nyu-software-engineering/4-containers-next_team/actions/workflows/ci.yml/badge.svg)](https://github.com/nyu-software-engineering/4-containers-next_team/actions/workflows/ci.yml)
+[![CI Subsystems](https://github.com/swe-students-spring2026/4-containers-next_team/actions/workflows/ci.yml/badge.svg)](https://github.com/swe-students-spring2026/4-containers-next_team/actions/workflows/ci.yml)
+[![lint-free](https://github.com/swe-students-spring2026/4-containers-next_team/actions/workflows/lint.yml/badge.svg)](https://github.com/swe-students-spring2026/4-containers-next_team/actions/workflows/lint.yml)
 
 A containerized health monitoring application to help developers maintain better posture. The project uses a Machine Learning client (with OpenCV and MediaPipe) to detect poor posture like slouching from a video feed, and saves the data to a MongoDB database. A Flask web dashboard reads this database to show the posture data in real-time.
 
@@ -27,7 +28,7 @@ Make sure you have Git, Docker, and Docker Compose installed. You'll need Docker
 
 **2. Clone the repository**
 ```bash
-git clone https://github.com/nyu-software-engineering/4-containers-next_team.git
+git clone https://github.com/swe-students-spring2026/4-containers-next_team.git
 cd 4-containers-next_team
 ```
 
