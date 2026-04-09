@@ -1,8 +1,12 @@
-from pymongo import MongoClient 
+"""
+This is a test file to make sure the DB is working and conected
+"""
 
-client = MongoClient('mongodb://admin:secret@localhost:27017/')
-db = client['mydatabase']
-collection = db['records']
+from pymongo import MongoClient
 
-collection.insert_one({'name': 'Alice', 'age': 30})
+client = MongoClient("mongodb://admin:secret@localhost:27017/")
+db = client["mydatabase"]
+collection = db["records"]
+
+collection.insert_one({"name": "Alice", "age": 30})
 print("Inserted")
