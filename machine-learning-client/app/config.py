@@ -11,3 +11,7 @@ load_dotenv(BASE_DIR / ".env")
 MONGO_URI = os.getenv("MONGO_URI")
 MONGO_DB_NAME = os.getenv("MONGO_DB_NAME")
 MONGO_COLLECTION_NAME = os.getenv("MONGO_COLLECTION_NAME")
+
+# add a default recorder
+SAMPLE_RATE = 44100
+CHANNELS = 1
