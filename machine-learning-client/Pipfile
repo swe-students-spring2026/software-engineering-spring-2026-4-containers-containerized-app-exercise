@@ -8,6 +8,9 @@ pymongo = "*"
 openai = "*"
 python-dotenv = "*"
 numpy = "*"
+openai-whisper = "*"
+sounddevice = "*"
+scipy = "*"
 
 [dev-packages]
 black = "*"
