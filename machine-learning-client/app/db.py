@@ -1,7 +1,6 @@
 """Database helpers for saving practice session data."""
 
 from pymongo import MongoClient
-
 from app.config import MONGO_URI, MONGO_DB_NAME, MONGO_COLLECTION_NAME
 
 

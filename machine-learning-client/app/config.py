@@ -15,4 +15,3 @@ MONGO_COLLECTION_NAME = os.getenv("MONGO_COLLECTION_NAME")
 # add a default recorder
 SAMPLE_RATE = 44100
 CHANNELS = 1
-

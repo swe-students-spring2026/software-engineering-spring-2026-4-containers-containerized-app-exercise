@@ -3,7 +3,6 @@ Pipeline for recording, transcription, analysis, and storage.
 """
 
 import wave
-
 from app.recorder import record_audio_manual
 from app.openai_transcriber import transcribe_audio
 from app.data_analyzer import analyze_transcript

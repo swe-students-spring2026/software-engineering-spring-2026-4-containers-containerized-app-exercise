@@ -4,11 +4,9 @@ Audio recording utilities.
 
 from datetime import datetime
 from pathlib import Path
-
 import numpy as np
 import sounddevice as sd
 from scipy.io.wavfile import write
-
 from app.config import CHANNELS, SAMPLE_RATE
 
 OUTPUT_DIR = Path("record_outputs")
@@ -40,7 +38,7 @@ def record_audio_manual(
 
     frames = []
 
-    def callback(indata, frames_count, time, status):
+    def callback(indata, _frames_count, _time, status):
         if status:
             print(status)
         frames.append(indata.copy())

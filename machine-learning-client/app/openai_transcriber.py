@@ -3,12 +3,9 @@ Local Whisper speech-to-text helper.
 """
 
 from pathlib import Path
-
 import whisper
 
-
-MODEL_NAME = "base"
-_model = None
+MODEL_NAME = "base.en"
 
 
 def get_model():
@@ -18,10 +15,8 @@ def get_model():
     Returns:
         Loaded Whisper model.
     """
-    global _model
-    if _model is None:
-        _model = whisper.load_model(MODEL_NAME)
-    return _model
+    model = whisper.load_model(MODEL_NAME)
+    return model
 
 
 def transcribe_audio(file_path: str) -> str:
