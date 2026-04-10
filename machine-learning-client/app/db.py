@@ -12,17 +12,17 @@ def get_collection():
     Returns:
         The MongoDB collection object.
     """
-    client     = MongoClient(MONGO_URI)
-    db         = client[MONGO_DB_NAME]
+    client = MongoClient(MONGO_URI)
+    db = client[MONGO_DB_NAME]
     collection = db[MONGO_COLLECTION_NAME]
     return collection
 
 
 # for saving
 def save_practice_session(
-    filename : str,
+    filename: str,
     transcript: str,
-    analysis : dict,
+    analysis: dict,
 ):
     """
     Save a practice session document to MongoDB.
@@ -37,12 +37,12 @@ def save_practice_session(
         The inserted MongoDB document ID.
     """
     collection = get_collection()
-    document   = {
-        "filename"          : filename,
-        "transcript"        : transcript,
-        "word_count"        : analysis["word_count"],
-        "wpm"               : analysis["wpm"],
-        "filler_words"      : analysis["filler_words"],
+    document = {
+        "filename": filename,
+        "transcript": transcript,
+        "word_count": analysis["word_count"],
+        "wpm": analysis["wpm"],
+        "filler_words": analysis["filler_words"],
         "total_filler_count": analysis["total_filler_count"],
     }
 

@@ -13,6 +13,7 @@ FILLER_WORDS = [
     "i mean",
 ]
 
+
 def count_words(transcript: str) -> int:
     """
     Count the total number of words in a transcript.
@@ -29,6 +30,7 @@ def count_words(transcript: str) -> int:
     words = re.findall(r"\b[\w']+\b", transcript.lower())
     return len(words)
 
+
 def count_filler_words(transcript: str) -> dict:
     """
     Count occurrences of predefined filler words/phrases.
@@ -42,13 +44,13 @@ def count_filler_words(transcript: str) -> dict:
     if not isinstance(transcript, str):
         raise ValueError("transcript must be a string")
 
-    text   = transcript.lower()
+    text = transcript.lower()
     counts = {}
 
     for w in FILLER_WORDS:
         # find words if in the FILLER_WORDS
-        pattern   = r"\b" + re.escape(w) + r"\b"
-        matches   = re.findall(pattern, text)
+        pattern = r"\b" + re.escape(w) + r"\b"
+        matches = re.findall(pattern, text)
         counts[w] = len(matches)
 
     return counts
@@ -71,10 +73,10 @@ def analyze_transcript(transcript: str, duration_seconds: float) -> dict:
     if not isinstance(duration_seconds, (int, float)) or duration_seconds <= 0:
         raise ValueError("duration_seconds must be a positive number")
 
-    word_count         = count_words(transcript)
-    filler_words       = count_filler_words(transcript)
+    word_count = count_words(transcript)
+    filler_words = count_filler_words(transcript)
     total_filler_count = sum(filler_words.values())
-    wpm                = round((word_count / duration_seconds) * 60)
+    wpm = round((word_count / duration_seconds) * 60)
 
     # pace feedback
     if wpm < 100:
@@ -101,10 +103,10 @@ def analyze_transcript(transcript: str, duration_seconds: float) -> dict:
         )
 
     return {
-        "word_count"        : word_count,
-        "filler_words"      : filler_words,
+        "word_count": word_count,
+        "filler_words": filler_words,
         "total_filler_count": total_filler_count,
-        "wpm"               : wpm,
-        "pace_feedback"     : pace_feedback,
-        "filler_feedback"   : filler_feedback,
+        "wpm": wpm,
+        "pace_feedback": pace_feedback,
+        "filler_feedback": filler_feedback,
     }

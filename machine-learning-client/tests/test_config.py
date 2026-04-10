@@ -16,4 +16,3 @@ def test_mongo_db_name_loaded():
 def test_mongo_collection_name_loaded():
     """Test that MONGO_COLLECTION_NAME is loaded correctly."""
     assert MONGO_COLLECTION_NAME == "practice_sessions"
-    
