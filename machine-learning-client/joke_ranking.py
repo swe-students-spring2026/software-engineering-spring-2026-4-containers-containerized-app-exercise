@@ -1,9 +1,15 @@
+"""
+This module connects to the Google GenAI API to evaluate and rank jokes.
+"""
+
 import os
-"""used to load environment credintials"""
-from google import genai
-"""used to get a score for the joke"""
-from google.genai import types
+
+# Used to load environment credentials
 from dotenv import load_dotenv
+
+# Used to get a score for the joke
+from google import genai
+from google.genai import types
 
 load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
@@ -33,4 +39,4 @@ def generate_score(joke):
     if score < 1 or score > 100:
         raise OutOfRangeError
 
-    return(score)
+    return score
