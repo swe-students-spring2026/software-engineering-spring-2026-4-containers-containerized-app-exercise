@@ -125,9 +125,9 @@ def test_analyze_transcript_empty_transcript():
 
 
 def test_analyze_transcript_whitespace_transcript():
-        """Test analyze_transcript raises ValueError for whitespace transcript."""
-        with pytest.raises(ValueError):
-            analyze_transcript("   ", 30)
+    """Test analyze_transcript raises ValueError for whitespace transcript."""
+    with pytest.raises(ValueError):
+        analyze_transcript("   ", 30)
 
 
 def test_analyze_transcript_invalid_duration_zero():
@@ -146,4 +146,3 @@ def test_analyze_transcript_invalid_duration_type():
     """Test analyze_transcript raises ValueError for invalid duration type."""
     with pytest.raises(ValueError):
         analyze_transcript("Hello world", "30")
-        
