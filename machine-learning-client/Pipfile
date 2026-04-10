@@ -4,13 +4,13 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pylint = "*"
-black = "*"
 pymongo = "*"
 python-dotenv = "*"
 
 [dev-packages]
+black = "*"
 pylint = "*"
+pytest = "*"
 
 [requires]
 python_version = "3.11"
