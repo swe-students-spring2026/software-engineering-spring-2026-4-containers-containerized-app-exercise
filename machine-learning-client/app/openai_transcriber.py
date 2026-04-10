@@ -1,45 +1,48 @@
 """
-OpenAI speech-to-text helper.
+Local Whisper speech-to-text helper.
 """
 
-import os
 from pathlib import Path
 
-from dotenv import load_dotenv
-from openai import OpenAI
+import whisper
 
 
-load_dotenv()
+MODEL_NAME = "base"
+_model = None
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-
-def transcribe_audio(file_path: str, model: str = "gpt-4o-mini-transcribe") -> str:
+def get_model():
     """
-    Transcribe an audio file using OpenAI speech-to-text API.
+    Lazily load the Whisper model once.
+
+    Returns:
+        Loaded Whisper model.
+    """
+    global _model
+    if _model is None:
+        _model = whisper.load_model(MODEL_NAME)
+    return _model
+
+
+def transcribe_audio(file_path: str) -> str:
+    """
+    Transcribe an audio file using local Whisper.
 
     Args:
         file_path: Path to the audio file.
-        model: OpenAI transcription model.
 
     Returns:
         Transcribed text.
 
     Raises:
         ValueError: If file path does not exist.
-        RuntimeError: If API key is missing.
     """
-    if not os.getenv("OPENAI_API_KEY"):
-        raise RuntimeError("OPENAI_API_KEY is not set")
-
     path = Path(file_path)
     if not path.exists():
         raise ValueError(f"Audio file not found: {file_path}")
 
-    with path.open("rb") as audio_file:
-        transcript = client.audio.transcriptions.create(
-            model=model,
-            file=audio_file,
-        )
+    model = get_model()
+    result = model.transcribe(str(path))
 
-    return transcript.text
+    text = result.get("text", "").strip()
+    return text
