@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 pymongo = "*"
+openai = "*"
 python-dotenv = "*"
 
 [dev-packages]
