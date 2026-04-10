@@ -61,7 +61,3 @@ def record_audio_manual(
 
     print(f"Audio saved to {output_file}")
     return str(output_file)
-
-if __name__ == "__main__":
-    path = record_audio_manual()
-    print(f"Created file: {path}")
