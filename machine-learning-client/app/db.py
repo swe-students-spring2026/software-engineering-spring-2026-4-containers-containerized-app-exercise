@@ -18,33 +18,19 @@ def get_collection():
     return collection
 
 
-# for saving
-def save_practice_session(
-    filename: str,
-    transcript: str,
-    analysis: dict,
-):
+def save_practice_session(session: dict):
     """
-    Save a practice session document to MongoDB.
+    Save a complete practice session document to MongoDB.
 
     Args:
-        filename: Name of the audio file.
-        transcript: Transcript text of the session.
-        analysis: Analysis results including word count, wpm,
-            filler_words, and total_filler_count.
+        session: A dictionary containing the full practice session data.
 
     Returns:
         The inserted MongoDB document ID.
     """
-    collection = get_collection()
-    document = {
-        "filename": filename,
-        "transcript": transcript,
-        "word_count": analysis["word_count"],
-        "wpm": analysis["wpm"],
-        "filler_words": analysis["filler_words"],
-        "total_filler_count": analysis["total_filler_count"],
-    }
+    if not isinstance(session, dict):
+        raise ValueError("session must be a dictionary")
 
-    result = collection.insert_one(document)
+    collection = get_collection()
+    result = collection.insert_one(session)
     return result.inserted_id
