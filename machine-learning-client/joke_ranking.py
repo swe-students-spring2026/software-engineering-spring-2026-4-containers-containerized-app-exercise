@@ -23,7 +23,26 @@ class OutOfRangeError(Exception):
         return "Invalid Score was generated"
 
 
-# JOKE = "They done messed up & selected me for jusry duty, SOMEBODY COMING HOME"
+def generate_classification(text):
+    """Given a string returns 0 if it's humorless or 1 if it has humor"""
+
+    response = client.models.generate_content(
+        model="gemini-3-flash-preview",
+        config=types.GenerateContentConfig(
+            system_instruction="""
+            Return only 1 if the input contains 
+            humor and only 0 if it is humorless"""
+        ),
+        contents=f"{text}",
+    )
+
+    classification = "".join(filter(str.isdigit, response.text))
+    classification = int(classification)
+
+    if classification != 0 and classification != 1:
+        raise OutOfRangeError
+
+    return classification
 
 
 def generate_score(joke):
@@ -45,3 +64,23 @@ def generate_score(joke):
         raise OutOfRangeError
 
     return score
+
+
+def analyze_text(text):
+    """Given text returns a tuple of two elements
+
+    First element is either 0 or 1 where 0 corresponds to humorless text
+    and 1 corresponds to funny text
+
+    Second element is defaulted to -1 in case the text is not detected to be a joke
+    In case where it is detected to be a joke the second element will correspond
+    to a ranking of 1-100 based on how funny it is
+    """
+
+    score = -1
+    classification = generate_classification(text)
+
+    if classification:
+        score = generate_score(text)
+
+    return (classification, score)
