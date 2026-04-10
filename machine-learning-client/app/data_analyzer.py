@@ -1,3 +1,5 @@
+"""Utilities for analyzing speech transcripts."""
+
 import re
 
 FILLER_WORDS = [
@@ -45,9 +47,9 @@ def count_filler_words(transcript: str) -> dict:
 
     for w in FILLER_WORDS:
         # find words if in the FILLER_WORDS
-        pattern        = r"\b" + re.escape(w) + r"\b"
-        matches        = re.findall(pattern, text)
-        counts[w]      = len(matches)
+        pattern   = r"\b" + re.escape(w) + r"\b"
+        matches   = re.findall(pattern, text)
+        counts[w] = len(matches)
 
     return counts
 
@@ -88,9 +90,15 @@ def analyze_transcript(transcript: str, duration_seconds: float) -> dict:
     elif total_filler_count <= 5:
         filler_feedback = "Good fluency. Only a few filler words were used."
     elif total_filler_count <= 10:
-        filler_feedback = "Moderate filler word usage. Try to pause instead of using filler words."
+        filler_feedback = (
+            "Moderate filler word usage. "
+            "Try to pause instead of using filler words."
+        )
     else:
-        filler_feedback = "High filler word usage. Practice slowing down and organizing thoughts before speaking."
+        filler_feedback = (
+            "High filler word usage. "
+            "Practice slowing down and organizing thoughts before speaking."
+        )
 
     return {
         "word_count"        : word_count,
