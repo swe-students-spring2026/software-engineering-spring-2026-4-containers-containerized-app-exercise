@@ -5,7 +5,7 @@ import os
 import assemblyai as aai
 
 app = Flask(__name__)
-aai.settings.api_key = "693286ac70e740a2b438334875176dca"
+aai.settings.api_key = os.getenv("VTT_API_KEY", "dev-secret")
 
 @app.get("/")
 def voice_to_text():
