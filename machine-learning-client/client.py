@@ -1,3 +1,7 @@
+"""
+Run the MediaPipe attention monitoring client.
+"""
+
 import os
 import sys
 import time
@@ -11,6 +15,7 @@ from pymongo import MongoClient
 MONGO_URI = os.environ["MONGO_URI"]
 MONGO_DB = os.getenv("MONGO_DB", "mydatabase")
 MONGO_COLLECTION = os.getenv("MONGO_COLLECTION", "attention_events")
+CONTROL_COLLECTION = os.getenv("CONTROL_COLLECTION", "attention_control")
 CAMERA_INDEX = int(os.getenv("CAMERA_INDEX", "0"))
 PROCESS_INTERVAL_SEC = float(os.getenv("PROCESS_INTERVAL_SEC", "1"))
 FLAG_THRESHOLD_SEC = float(os.getenv("FLAG_THRESHOLD_SEC", "5"))
@@ -25,7 +30,20 @@ LEFT_CHEEK_INDEX = 234
 RIGHT_CHEEK_INDEX = 454
 
 
+def is_monitoring_enabled(control_collection):
+    """
+    Return whether the dashboard has enabled attention monitoring.
+    """
+
+    control = control_collection.find_one({"_id": "monitoring"})
+    return control is not None and control.get("status") == "running"
+
+
 def create_landmarker():
+    """
+    Create the MediaPipe Face Landmarker from the configured model file.
+    """
+
     if not os.path.exists(MODEL_PATH):
         print(f"Missing Face Landmarker model: {MODEL_PATH}", file=sys.stderr)
         return None
@@ -38,6 +56,10 @@ def create_landmarker():
 
 
 def classify_attention(detection_result):
+    """
+    Classify a detection result as attentive, looking away, or absent.
+    """
+
     if not detection_result.face_landmarks:
         return "absent"
     landmarks = detection_result.face_landmarks[0]
@@ -54,25 +76,25 @@ def classify_attention(detection_result):
     return "attentive"
 
 
-def main():
-    mongo_client = MongoClient(MONGO_URI)
-    collection = mongo_client[MONGO_DB][MONGO_COLLECTION]
+def run_monitoring(collection, control_collection):
+    """
+    Capture frames, classify attention, and write events while enabled.
+    """
+
     cap = cv2.VideoCapture(CAMERA_INDEX)
     if not cap.isOpened():
         print(f"Unable to open camera index {CAMERA_INDEX}", file=sys.stderr)
-        mongo_client.close()
-        return 1
+        return
 
     landmarker = create_landmarker()
     if landmarker is None:
         cap.release()
-        mongo_client.close()
-        return 1
+        return
 
     last_attentive_at = time.monotonic()
 
     try:
-        while True:
+        while is_monitoring_enabled(control_collection):
             loop_started_at = time.monotonic()
             ok, frame = cap.read()
             if not ok:
@@ -104,6 +126,28 @@ def main():
     finally:
         landmarker.close()
         cap.release()
+
+
+def main():
+    """
+    Wait for the start signal, then run attention monitoring.
+    """
+    
+    mongo_client = MongoClient(MONGO_URI)
+    db = mongo_client[MONGO_DB]
+    event_collection = db[MONGO_COLLECTION]
+    control_collection = db[CONTROL_COLLECTION]
+
+    try:
+        while True:
+            if is_monitoring_enabled(control_collection):
+                print("Attention monitoring started")
+                run_monitoring(event_collection, control_collection)
+                print("Attention monitoring stopped")
+            time.sleep(PROCESS_INTERVAL_SEC)
+    except KeyboardInterrupt:
+        print("Stopping client")
+    finally:
         mongo_client.close()
 
     return 0

@@ -1,4 +1,9 @@
+"""
+Flask app that connects MongoDB to the web app
+"""
+
 import os
+
 from flask import Flask, render_template
 from pymongo import MongoClient
 
@@ -10,8 +15,11 @@ collection = db[os.getenv("MONGO_COLLECTION", "attention_events")]
 
 @app.route("/")
 def home():
+    """
+    Fetches records from the DB and renders them to the web app
+    """
+        
     records = list(collection.find())
-    print(records)
     return render_template("index.html", records=records)
 
 
