@@ -1,15 +1,113 @@
-"""
-Script that connects to Database
-"""
+import os
+import sys
+import time
 
-from datetime import datetime
+import cv2
+import mediapipe as mp
+from mediapipe.tasks import python
+from mediapipe.tasks.python import vision
 from pymongo import MongoClient
 
-client = MongoClient("mongodb://admin:secret@mongo:27017/?authSource=admin")
-db = client["mydatabase"]
-collection = db["records"]
+MONGO_URI = os.environ["MONGO_URI"]
+MONGO_DB = os.getenv("MONGO_DB", "mydatabase")
+MONGO_COLLECTION = os.getenv("MONGO_COLLECTION", "attention_events")
+CAMERA_INDEX = int(os.getenv("CAMERA_INDEX", "0"))
+PROCESS_INTERVAL_SEC = float(os.getenv("PROCESS_INTERVAL_SEC", "1"))
+FLAG_THRESHOLD_SEC = float(os.getenv("FLAG_THRESHOLD_SEC", "5"))
+ORIENTATION_THRESHOLD = float(os.getenv("ORIENTATION_THRESHOLD", "0.15"))
+MODEL_PATH = os.getenv(
+    "FACE_LANDMARKER_MODEL_PATH",
+    os.path.join(os.path.dirname(__file__), "face_landmarker.task"),
+)
 
-result = {"timestamp": datetime.now(), "label": "test_detection", "confidence": 0.95}
+NOSE_TIP_INDEX = 1
+LEFT_CHEEK_INDEX = 234
+RIGHT_CHEEK_INDEX = 454
 
-collection.insert_one(result)
-print("Result inserted into MongoDB")
+
+def create_landmarker():
+    if not os.path.exists(MODEL_PATH):
+        print(f"Missing Face Landmarker model: {MODEL_PATH}", file=sys.stderr)
+        return None
+    options = vision.FaceLandmarkerOptions(
+        base_options=python.BaseOptions(model_asset_path=MODEL_PATH),
+        running_mode=vision.RunningMode.VIDEO,
+        num_faces=1,
+    )
+    return vision.FaceLandmarker.create_from_options(options)
+
+
+def classify_attention(detection_result):
+    if not detection_result.face_landmarks:
+        return "absent"
+    landmarks = detection_result.face_landmarks[0]
+    nose_x = landmarks[NOSE_TIP_INDEX].x
+    left_cheek_x = landmarks[LEFT_CHEEK_INDEX].x
+    right_cheek_x = landmarks[RIGHT_CHEEK_INDEX].x
+    face_center_x = (left_cheek_x + right_cheek_x) / 2
+    cheek_span = abs(right_cheek_x - left_cheek_x)
+    if cheek_span <= 0:
+        return "attentive"
+    deviation = abs(nose_x - face_center_x) / cheek_span
+    if deviation > ORIENTATION_THRESHOLD:
+        return "looking_away"
+    return "attentive"
+
+
+def main():
+    mongo_client = MongoClient(MONGO_URI)
+    collection = mongo_client[MONGO_DB][MONGO_COLLECTION]
+    cap = cv2.VideoCapture(CAMERA_INDEX)
+    if not cap.isOpened():
+        print(f"Unable to open camera index {CAMERA_INDEX}", file=sys.stderr)
+        mongo_client.close()
+        return 1
+
+    landmarker = create_landmarker()
+    if landmarker is None:
+        cap.release()
+        mongo_client.close()
+        return 1
+
+    last_attentive_at = time.monotonic()
+
+    try:
+        while True:
+            loop_started_at = time.monotonic()
+            ok, frame = cap.read()
+            if not ok:
+                print("Camera frame read failed", file=sys.stderr)
+                break
+
+            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
+            timestamp_ms = int(time.monotonic() * 1000)
+            detection_result = landmarker.detect_for_video(mp_image, timestamp_ms)
+
+            state = classify_attention(detection_result)
+            now = time.monotonic()
+            if state == "attentive":
+                last_attentive_at = now
+            flag = state != "attentive" and now - last_attentive_at > FLAG_THRESHOLD_SEC
+
+            event = {"timestamp": time.time(), "state": state, "flag": flag}
+            try:
+                collection.insert_one(event)
+            except Exception as exc:
+                print(f"MongoDB insert failed: {exc}", file=sys.stderr)
+            print(event)
+
+            elapsed = time.monotonic() - loop_started_at
+            time.sleep(max(0, PROCESS_INTERVAL_SEC - elapsed))
+    except KeyboardInterrupt:
+        print("Stopping client")
+    finally:
+        landmarker.close()
+        cap.release()
+        mongo_client.close()
+
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
