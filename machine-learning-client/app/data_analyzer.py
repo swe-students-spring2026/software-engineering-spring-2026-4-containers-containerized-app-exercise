@@ -94,7 +94,7 @@ def analyze_transcript(transcript: str, duration_seconds: float) -> dict:
     elif total_filler_count <= 10:
         filler_feedback = (
             "Moderate filler word usage. "
-            "Try to pause instead of using filler words."
+            + "Try to pause instead of using filler words."
         )
     else:
         filler_feedback = (
