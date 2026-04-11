@@ -1,5 +1,7 @@
 """Configuration module for environment variables."""
 
+# pylint: disable=too-few-public-methods
+
 import os
 
 

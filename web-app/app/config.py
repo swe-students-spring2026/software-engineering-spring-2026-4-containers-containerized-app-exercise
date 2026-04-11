@@ -1,5 +1,7 @@
 """Configuration for the web application."""
 
+# pylint: disable=too-few-public-methods
+
 import os
 
 
