@@ -1,6 +1,11 @@
+"""Configuration for the web application."""
+
 import os
 
+
 class Config:
+    """Application configuration values."""
+
     SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key")
     ML_CLIENT_URL = os.getenv("ML_CLIENT_URL", "http://localhost:5001")
     MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")

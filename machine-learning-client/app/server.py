@@ -1,3 +1,5 @@
+"""Flask server for emotion detection API."""
+
 from flask import Flask, jsonify, request
 
 from app.config import Config
@@ -7,20 +9,26 @@ from app.schemas import build_prediction_document
 
 app = Flask(__name__)
 
+
 @app.route("/health", methods=["GET"])
 def health():
+    """Health check endpoint."""
     return jsonify({"status": "ok"}), 200
+
 
 @app.route("/db-health", methods=["GET"])
 def db_health():
+    """Database health check endpoint."""
     try:
         ping_db()
         return jsonify({"status": "ok", "database": "connected"}), 200
-    except Exception as exc:
+    except RuntimeError as exc:
         return jsonify({"status": "error", "message": str(exc)}), 500
+
 
 @app.route("/analyze", methods=["POST"])
 def analyze():
+    """Analyze emotion from image data."""
     data = request.get_json(silent=True) or {}
     session_id = data.get("session_id", "default-session")
     image_b64 = data.get("image_b64")
@@ -42,6 +50,7 @@ def analyze():
         ),
         200,
     )
+
 
 if __name__ == "__main__":
     app.run(host=Config.ML_CLIENT_HOST, port=Config.ML_CLIENT_PORT, debug=True)

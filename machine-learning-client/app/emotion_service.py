@@ -1,8 +1,10 @@
-# placeholder for now
+"""Emotion detection service layer."""
 
 from app.label_mapper import emotion_to_border_color, normalize_emotion
 
+
 def detect_emotion(_image):
+    """Return a stubbed emotion analysis result for the provided image."""
     raw_emotion = "happy"
     emotion = normalize_emotion(raw_emotion)
 
