@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 pylint = "*"
 black = "*"
+fer = "*"
+setuptools = "*"
 
 [dev-packages]
 
