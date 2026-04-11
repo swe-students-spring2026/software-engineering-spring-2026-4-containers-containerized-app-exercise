@@ -13,11 +13,13 @@ from ultralytics import YOLO
 load_dotenv()
 
 
-def get_camera(camera_index=0):
-    """Open and return a VideoCapture object."""
-    cap = cv2.VideoCapture(camera_index)
+def get_camera(source=None):
+    """Open camera (index) or video file. Reads VIDEO_SOURCE env var as fallback."""
+    if source is None:
+        source = os.getenv("VIDEO_SOURCE", "0")
+    cap = cv2.VideoCapture(int(source) if source.isdigit() else source)
     if not cap.isOpened():
-        raise RuntimeError("Cannot open camera")
+        raise RuntimeError(f"Cannot open video source: {source}")
     return cap
 
 
@@ -108,6 +110,7 @@ def main():
         print("MongoDB not available — running without database.")
         db = None
 
+    headless = os.getenv("HEADLESS", "").lower() in ("1", "true")
     last_save = 0
     try:
         while True:
@@ -115,8 +118,12 @@ def main():
             if frame is None:
                 break
             detections = detect_objects(model, frame)
-            annotated = annotate_frame(frame, detections)
-            cv2.imshow("ML Client - Detections", annotated)
+
+            if not headless:
+                annotated = annotate_frame(frame.copy(), detections)
+                cv2.imshow("ML Client - Detections", annotated)
+                if cv2.waitKey(1) & 0xFF == ord("q"):
+                    break
 
             now = time.time()
             if detections and db is not None and (now - last_save) >= 1.0:
@@ -125,12 +132,10 @@ def main():
                 last_save = now
             elif detections:
                 print(f"Detected: {[d['label'] for d in detections]}")
-
-            if cv2.waitKey(1) & 0xFF == ord("q"):
-                break
     finally:
         cap.release()
-        cv2.destroyAllWindows()
+        if not headless:
+            cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":
