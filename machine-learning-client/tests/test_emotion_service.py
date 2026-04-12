@@ -1,18 +1,15 @@
+"""Tests for the emotion service module."""
+
 from app.emotion_service import analyze_image
 
-def test_analyze_image_returns_expected_keys(monkeypatch):
-    def fake_analyze(*args, **kwargs):
-        return {
-            "dominant_emotion": "happy",
-            "emotion_scores": {
-                "angry": 1,
-                "disgust": 0,
-                "fear": 2,
-                "happy": 80,
-                "sad": 4,
-                "surprise": 3,
-                "neutral": 10,
-            },
-            "face_detected": True,
-            "processing_time_ms": 100,
-        }
+
+def test_analyze_image_returns_expected_keys():
+    """analyze_image should return all required output fields."""
+    result = analyze_image("sample_data/test.jpg")
+
+    assert "dominant_emotion" in result
+    assert "emotion_scores" in result
+    assert "face_detected" in result
+    assert "processing_time_ms" in result
+    assert result["face_detected"] is True
+    assert isinstance(result["emotion_scores"], dict)

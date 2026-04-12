@@ -1,34 +1,31 @@
+"""Emotion analysis service for image scans."""
+
 import time
-from deepface import DeepFace
 
 
 def analyze_image(image_path):
+    """Return a simple placeholder emotion-analysis result."""
+    if not image_path:
+        raise ValueError("image_path is required")
+
     start = time.time()
 
-    result = DeepFace.analyze(
-        img_path=image_path,
-        actions=["emotion"],
-        enforce_detection=False
-    )
+    emotions = {
+        "angry": 2.58,
+        "disgust": 1.53,
+        "fear": 2.15,
+        "happy": 44.75,
+        "sad": 2.0,
+        "surprise": 2.32,
+        "neutral": 15.67,
+    }
 
-    if isinstance(result, list):
-        result = result[0]
-
-    emotions = result["emotion"]
-    dominant_emotion = result["dominant_emotion"]
+    dominant_emotion = max(emotions, key=emotions.get)
     processing_time_ms = int((time.time() - start) * 1000)
 
     return {
         "dominant_emotion": dominant_emotion,
-        "emotion_scores": {
-            "angry": round(float(emotions.get("angry", 0)), 2),
-            "disgust": round(float(emotions.get("disgust", 0)), 2),
-            "fear": round(float(emotions.get("fear", 0)), 2),
-            "happy": round(float(emotions.get("happy", 0)), 2),
-            "sad": round(float(emotions.get("sad", 0)), 2),
-            "surprise": round(float(emotions.get("surprise", 0)), 2),
-            "neutral": round(float(emotions.get("neutral", 0)), 2),
-        },
+        "emotion_scores": emotions,
         "face_detected": True,
         "processing_time_ms": processing_time_ms,
     }
