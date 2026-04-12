@@ -118,9 +118,9 @@ def run_loop(collection):
 
 
 if __name__ == "__main__":
-    # db = get_database()
-    # col = db["detections"]
-    # run_loop(col)
-    path = capture_image("capture.jpg")
+    db = get_database()
+    col = db["detections"]
+    run_loop(col)
+    # path = capture_image("capture.jpg")
     # predictions = run_inference("capture.jpg")
     # print(predictions)
