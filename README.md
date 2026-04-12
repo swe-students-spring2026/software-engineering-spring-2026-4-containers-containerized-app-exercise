@@ -10,6 +10,7 @@ A containerized health monitoring application to help developers maintain better
 - [Jonas Chen](https://github.com/JonasChenJusFox)
 - [Ruby Zhang](https://github.com/)
 - [Suri Su](https://github.com/suri-zip)
+- [Zeyue Xu](https://github.com/zeyuexu123)
 
 *(Note: We will update these links later.)*
 
@@ -33,12 +34,25 @@ cd 4-containers-next_team
 ```
 
 **3. Provide a sample video (Important!)**
-To avoid permission issues with webcams in Docker, our ML client processes a sample video instead. Since we don't upload large videos to GitHub, you need to create a placeholder or add your own video file *before* running docker-compose.
+To avoid permission issues with webcams in Docker, our ML client processes a sample video instead. Since we don't upload large videos to GitHub, you need to create a placeholder or add your own video file in machine-learning-client/data/raw/ *before* running docker-compose.
 *(Note: If you skip this, Docker will create a directory named `sample.mp4` by mistake and crash the ML container!)*
 ```bash
 # either copy a real short video to this path, or just create a blank placeholder file:
-touch machine-learning-client/sample.mp4
+touch machine-learning-client/data/raw/sample.mp4
 ```
+
+**3.5. Download datasets**
+Download and extract the skeleton dataset to machine-learning-client/data/raw/
+
+https://github.com/shahroudy/NTURGB-D/blob/master/README.md
+
+Then, download the landmarker and put it in machine-learning-client/data/model/
+
+https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker
+
+
+Modify the config file accordingly
+
 
 **4. Set up environment variables**
 We use a `.env` file for config. Create it by copying the template we provided:

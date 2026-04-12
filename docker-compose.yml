@@ -28,7 +28,7 @@ services:
       - MONGO_URI=mongodb://mongodb:27017/
     # We will mount a sample video to run the detection without a real webcam in Docker
     volumes:
-      - ./machine-learning-client/sample.mp4:/app/sample.mp4
+      - ./machine-learning-client/data/raw/sample.mp4:/app/data/raw/sample.mp4
     depends_on:
       - mongodb
     restart: always
