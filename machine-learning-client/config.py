@@ -3,8 +3,9 @@
 Reads values from environment variables (and a .env file when present).
 This file is intentionally safe to include in development; don't commit secrets.
 """
-from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
+
 
 load_dotenv()
 
