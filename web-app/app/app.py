@@ -8,10 +8,10 @@ from app.routes import main
 
 def create_app():
     """Create and configure the Flask application."""
-    app = Flask(__name__)
-    app.config.from_object(Config)
-    app.register_blueprint(main)
-    return app
+    flask_app = Flask(__name__)
+    flask_app.config.from_object(Config)
+    flask_app.register_blueprint(main)
+    return flask_app
 
 
 app = create_app()
