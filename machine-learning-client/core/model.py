@@ -18,6 +18,26 @@ MODEL_POINTS = np.array([
 
 
 def predict_focus(img):
+    """
+    This function uses MediaPipe FaceMesh to detect facial landmarks
+    and OpenCV's solvePnP method to estimate the 3D head pose, including
+    pitch, yaw, and roll angles.
+
+    Based on the estimated head orientation, it computes a focus score
+    between 0 and 1. The more the face is oriented toward the camera,
+    the higher the focus score; otherwise, the score decreases.
+
+    Args:
+        img (numpy.ndarray):
+            Input image in OpenCV format (BGR color space).
+
+    Returns:
+        float:
+            A focus score ranging from 0.0 to 1.0:
+            - 1.0 indicates the face is directly facing the camera (high focus)
+            - 0.0 indicates no face detected or extreme head deviation
+    """
+
     h, w = img.shape[:2]
     rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
