@@ -1,0 +1,2 @@
+[MASTER]
+ignored-modules=roboflow,pymongo,cv2,dotenv

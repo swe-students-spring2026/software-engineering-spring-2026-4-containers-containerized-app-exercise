@@ -1,0 +1,40 @@
+name: ML Client CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r machine-learning-client/requirements.txt
+
+      - name: Lint with pylint
+        working-directory: machine-learning-client
+        run: pylint ml_client.py database.py --fail-under=8.0
+
+      - name: Format check with black
+        working-directory: machine-learning-client
+        run: black --check .
+
+      - name: Run tests with coverage
+        working-directory: machine-learning-client
+        env:
+          ROBOFLOW_API_KEY: ${{ secrets.ROBOFLOW_API_KEY }}
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+        run: |
+          coverage run --omit="*/config-3.py,*/config*.py" -m pytest ../test/ -v
+          coverage report --fail-under=80
