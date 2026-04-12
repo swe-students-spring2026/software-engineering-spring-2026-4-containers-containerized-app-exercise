@@ -1,7 +1,3 @@
-"""Unit tests for the Flask application."""
-
-# pylint: disable=redefined-outer-name, unused-argument, too-few-public-methods
-
 import pytest
 import db
 from app import app
