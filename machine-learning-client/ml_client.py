@@ -7,6 +7,7 @@ and saves results to MongoDB.
 import os
 import logging
 import time
+
 # from datetime import datetime, timezone
 
 import cv2
@@ -65,9 +66,8 @@ def run_inference(image_path):
         list of prediction dicts
     """
     rf = Roboflow(api_key=os.environ["ROBOFLOW_API_KEY"])
-    project = (
-        rf.workspace("material-identification")
-        .project("garbage-classification-3")
+    project = rf.workspace("material-identification").project(
+        "garbage-classification-3"
     )
     model = project.version(2).model
 
@@ -106,9 +106,7 @@ def run_loop(collection):
     Args:
         collection: pymongo collection
     """
-    logger.info(
-        "Starting ML client loop every %d seconds.", CAPTURE_INTERVAL
-    )
+    logger.info("Starting ML client loop every %d seconds.", CAPTURE_INTERVAL)
     while True:
         try:
             process_once(collection)
@@ -124,4 +122,3 @@ if __name__ == "__main__":
     # path = capture_image("capture.jpg")
     # predictions = run_inference("capture.jpg")
     # print(predictions)
-    
