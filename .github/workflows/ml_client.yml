@@ -31,11 +31,11 @@ jobs:
         run: black --check .
 
       - name: Run tests with coverage
-
+        working-directory: machine-learning-client
         env:
           ROBOFLOW_API_KEY: ${{ secrets.ROBOFLOW_API_KEY }}
           MONGO_URI: ${{ secrets.MONGO_URI }}
         run: |
-          coverage erase
-          coverage run -m pytest test/ -v
+          rm .coverage
+          coverage run -m pytest ../test/ -v
           coverage report --fail-under=80
