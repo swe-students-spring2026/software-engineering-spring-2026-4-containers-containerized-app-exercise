@@ -38,10 +38,10 @@ jobs:
         run: |
           coverage run --omit="*/config-3.py,*/config*.py" -m pytest ../test/ -v
           coverage report --fail-under=80
-    docker:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v4
-        - name: Build Docker image
-          run: docker build -t ml-client ./machine-learning-client
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t ml-client ./machine-learning-client
         
