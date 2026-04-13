@@ -1,0 +1,218 @@
+{
+  "timestamp": "2026-04-13T16:32:37.629917",
+  "backend": "transformers",
+  "text_prompt": "rice. noodle. soup. bread. sandwich. hamburger. pizza. hot dog. sushi. dumpling. spring roll. fried rice. fried chicken. steak. grilled fish. salmon. shrimp. lobster. crab. salad. broccoli. carrot. corn. tomato. cucumber. potato. egg. tofu. cheese. butter. yogurt. cake. cookie. donut. ice cream. chocolate. pie. pancake. waffle. apple. banana. orange. grape. strawberry. watermelon. mango. coffee. tea. juice. milk. beer. wine. water bottle. soda. french fries. taco. burrito. pasta. ramen. pho. curry. chicken wing. bacon. sausage. ham. bowl of food. plate of food. dish.",
+  "box_threshold": 0.35,
+  "text_threshold": 0.25,
+  "device": "cpu",
+  "total_images": 1,
+  "total_detections": 20,
+  "results": [
+    {
+      "filename": "fridge.png",
+      "num_detections": 20,
+      "detections": [
+        {
+          "class_name": "bowl",
+          "confidence": 0.7455,
+          "bbox_xyxy": [
+            451.35,
+            683.21,
+            720.03,
+            866.69
+          ]
+        },
+        {
+          "class_name": "plate",
+          "confidence": 0.603,
+          "bbox_xyxy": [
+            174.09,
+            528.76,
+            497.0,
+            590.5
+          ]
+        },
+        {
+          "class_name": "water bottle",
+          "confidence": 0.4503,
+          "bbox_xyxy": [
+            444.64,
+            327.85,
+            535.64,
+            554.2
+          ]
+        },
+        {
+          "class_name": "broccoli",
+          "confidence": 0.5537,
+          "bbox_xyxy": [
+            726.98,
+            640.16,
+            1043.93,
+            882.29
+          ]
+        },
+        {
+          "class_name": "tomato",
+          "confidence": 0.4265,
+          "bbox_xyxy": [
+            595.49,
+            672.18,
+            667.04,
+            728.69
+          ]
+        },
+        {
+          "class_name": "tomato apple",
+          "confidence": 0.3868,
+          "bbox_xyxy": [
+            606.39,
+            724.35,
+            676.76,
+            795.79
+          ]
+        },
+        {
+          "class_name": "tomato",
+          "confidence": 0.3929,
+          "bbox_xyxy": [
+            543.45,
+            771.32,
+            618.69,
+            837.36
+          ]
+        },
+        {
+          "class_name": "tomato apple",
+          "confidence": 0.3935,
+          "bbox_xyxy": [
+            488.06,
+            711.56,
+            565.43,
+            801.38
+          ]
+        },
+        {
+          "class_name": "corn",
+          "confidence": 0.3926,
+          "bbox_xyxy": [
+            127.39,
+            712.31,
+            490.56,
+            894.56
+          ]
+        },
+        {
+          "class_name": "tomato",
+          "confidence": 0.3736,
+          "bbox_xyxy": [
+            552.6,
+            704.7,
+            611.05,
+            750.71
+          ]
+        },
+        {
+          "class_name": "cheese",
+          "confidence": 0.4132,
+          "bbox_xyxy": [
+            199.88,
+            424.92,
+            463.26,
+            555.98
+          ]
+        },
+        {
+          "class_name": "tomato",
+          "confidence": 0.3548,
+          "bbox_xyxy": [
+            633.55,
+            703.85,
+            696.56,
+            741.23
+          ]
+        },
+        {
+          "class_name": "carrot",
+          "confidence": 0.4481,
+          "bbox_xyxy": [
+            426.78,
+            67.48,
+            606.9,
+            272.37
+          ]
+        },
+        {
+          "class_name": "water bottle",
+          "confidence": 0.3663,
+          "bbox_xyxy": [
+            268.12,
+            361.41,
+            331.78,
+            434.1
+          ]
+        },
+        {
+          "class_name": "cucumber",
+          "confidence": 0.3766,
+          "bbox_xyxy": [
+            322.05,
+            158.0,
+            406.51,
+            226.29
+          ]
+        },
+        {
+          "class_name": "grilled fish bacon ham",
+          "confidence": 0.3902,
+          "bbox_xyxy": [
+            210.77,
+            612.35,
+            422.93,
+            781.4
+          ]
+        },
+        {
+          "class_name": "water bottle",
+          "confidence": 0.3576,
+          "bbox_xyxy": [
+            344.08,
+            362.24,
+            404.86,
+            441.09
+          ]
+        },
+        {
+          "class_name": "cucumber",
+          "confidence": 0.3636,
+          "bbox_xyxy": [
+            229.18,
+            152.04,
+            303.04,
+            223.46
+          ]
+        },
+        {
+          "class_name": "tomato",
+          "confidence": 0.3726,
+          "bbox_xyxy": [
+            552.3,
+            752.62,
+            609.57,
+            774.08
+          ]
+        },
+        {
+          "class_name": "carrot",
+          "confidence": 0.4008,
+          "bbox_xyxy": [
+            370.77,
+            68.18,
+            482.83,
+            227.45
+          ]
+        }
+      ]
+    }
+  ]
+}

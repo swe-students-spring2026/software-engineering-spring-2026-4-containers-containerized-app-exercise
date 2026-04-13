@@ -1,0 +1,32 @@
+============================================================
+Food Detection Report (Grounding DINO)
+Timestamp : 2026-04-13T16:32:37.629917
+Backend   : transformers
+Device    : cpu
+Box Thresh: 0.35 | Text Thresh: 0.25
+Images    : 1
+Detections: 20
+============================================================
+
+--- fridge.png ---
+  bowl (conf: 74.55%) bbox: [451, 683, 720, 867]
+  plate (conf: 60.30%) bbox: [174, 529, 497, 590]
+  water bottle (conf: 45.03%) bbox: [445, 328, 536, 554]
+  broccoli (conf: 55.37%) bbox: [727, 640, 1044, 882]
+  tomato (conf: 42.65%) bbox: [595, 672, 667, 729]
+  tomato apple (conf: 38.68%) bbox: [606, 724, 677, 796]
+  tomato (conf: 39.29%) bbox: [543, 771, 619, 837]
+  tomato apple (conf: 39.35%) bbox: [488, 712, 565, 801]
+  corn (conf: 39.26%) bbox: [127, 712, 491, 895]
+  tomato (conf: 37.36%) bbox: [553, 705, 611, 751]
+  cheese (conf: 41.32%) bbox: [200, 425, 463, 556]
+  tomato (conf: 35.48%) bbox: [634, 704, 697, 741]
+  carrot (conf: 44.81%) bbox: [427, 67, 607, 272]
+  water bottle (conf: 36.63%) bbox: [268, 361, 332, 434]
+  cucumber (conf: 37.66%) bbox: [322, 158, 407, 226]
+  grilled fish bacon ham (conf: 39.02%) bbox: [211, 612, 423, 781]
+  water bottle (conf: 35.76%) bbox: [344, 362, 405, 441]
+  cucumber (conf: 36.36%) bbox: [229, 152, 303, 223]
+  tomato (conf: 37.26%) bbox: [552, 753, 610, 774]
+  carrot (conf: 40.08%) bbox: [371, 68, 483, 227]
+
