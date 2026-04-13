@@ -1,0 +1,26 @@
+[MASTER]
+ignore=venv,results,test_images
+
+[MESSAGES CONTROL]
+disable=
+    C0114,
+    C0115,
+    C0116,
+    C0301,
+    C0304,
+    C0415,
+    E0401,
+    R0913,
+    R0914,
+    R0915,
+    C0200
+
+[TYPECHECK]
+ignored-modules=
+    cv2,
+    numpy,
+    PIL,
+    groundingdino,
+    groundingdino.util,
+    groundingdino.util.inference,
+    transformers
