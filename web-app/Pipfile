@@ -9,12 +9,12 @@ black = "*"
 flask = "*"
 
 [dev-packages]
-pylint = "*"
-black = "*"
 pytest = "*"
 pytest-flask = "*"
 tomli = "*"
 typing-extensions = "*"
+pylint = "*"
+black = "*"
 
 [requires]
 python_version = "3.10"
