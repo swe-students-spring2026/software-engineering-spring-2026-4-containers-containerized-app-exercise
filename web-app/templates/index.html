@@ -9,17 +9,21 @@
 
     <!-- HEADER -->
     <header class="header">
-        <p>Test</p>
+        <h1>Bird Detection Dashboard</h1>
+        <p class="subtitle">Real-time bird sound detection</p>
     </header>
 
     <!-- LIVE CONTROL -->
     <section class="control">
-
+        <button id="toggleBtn" class="start">
+            Start Listening
+        </button>
     </section>
 
     <!-- STATUS -->
     <section class="status">
-
+        <span id="statusText">Idle</span>
+        <span id="statusDot" class="dot idle"></span>
     </section>
 
     <script src="{{ url_for('static', filename='app.js') }}"></script>
