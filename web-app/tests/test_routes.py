@@ -9,9 +9,22 @@ def test_home_page(client):
 
 
 def test_dashboard_page(client):
-    response = client.get("/dashboard")
-    assert response.status_code == 200
-    assert b"Inventory Dashboard" in response.data
+    with patch("routes.get_inventory_items") as mock_get_inventory_items:
+        mock_get_inventory_items.return_value = [
+            {
+                "display_name": "tomato",
+                "original_name": "tomato",
+                "confidence": 0.91,
+                "image_filename": "fridge.png",
+                "created_at": None,
+                "_id": "fake-id-1",
+            }
+        ]
+
+        response = client.get("/dashboard")
+        assert response.status_code == 200
+        assert b"Inventory Dashboard" in response.data
+        assert b"tomato" in response.data
 
 
 def test_upload_route_success(client):
