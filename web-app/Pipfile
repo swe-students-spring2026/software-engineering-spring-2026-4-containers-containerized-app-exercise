@@ -9,6 +9,7 @@ black = "*"
 flask = "*"
 
 [dev-packages]
+tomli = "*"
 
 [requires]
 python_version = "3.10"
