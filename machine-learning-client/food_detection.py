@@ -38,14 +38,30 @@ IMG_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".webp", ".tiff", ".tif"}
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Food Detection (Grounding DINO)")
-    parser.add_argument("--input", "-i", type=str, required=True, help="Path to input image directory")
-    parser.add_argument("--output", "-o", type=str, default="./results", help="Path to output directory")
-    parser.add_argument("--classes", type=str, default=DEFAULT_FOOD_CLASSES,
-                        help="Dot-separated food classes (e.g. 'sushi. ramen. rice')")
-    parser.add_argument("--box-thresh", type=float, default=0.35, help="Box confidence threshold")
-    parser.add_argument("--text-thresh", type=float, default=0.25, help="Text matching threshold")
-    parser.add_argument("--device", type=str, default="", help="Device: 'cpu' or 'cuda'")
-    parser.add_argument("--save-crop", action="store_true", help="Save cropped detections")
+    parser.add_argument(
+        "--input", "-i", type=str, required=True, help="Path to input image directory"
+    )
+    parser.add_argument(
+        "--output", "-o", type=str, default="./results", help="Path to output directory"
+    )
+    parser.add_argument(
+        "--classes",
+        type=str,
+        default=DEFAULT_FOOD_CLASSES,
+        help="Dot-separated food classes (e.g. 'sushi. ramen. rice')",
+    )
+    parser.add_argument(
+        "--box-thresh", type=float, default=0.35, help="Box confidence threshold"
+    )
+    parser.add_argument(
+        "--text-thresh", type=float, default=0.25, help="Text matching threshold"
+    )
+    parser.add_argument(
+        "--device", type=str, default="", help="Device: 'cpu' or 'cuda'"
+    )
+    parser.add_argument(
+        "--save-crop", action="store_true", help="Save cropped detections"
+    )
     return parser.parse_args()
 
 
@@ -54,7 +70,9 @@ def get_image_files(input_dir: str) -> list:
     if not input_path.exists():
         print(f"Error: Input directory '{input_dir}' does not exist")
         sys.exit(1)
-    image_files = sorted(f for f in input_path.iterdir() if f.suffix.lower() in IMG_EXTENSIONS)
+    image_files = sorted(
+        f for f in input_path.iterdir() if f.suffix.lower() in IMG_EXTENSIONS
+    )
     if not image_files:
         print(f"Error: No image files found in '{input_dir}'")
         sys.exit(1)
@@ -108,8 +126,14 @@ def load_model(device: str):
         sys.exit(1)
 
 
-def detect_groundingdino(model, image_path: str, text_prompt: str,
-                         box_threshold: float, text_threshold: float, device: str):
+def detect_groundingdino(
+    model,
+    image_path: str,
+    text_prompt: str,
+    box_threshold: float,
+    text_threshold: float,
+    device: str,
+):
     """Run inference with the groundingdino-py backend."""
     from groundingdino.util.inference import predict, load_image
 
@@ -128,18 +152,26 @@ def detect_groundingdino(model, image_path: str, text_prompt: str,
         cx, cy, bw, bh = boxes[i].tolist()
         x1, y1 = (cx - bw / 2) * w, (cy - bh / 2) * h
         x2, y2 = (cx + bw / 2) * w, (cy + bh / 2) * h
-        detections.append({
-            "class_name": phrases[i].strip(),
-            "confidence": round(logits[i].item(), 4),
-            "bbox_xyxy": [round(x1, 2), round(y1, 2), round(x2, 2), round(y2, 2)],
-        })
+        detections.append(
+            {
+                "class_name": phrases[i].strip(),
+                "confidence": round(logits[i].item(), 4),
+                "bbox_xyxy": [round(x1, 2), round(y1, 2), round(x2, 2), round(y2, 2)],
+            }
+        )
     # load_image returns RGB; convert to BGR for cv2
     image_bgr = cv2.cvtColor(image_source, cv2.COLOR_RGB2BGR)
     return detections, image_bgr
 
 
-def detect_transformers(model_tuple, image_path: str, text_prompt: str,
-                        box_threshold: float, text_threshold: float, device: str):
+def detect_transformers(
+    model_tuple,
+    image_path: str,
+    text_prompt: str,
+    box_threshold: float,
+    text_threshold: float,
+    device: str,
+):
     """Run inference with the HuggingFace transformers backend."""
     from PIL import Image
 
@@ -162,11 +194,13 @@ def detect_transformers(model_tuple, image_path: str, text_prompt: str,
     detections = []
     for i in range(len(results["boxes"])):
         box = results["boxes"][i].tolist()
-        detections.append({
-            "class_name": results["labels"][i].strip(),
-            "confidence": round(results["scores"][i].item(), 4),
-            "bbox_xyxy": [round(v, 2) for v in box],
-        })
+        detections.append(
+            {
+                "class_name": results["labels"][i].strip(),
+                "confidence": round(results["scores"][i].item(), 4),
+                "bbox_xyxy": [round(v, 2) for v in box],
+            }
+        )
 
     image_np = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
     return detections, image_np
@@ -194,13 +228,23 @@ def draw_detections(image: np.ndarray, detections: list) -> np.ndarray:
         label = f"{cls_name} {conf:.0%}"
         (lw, lh), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 1)
         cv2.rectangle(img, (x1, y1 - lh - 10), (x1 + lw + 4, y1), color, -1)
-        cv2.putText(img, label, (x1 + 2, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
+        cv2.putText(
+            img,
+            label,
+            (x1 + 2, y1 - 5),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.6,
+            (255, 255, 255),
+            1,
+        )
 
     return img
 
 
 def run_detection(args):
-    device = args.device if args.device else ("cuda" if torch.cuda.is_available() else "cpu")
+    device = (
+        args.device if args.device else ("cuda" if torch.cuda.is_available() else "cpu")
+    )
     print(f"Device: {device}")
 
     output_dir = Path(args.output)
@@ -217,14 +261,15 @@ def run_detection(args):
 
     image_files = get_image_files(args.input)
     all_results = []
-    detect_fn = detect_groundingdino if backend == "groundingdino" else detect_transformers
+    detect_fn = (
+        detect_groundingdino if backend == "groundingdino" else detect_transformers
+    )
 
     for idx, img_path in enumerate(image_files, 1):
         print(f"\n[{idx}/{len(image_files)}] {img_path.name}")
 
         detections, image_np = detect_fn(
-            model, str(img_path), text_prompt,
-            args.box_thresh, args.text_thresh, device
+            model, str(img_path), text_prompt, args.box_thresh, args.text_thresh, device
         )
 
         annotated = draw_detections(image_np, detections)
@@ -252,7 +297,13 @@ def run_detection(args):
                 x1, y1, x2, y2 = [int(v) for v in d["bbox_xyxy"]]
                 crop = image_np[y1:y2, x1:x2]
                 if crop.size > 0:
-                    cv2.imwrite(str(crop_dir / f"{d['class_name']}_{i}_{d['confidence']:.2f}.jpg"), crop)
+                    cv2.imwrite(
+                        str(
+                            crop_dir
+                            / f"{d['class_name']}_{i}_{d['confidence']:.2f}.jpg"
+                        ),
+                        crop,
+                    )
 
     # Save structured JSON (for backend/database consumption)
     summary_data = {
