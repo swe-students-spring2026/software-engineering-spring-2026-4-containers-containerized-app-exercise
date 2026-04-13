@@ -1,0 +1,168 @@
+{
+  "timestamp": "2026-04-13T10:21:24.918267",
+  "backend": "groundingdino",
+  "text_prompt": "rice. noodle. soup. bread. sandwich. hamburger. pizza. hot dog. sushi. dumpling. spring roll. fried rice. fried chicken. steak. grilled fish. salmon. shrimp. lobster. crab. salad. broccoli. carrot. corn. tomato. cucumber. potato. egg. tofu. cheese. butter. yogurt. cake. cookie. donut. ice cream. chocolate. pie. pancake. waffle. apple. banana. orange. grape. strawberry. watermelon. mango. coffee. tea. juice. milk. beer. wine. water bottle. soda. french fries. taco. burrito. pasta. ramen. pho. curry. chicken wing. bacon. sausage. ham. bowl of food. plate of food. dish.",
+  "box_threshold": 0.35,
+  "text_threshold": 0.25,
+  "device": "cpu",
+  "total_images": 1,
+  "total_detections": 15,
+  "results": [
+    {
+      "filename": "fridge.png",
+      "num_detections": 15,
+      "detections": [
+        {
+          "class_name": "bowl",
+          "confidence": 0.7881,
+          "bbox_xyxy": [
+            451.61,
+            682.44,
+            719.49,
+            866.45
+          ]
+        },
+        {
+          "class_name": "water bottle",
+          "confidence": 0.463,
+          "bbox_xyxy": [
+            444.55,
+            327.88,
+            535.61,
+            554.3
+          ]
+        },
+        {
+          "class_name": "plate",
+          "confidence": 0.5906,
+          "bbox_xyxy": [
+            173.82,
+            528.92,
+            497.06,
+            590.46
+          ]
+        },
+        {
+          "class_name": "broccoli",
+          "confidence": 0.5347,
+          "bbox_xyxy": [
+            727.0,
+            640.03,
+            1043.9,
+            882.12
+          ]
+        },
+        {
+          "class_name": "tomato",
+          "confidence": 0.4327,
+          "bbox_xyxy": [
+            595.5,
+            672.12,
+            667.09,
+            728.62
+          ]
+        },
+        {
+          "class_name": "tomato",
+          "confidence": 0.3825,
+          "bbox_xyxy": [
+            543.56,
+            771.41,
+            618.8,
+            837.32
+          ]
+        },
+        {
+          "class_name": "tomato apple",
+          "confidence": 0.3755,
+          "bbox_xyxy": [
+            606.47,
+            724.32,
+            676.88,
+            795.88
+          ]
+        },
+        {
+          "class_name": "tomato apple",
+          "confidence": 0.3771,
+          "bbox_xyxy": [
+            488.04,
+            711.42,
+            565.46,
+            801.45
+          ]
+        },
+        {
+          "class_name": "tomato",
+          "confidence": 0.3675,
+          "bbox_xyxy": [
+            552.7,
+            704.74,
+            611.03,
+            750.63
+          ]
+        },
+        {
+          "class_name": "grilled fish wing bacon ham",
+          "confidence": 0.3882,
+          "bbox_xyxy": [
+            210.77,
+            612.41,
+            422.91,
+            781.3
+          ]
+        },
+        {
+          "class_name": "water bottle",
+          "confidence": 0.3567,
+          "bbox_xyxy": [
+            267.97,
+            361.3,
+            331.74,
+            434.23
+          ]
+        },
+        {
+          "class_name": "cucumber",
+          "confidence": 0.3622,
+          "bbox_xyxy": [
+            322.1,
+            158.04,
+            406.42,
+            226.31
+          ]
+        },
+        {
+          "class_name": "carrot",
+          "confidence": 0.4123,
+          "bbox_xyxy": [
+            426.97,
+            67.38,
+            606.76,
+            272.44
+          ]
+        },
+        {
+          "class_name": "tomato",
+          "confidence": 0.3531,
+          "bbox_xyxy": [
+            552.25,
+            752.58,
+            609.64,
+            774.13
+          ]
+        },
+        {
+          "class_name": "carrot",
+          "confidence": 0.3766,
+          "bbox_xyxy": [
+            371.05,
+            68.97,
+            482.77,
+            227.14
+          ]
+        }
+      ]
+    }
+  ]
+}
