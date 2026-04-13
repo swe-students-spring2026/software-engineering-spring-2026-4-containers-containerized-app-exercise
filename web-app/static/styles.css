@@ -1,56 +1,73 @@
 body {
     font-family: Arial, sans-serif;
     text-align: center;
-    background: #f5f5f5;
+    background: #eee6f3; /* Light Violet */
+    color: #000000;
 }
 
+/* HEADER */
 .header {
-    margin-top: 40px;
+    margin-top: 0px;
+    padding: 24px 0;
+    background-color: #57068c; /* NYU Violet */
+    color: white;
+}
+
+.header h1 {
+    margin-bottom: 8px;
 }
 
 .subtitle {
-    color: gray;
+    color: #eee6f3; /* Light Violet */
 }
 
+/* CONTROL */
 .control {
-    margin: 30px;
+    margin: 32px;
 }
 
+/* BUTTON */
 button {
-    padding: 12px 20px;
-    font-size: 16px;
+    padding: 16px 32px;     
+    font-size: 20px;    
     border: none;
-    border-radius: 8px;
-    cursor: pointer;
+    background-color: #57068c;/* NYU Violet */
+    color: white;
+    font-weight: bold;
 }
 
 .start {
-    background-color: green;
-    color: white;
+    background-color: #57068c;/* NYU Violet */
 }
 
 .stop {
-    background-color: red;
-    color: white;
+    background-color: #330662; /* Deep Violet */
 }
 
+button:hover {
+    opacity: 0.9;
+}
+
+/* STATUS */
 .status {
-    margin-top: 20px;
-    font-size: 18px;
+    margin-top: 16px;
+    font-size: 16px;
+    color: #404040;
 }
 
+/* DOT */
 .dot {
-    height: 12px;
-    width: 12px;
+    height: 10px;
+    width: 10px;
     border-radius: 50%;
     display: inline-block;
-    margin-left: 8px;
+    margin-left: 6px;
 }
 
 .idle {
-    background-color: gray;
+    background-color: #b8b8b8;
 }
 
 .active {
-    background-color: red;
+    background-color: #8900e1; /* Ultra Violet */
 }
