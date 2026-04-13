@@ -10,6 +10,7 @@ and return them as (filename, image) pairs using OpenCV.
 import os
 import cv2
 
+
 def load_images(folder):
     """
     Load images from a specified folder.

@@ -5,6 +5,7 @@ Utility module for writing model results to JSON files.
 import json
 import os
 
+
 def write_json(path, results):
     """
     Write prediction results to a JSON file.

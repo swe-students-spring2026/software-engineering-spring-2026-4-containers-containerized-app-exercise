@@ -13,6 +13,7 @@ from writer import write_json
 IMG_DIR = "/shared/img"
 OUT_FILE = "/app/output/result.json"
 
+
 def main():
     """
     Main function.
@@ -24,13 +25,12 @@ def main():
     for img_path, img in images:
         score = predict_focus(img)
 
-        results.append({
-            "image": img_path,
-            "focused": score > 0.5,
-            "confidence": float(score)
-        })
+        results.append(
+            {"image": img_path, "focused": score > 0.5, "confidence": float(score)}
+        )
 
     write_json(OUT_FILE, results)
+
 
 if __name__ == "__main__":
     main()

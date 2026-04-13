@@ -13,45 +13,42 @@ mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(static_image_mode=True)
 
 LANDMARKS = [1, 33, 263, 61, 291, 199]
-MODEL_POINTS = np.array([
-    (0.0, 0.0, 0.0),
-    (-30.0, -30.0, -30.0),
-    (30.0, -30.0, -30.0),
-    (-25.0, 30.0, -30.0),
-    (25.0, 30.0, -30.0),
-    (0.0, 60.0, -30.0)
-], dtype=np.float64)
+MODEL_POINTS = np.array(
+    [
+        (0.0, 0.0, 0.0),
+        (-30.0, -30.0, -30.0),
+        (30.0, -30.0, -30.0),
+        (-25.0, 30.0, -30.0),
+        (25.0, 30.0, -30.0),
+        (0.0, 60.0, -30.0),
+    ],
+    dtype=np.float64,
+)
 
 
 def get_image_points(face, w, h):
     """
     Extract 2D facial landmark coordinates.
     """
-    return np.array([
-        (int(face.landmark[i].x * w), int(face.landmark[i].y * h))
-        for i in LANDMARKS
-    ], dtype=np.float64)
+    return np.array(
+        [(int(face.landmark[i].x * w), int(face.landmark[i].y * h)) for i in LANDMARKS],
+        dtype=np.float64,
+    )
 
 
 def get_camera_matrix(w, h):
     """
     Construct a simple camera matrix.
     """
-    return np.array([
-        [w, 0, w / 2],
-        [0, w, h / 2],
-        [0, 0, 1]
-    ], dtype=np.float64)
+    return np.array([[w, 0, w / 2], [0, w, h / 2], [0, 0, 1]], dtype=np.float64)
+
 
 def estimate_pose(image_points, camera_matrix):
     """
     Estimate head pose.
     """
     success, rvec, _ = cv2.solvePnP(
-        MODEL_POINTS,
-        image_points,
-        camera_matrix,
-        np.zeros((4, 1))
+        MODEL_POINTS, image_points, camera_matrix, np.zeros((4, 1))
     )
 
     if not success:
@@ -59,7 +56,7 @@ def estimate_pose(image_points, camera_matrix):
 
     rmat, _ = cv2.Rodrigues(rvec)
 
-    sy = math.sqrt(rmat[0, 0]**2 + rmat[1, 0]**2)
+    sy = math.sqrt(rmat[0, 0] ** 2 + rmat[1, 0] ** 2)
 
     if sy < 1e-6:
         pitch = math.atan2(-rmat[1, 2], rmat[1, 1])
@@ -70,11 +67,10 @@ def estimate_pose(image_points, camera_matrix):
         yaw = math.atan2(-rmat[2, 0], sy)
         roll = math.atan2(rmat[1, 0], rmat[0, 0])
 
-    pitch, yaw, roll = [
-        abs(a * 180 / np.pi) for a in (pitch, yaw, roll)
-    ]
+    pitch, yaw, roll = [abs(a * 180 / np.pi) for a in (pitch, yaw, roll)]
 
     return pitch, yaw, roll
+
 
 def compute_focus(pitch, yaw, roll):
     """
