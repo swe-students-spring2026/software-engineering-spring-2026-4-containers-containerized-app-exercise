@@ -154,7 +154,7 @@ def detect_transformers(model_tuple, image_path: str, text_prompt: str,
     results = processor.post_process_grounded_object_detection(
         outputs,
         inputs.input_ids,
-        box_threshold=box_threshold,
+        threshold=box_threshold,
         text_threshold=text_threshold,
         target_sizes=[(h, w)],
     )[0]
