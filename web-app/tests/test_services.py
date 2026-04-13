@@ -165,5 +165,7 @@ def test_save_detection_results_to_db():
         names = {item["original_name"] for item in inserted_items}
         assert names == {"tomato", "cucumber"}
 
-        tomato_item = next(item for item in inserted_items if item["original_name"] == "tomato")
+        tomato_item = next(
+            item for item in inserted_items if item["original_name"] == "tomato"
+        )
         assert tomato_item["confidence"] == 0.8

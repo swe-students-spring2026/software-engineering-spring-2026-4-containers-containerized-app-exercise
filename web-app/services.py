@@ -3,7 +3,6 @@ import shutil
 import subprocess
 import uuid
 from datetime import datetime
-from pathlib import Path
 from bson import ObjectId
 
 from werkzeug.utils import secure_filename
@@ -30,10 +29,7 @@ def save_uploaded_file(file_storage):
 def get_inventory_items():
     db = get_db()
     items = list(
-        db.inventory_items.find(
-            {"is_deleted": False},
-            sort=[("created_at", -1)]
-        )
+        db.inventory_items.find({"is_deleted": False}, sort=[("created_at", -1)])
     )
     return items
 
@@ -69,7 +65,11 @@ def run_ml_detection(uploaded_file_path):
         str(output_dir),
     ]
 
-    result = subprocess.run(command, capture_output=True, text=True)
+    result = subprocess.run(  # pylint: disable=subprocess-run-check
+        command,
+        capture_output=True,
+        text=True,
+    )
 
     if result.returncode != 0:
         raise RuntimeError(
@@ -131,7 +131,7 @@ def save_detection_results_to_db(image_filename, task_id, output_dir, json_path)
 
     if items_to_insert:
         db.inventory_items.insert_many(items_to_insert)
-    
+
 
 def update_inventory_item_name(item_id, new_name):
     db = get_db()

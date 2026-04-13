@@ -5,17 +5,17 @@ from routes import main_bp
 
 
 def create_app(test_config=None):
-    app = Flask(__name__)
-    app.config["SECRET_KEY"] = Config.SECRET_KEY
-    app.config["UPLOAD_FOLDER"] = Config.UPLOAD_FOLDER
-    app.config["RUNTIME_FOLDER"] = Config.RUNTIME_FOLDER
+    flask_app = Flask(__name__)
+    flask_app.config["SECRET_KEY"] = Config.SECRET_KEY
+    flask_app.config["UPLOAD_FOLDER"] = Config.UPLOAD_FOLDER
+    flask_app.config["RUNTIME_FOLDER"] = Config.RUNTIME_FOLDER
 
     if test_config:
-        app.config.update(test_config)
+        flask_app.config.update(test_config)
 
-    app.register_blueprint(main_bp)
+    flask_app.register_blueprint(main_bp)
 
-    return app
+    return flask_app
 
 
 app = create_app()
