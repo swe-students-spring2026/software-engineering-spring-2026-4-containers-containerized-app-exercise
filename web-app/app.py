@@ -114,15 +114,11 @@ def extract_prediction(response_data, result):
             or top_prediction.get("label")
             or result["category"]
         )
-        result["confidence"] = normalize_confidence(
-            top_prediction.get("confidence")
-        )
+        result["confidence"] = normalize_confidence(top_prediction.get("confidence"))
     else:
         result["category"] = response_data.get("category", result["category"])
         if response_data.get("confidence") is not None:
-            result["confidence"] = normalize_confidence(
-                response_data["confidence"]
-            )
+            result["confidence"] = normalize_confidence(response_data["confidence"])
     result["bin"] = map_bin(result["category"])
 
 
