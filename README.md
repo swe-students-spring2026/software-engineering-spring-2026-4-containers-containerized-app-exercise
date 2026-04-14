@@ -8,11 +8,9 @@ A containerized health monitoring application to help developers maintain better
 ## Team Members
 - [Hollan Yuan](https://github.com/hwyuanzi)
 - [Jonas Chen](https://github.com/JonasChenJusFox)
-- [Ruby Zhang](https://github.com/)
+- [Ruby Zhang](https://github.com/yz10113-tech)
 - [Suri Su](https://github.com/suri-zip)
 - [Zeyue Xu](https://github.com/zeyuexu123)
-
-*(Note: We will update these links later.)*
 
 ## Architecture
 This project is containerized using Docker and is split into three main parts, run together using Docker Compose:
