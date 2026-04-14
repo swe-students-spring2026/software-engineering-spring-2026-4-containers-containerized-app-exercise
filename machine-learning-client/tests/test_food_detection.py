@@ -190,7 +190,7 @@ class TestLoadModel:
             },
         ), patch("food_detection.Path") as mock_path_cls, patch(
             "food_detection.torch"
-        ) as mock_torch:
+        ):
             mock_gd_dir = MagicMock()
             mock_config = MagicMock()
             mock_config.exists.return_value = True
@@ -206,7 +206,7 @@ class TestLoadModel:
             mock_path_cls.home.return_value = mock_home
             mock_home.__truediv__ = MagicMock(return_value=mock_weights_dir)
 
-            model, backend = load_model("cpu")
+            _, backend = load_model("cpu")
             assert backend == "groundingdino"
 
     def test_load_transformers_backend(self):
@@ -251,8 +251,8 @@ class TestLoadModel:
             with pytest.raises(SystemExit):
                 load_model("cpu")
 
-class TestDetectGroundingdino:
-    def test_returns_detections_and_image(self):
+class TestDetectBackends:
+    def test_groundingdino_returns_detections_and_image(self):
         from food_detection import detect_groundingdino
 
         import torch
@@ -288,8 +288,7 @@ class TestDetectGroundingdino:
             assert len(detections[0]["bbox_xyxy"]) == 4
             assert image_bgr.shape == (480, 640, 3)
 
-class TestDetectTransformers:
-    def test_returns_detections_and_image(self):
+    def test_transformers_returns_detections_and_image(self):
         from food_detection import detect_transformers
 
         import torch
@@ -327,7 +326,7 @@ class TestDetectTransformers:
             with patch("food_detection.cv2.cvtColor", return_value=fake_np_array), patch(
                 "food_detection.np.array", return_value=fake_np_array
             ):
-                detections, image_bgr = detect_transformers(
+                detections, _ = detect_transformers(
                     (mock_model, mock_processor),
                     "/fake/img.jpg",
                     "banana.",
