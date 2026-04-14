@@ -8,6 +8,8 @@ app = Flask(__name__)
 aai.settings.api_key = os.getenv("VTT_API_KEY")
 
 """Helper function to retrieve audio"""
+
+
 def get_audio():
     if "joke" not in request.files:
         raise FileNotFoundError("No jokes have been uploaded")
@@ -15,6 +17,7 @@ def get_audio():
     if audio.filename == "":
         raise FileNotFoundError("Joke has not been uploaded")
     return audio
+
 
 @app.post("/")
 def voice_to_text(audio):
