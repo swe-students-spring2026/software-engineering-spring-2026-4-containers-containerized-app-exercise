@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 
+# pylint: disable=too-few-public-methods
 class AudioTranscriber:
     """Uses faster-whisper when available, otherwise returns a placeholder."""
 
@@ -13,6 +14,7 @@ class AudioTranscriber:
         self._model = None
 
     def transcribe(self, audio_path: str | Path) -> tuple[str, str]:
+        """Transcribe audio, or return a clear fallback message."""
         path = Path(audio_path)
         try:
             model = self._get_model()
@@ -30,8 +32,11 @@ class AudioTranscriber:
         return text, "completed"
 
     def _get_model(self):
+        """Lazily load the Whisper model so startup stays lightweight."""
         if self._model is None:
-            from faster_whisper import WhisperModel  # pylint: disable=import-error
+            from faster_whisper import (  # pylint: disable=import-error,import-outside-toplevel
+                WhisperModel,
+            )
 
             self._model = WhisperModel(self.model_name)
         return self._model

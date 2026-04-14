@@ -20,6 +20,7 @@ class MockInterviewService:
         self.transcriber = transcriber
 
     def create_session(self, question_count: int = 2) -> dict[str, Any]:
+        """Create a new session seeded with randomly chosen questions."""
         questions = sample(QUESTION_BANK, question_count)
         session_id = uuid4().hex
         session = self.storage.create_session(session_id, questions)
@@ -31,7 +32,10 @@ class MockInterviewService:
         question_id: str,
         uploaded_file,
     ) -> dict[str, Any]:
-        extension = self._detect_extension(uploaded_file.mimetype, uploaded_file.filename)
+        """Save one uploaded audio response and attach its transcript."""
+        extension = self._detect_extension(
+            uploaded_file.mimetype, uploaded_file.filename
+        )
         filename = f"{question_id}{extension}"
         destination = self.storage.audio_path(session_id, filename)
         destination.parent.mkdir(parents=True, exist_ok=True)
@@ -47,6 +51,7 @@ class MockInterviewService:
 
     @staticmethod
     def _detect_extension(mimetype: str | None, filename: str | None) -> str:
+        """Infer a stable file extension for the uploaded audio blob."""
         if filename and "." in filename:
             return Path(filename).suffix
         if mimetype == "audio/webm":

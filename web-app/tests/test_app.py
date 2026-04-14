@@ -10,10 +10,10 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from app import create_app
+from app import create_app  # pylint: disable=wrong-import-position,import-error
 
 
-# pylint: disable=too-few-public-methods
+# pylint: disable=too-few-public-methods,redefined-outer-name
 class StubTranscriber:
     """Deterministic transcriber for tests."""
 

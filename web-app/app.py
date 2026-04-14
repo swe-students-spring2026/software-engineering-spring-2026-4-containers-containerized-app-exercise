@@ -14,41 +14,45 @@ from transcriber import AudioTranscriber
 def create_app(test_config: dict | None = None) -> Flask:
     """Application factory used by the dev server and tests."""
 
-    app = Flask(__name__)
-    data_dir = Path(app.root_path) / "data" / "sessions"
-    app.config.update(
+    flask_app = Flask(__name__)
+    data_dir = Path(flask_app.root_path) / "data" / "sessions"
+    flask_app.config.update(
         SECRET_KEY="development-key",
         SESSION_STORAGE_PATH=data_dir,
     )
 
     if test_config:
-        app.config.update(test_config)
+        flask_app.config.update(test_config)
 
-    storage = SessionStorage(app.config["SESSION_STORAGE_PATH"])
+    storage = SessionStorage(flask_app.config["SESSION_STORAGE_PATH"])
     transcriber = AudioTranscriber()
     service = MockInterviewService(storage, transcriber)
-    app.config["INTERVIEW_SERVICE"] = service
-    app.config["SESSION_STORAGE"] = storage
+    flask_app.config["INTERVIEW_SERVICE"] = service
+    flask_app.config["SESSION_STORAGE"] = storage
 
-    @app.get("/")
+    @flask_app.get("/")
     def index():
+        """Render the bare interview page."""
         return render_template("index.html")
 
-    @app.post("/api/sessions")
+    @flask_app.post("/api/sessions")
     def create_session():
-        session = app.config["INTERVIEW_SERVICE"].create_session()
+        """Create a new interview session with two random questions."""
+        session = flask_app.config["INTERVIEW_SERVICE"].create_session()
         return jsonify(session), 201
 
-    @app.get("/api/sessions/<session_id>")
+    @flask_app.get("/api/sessions/<session_id>")
     def get_session(session_id: str):
+        """Fetch the persisted session payload."""
         try:
-            session = app.config["SESSION_STORAGE"].get_session(session_id)
+            session = flask_app.config["SESSION_STORAGE"].get_session(session_id)
         except FileNotFoundError:
             return jsonify({"error": "Session not found."}), 404
         return jsonify(session)
 
-    @app.post("/api/interview/upload")
+    @flask_app.post("/api/interview/upload")
     def upload_audio():
+        """Store one combined interview recording and its transcript."""
         session_id = request.form.get("sessionId", "").strip()
         question_id = request.form.get("questionId", "").strip() or "full_interview"
         audio = request.files.get("audio")
@@ -64,7 +68,9 @@ def create_app(test_config: dict | None = None) -> Flask:
             )
 
         try:
-            response_record = app.config["INTERVIEW_SERVICE"].store_audio_response(
+            response_record = flask_app.config[
+                "INTERVIEW_SERVICE"
+            ].store_audio_response(
                 session_id=session_id,
                 question_id=question_id,
                 uploaded_file=audio,
@@ -73,7 +79,7 @@ def create_app(test_config: dict | None = None) -> Flask:
             return jsonify({"error": "Session not found."}), 404
         return jsonify(response_record), 201
 
-    return app
+    return flask_app
 
 
 app = create_app()
