@@ -14,18 +14,24 @@ Flask web app for EyeWrite MVP.
 
 ## Run
 
-1. Install dependencies:
+1. Move into the service folder:
+
+```bash
+cd web-app
+```
+
+2. Install dependencies:
 
 ```bash
 pipenv install
 ```
 
-2. Start Flask app:
+3. Start Flask app:
 
 ```bash
 pipenv run python app.py
 ```
 
-3. Open browser:
+4. Open browser:
 
 - http://127.0.0.1:5000

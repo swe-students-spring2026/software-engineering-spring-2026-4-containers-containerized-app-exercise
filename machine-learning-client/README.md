@@ -21,19 +21,25 @@ Team Member 5
 
 ## Run
 
-1. Install dependencies:
+1. Move into the service folder:
+
+```bash
+cd machine-learning-client
+```
+
+2. Install dependencies:
 
 ```bash
 pipenv install
 ```
 
-2. Start tracker:
+3. Start tracker:
 
 ```bash
 pipenv run python src/tracker.py --api-url http://127.0.0.1:5000/api/gaze
 ```
 
-3. Calibration flow:
+4. Calibration flow:
 - Look at highlighted dot
 - Press `SPACE` repeatedly until it advances
 - Repeat for all 5 points
