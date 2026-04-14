@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 services:
   mongodb:
     image: mongo
@@ -27,3 +28,29 @@ services:
 
 volumes:
   mongodb_data:
+=======
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: speech_coach_db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  web-app:
+    build:
+      context: ./web-app
+    container_name: speech_coach_web
+    ports:
+      - "5001:5000"  # Host Port 5001 maps to Container Port 5000
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/speech_coach
+    depends_on:
+      - mongodb
+
+volumes:
+  mongo_data:
+>>>>>>> d3c46829bdf67506af6ff34ac8f4670e71708b4a

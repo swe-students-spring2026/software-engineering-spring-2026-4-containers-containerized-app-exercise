@@ -6,9 +6,16 @@ name = "pypi"
 [packages]
 pylint = "*"
 black = "*"
+flask = "*"
+pymongo = "*"
 
 [dev-packages]
 dill = "*"
+black = "*"
+pylint = "*"
+pytest = "*"
+pytest-flask = "*"
+coverage = "*"
 
 [requires]
 python_version = "3.11"
