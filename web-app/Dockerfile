@@ -10,4 +10,4 @@ COPY . .
 RUN mkdir -p /app/uploads /app/runtime
 
 EXPOSE 5000
-CMD ["flask", "--app", "app", "run", "--host=0.0.0.0", "--port=5000"]
+CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]

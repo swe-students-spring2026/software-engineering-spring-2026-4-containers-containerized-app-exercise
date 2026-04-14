@@ -10,5 +10,5 @@ services:
       ports: 
         - "5000:5000"
       volumes:
-        - ./web-app/data:/app
+        - ./web-app:/app
 
