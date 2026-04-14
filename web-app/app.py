@@ -22,7 +22,7 @@ def index():
 
 
 @app.route("/result")
-def result():
+def show_result():
     """
     Display classification result for a given item.
 
