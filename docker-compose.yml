@@ -5,9 +5,15 @@ services:
         - "27017:27017"
       volumes: 
         - ./mongodb/data:/data/db
+    ml-client:
+      build: ./machine-learning-client
+      ports:
+        - "10990:10990"
+      volumes:
+        - ./machine-learning-client:/app
     web-app:
       build: ./web-app
-      ports: 
+      ports:
         - "5000:5000"
       volumes:
         - ./web-app:/app
