@@ -126,10 +126,11 @@ def logout():
 @app.route("/dashboard")
 @login_required
 def dashboard():
-    """Shows all the speeches the user has recorded."""
-    # TODO
-    speeches = []
-    return render_template("dashboard.html", speeches=speeches)
+    """Shows all the speeches the user has recorded on the dashboard."""
+    docs = list(speeches_coll.find({"user_id": current_user.id}).sort("timestamp", -1))
+    for doc in docs:
+        doc["id"] = str(doc["_id"])
+    return render_template("dashboard.html", speeches=docs, user=current_user)
 
 @app.route("/record")
 @login_required
@@ -141,7 +142,16 @@ def record():
 @login_required
 def delete(speech_id):
     """This will allow users to delete a speech they have made."""
-    # TODO
+    try:
+        oid = ObjectId(speech_id)
+    except Exception:
+        flash("Invalid speech id.")
+        return redirect(url_for("dashboard"))
+    speeches_coll.delete_one({
+        "_id": oid,
+        "user_id": current_user.id
+    })
+    flash("Speech deleted.")
     return redirect(url_for("dashboard"))
 
 @app.route("/submit", methods=["POST"])
