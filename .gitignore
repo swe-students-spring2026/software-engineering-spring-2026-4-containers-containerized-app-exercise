@@ -147,3 +147,13 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# ML Client results / runtime
+machine-learning-client/results/**
+machine-learning-client/runtime/**
+machine-learning-client/uploads/**
+!machine-learning-client/runtime/.gitkeep
+!machine-learning-client/uploads/.gitkeep
+
+# MongoDB data
+mongodb/data/**
