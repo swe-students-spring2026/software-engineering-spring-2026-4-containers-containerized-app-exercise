@@ -150,3 +150,6 @@ cython_debug/
 
 # ML Client results
 machine-learning-client/results/**
+
+# MongoDB data
+mongodb/data/**
