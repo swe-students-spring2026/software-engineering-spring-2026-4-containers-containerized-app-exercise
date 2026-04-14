@@ -1,13 +1,13 @@
-""" test if birdnet works properly """
+"""test if birdnet works properly"""
 
 import birdnet
 
 model = birdnet.load("acoustic", "2.4", "tf")
 
 predictions = model.predict(
-  "example/soundscape.wav",
-  # predict only the species from the file
-  custom_species_list="example/species_list.txt",
+    "example/soundscape.wav",
+    # predict only the species from the file
+    custom_species_list="example/species_list.txt",
 )
 
 predictions.to_csv("example/predictions.csv")
