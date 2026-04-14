@@ -15,6 +15,15 @@ def utc_now():
     """Return the current UTC time."""
     return datetime.now(timezone.utc)
 
+def create_pending_scan(image_path):
+    result = scans.insert_one(
+        {
+            "image_path": image_path,
+            "status": "pending",
+            "created_at": utc_now(),
+        }
+    )
+    return result.inserted_id
 
 def get_next_pending_scan():
     """Find one pending scan and mark it as processing."""
