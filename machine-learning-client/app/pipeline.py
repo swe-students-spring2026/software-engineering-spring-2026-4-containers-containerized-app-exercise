@@ -3,7 +3,6 @@ Pipeline for recording, transcription, analysis, and storage.
 """
 
 import wave
-from app.recorder import record_audio_manual
 from app.openai_transcriber import transcribe_audio
 from app.data_analyzer import analyze_transcript
 from app.db import save_practice_session
@@ -27,14 +26,13 @@ def get_wav_duration(file_path: str) -> float:
     return round(duration)
 
 
-def run_pipeline() -> dict:
+def run_pipeline(audio_path: str) -> dict:
     """
     Run the full audio processing pipeline.
 
     Returns:
         Dictionary containing transcript and analysis results.
     """
-    audio_path = record_audio_manual()
     print(f"Using audio file: {audio_path}")
 
     duration_seconds = get_wav_duration(audio_path)
@@ -53,7 +51,3 @@ def run_pipeline() -> dict:
 
     return session
 
-
-if __name__ == "__main__":
-    output = run_pipeline()
-    print(output)
