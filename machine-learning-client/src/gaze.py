@@ -81,8 +81,8 @@ def extract_feature_point(landmarks) -> Optional[FeaturePoint]:
 
 
 class SimpleCalibrator:
+    """Calibrates for targets."""
     def __init__(self) -> None:
-        """Initialise empty sample buckets for all five calibration targets."""
         self.samples: Dict[str, List[FeaturePoint]] = {
             "center": [],
             "top_left": [],
