@@ -47,7 +47,7 @@ def infer():
 
         return jsonify(response)
 
-    except Exception as e:
+    except Exception as e:  # API boundary safety catch-all
         app.logger.exception("Inference failed")
         return jsonify({"error": str(e)}), 500
 
