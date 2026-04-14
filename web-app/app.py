@@ -1,3 +1,4 @@
+"""Flask web application for garbage classification system."""
 import os
 from datetime import datetime
 
