@@ -8,6 +8,8 @@ pylint = "*"
 black = "*"
 pymongo = "*"
 flask = "*"
+inference-sdk = "*"
+python-dotenv = "*"
 
 [dev-packages]
 

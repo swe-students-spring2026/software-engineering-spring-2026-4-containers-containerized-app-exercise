@@ -3,7 +3,14 @@ import os
 from datetime import datetime
 
 from flask import Flask, jsonify, render_template, request
+from bson import ObjectId
 from pymongo import MongoClient
+from pymongo.errors import PyMongoError
+from dotenv import load_dotenv
+import tempfile
+from inference_sdk import InferenceHTTPClient
+
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -81,22 +88,114 @@ def classify():
     Returns:
         Response: JSON response containing classification result.
     """
-    # Placeholder - will connect to ML client later
-    data = request.json or {}
-    item = data.get("item", "Plastic Bottle")
+    ml_model_url = os.getenv("ML_MODEL_URL", "https://serverless.roboflow.com")
+    ml_model_api_key = os.getenv("ML_MODEL_API_KEY", "")
+    image_file = request.files.get("image")
+    item = request.form.get("item", "Plastic Bottle")
+
+    client = InferenceHTTPClient(
+        api_url=ml_model_url,
+        api_key=ml_model_api_key,
+    )
 
     result = {
         "item": item,
-        "category": "Recyclable",
-        "bin": "Blue",
-        "confidence": 89,
-        "timestamp": datetime.utcnow(),
+        "category": "Unknown",
+        "bin": "Unknown",
+        "confidence": 0,
+        "timestamp": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+        "model_error": None,
     }
 
-    # Save to database
-    collection.insert_one(result)
+    def normalize_json(value):
+        if isinstance(value, ObjectId):
+            return str(value)
+        if isinstance(value, dict):
+            return {k: normalize_json(v) for k, v in value.items()}
+        if isinstance(value, list):
+            return [normalize_json(v) for v in value]
+        return value
 
-    return jsonify(result)
+    def normalize_confidence(value):
+        if value is None:
+            return 0
+        if isinstance(value, str):
+            value = value.strip().replace("%", "")
+        try:
+            conf_float = float(value)
+        except (TypeError, ValueError):
+            return 0
+        if 0 <= conf_float <= 1:
+            return int(conf_float * 100)
+        if 1 < conf_float <= 100:
+            return int(conf_float)
+        return 0
+
+    def map_bin(category_value):
+        if not category_value:
+            return "Unknown"
+        normalized = str(category_value).lower()
+        if "recycl" in normalized or "plastic" in normalized or "paper" in normalized:
+            return "Blue"
+        if "compost" in normalized or "food" in normalized or "organic" in normalized:
+            return "Green"
+        if "trash" in normalized or "landfill" in normalized or "other" in normalized:
+            return "Gray"
+        return "Unknown"
+
+    try:
+        if image_file:
+            with tempfile.NamedTemporaryFile(suffix=os.path.splitext(image_file.filename)[1], delete=False) as temp_file:
+                image_file.save(temp_file.name)
+                temp_path = temp_file.name
+
+            inference_response = client.infer(temp_path, model_id="garbage-classification-3/2")
+            os.unlink(temp_path)
+        else:
+            inference_response = client.infer(item, model_id="garbage-classification-3/2")
+
+        if hasattr(inference_response, "json"):
+            response_data = inference_response.json()
+        elif isinstance(inference_response, dict):
+            response_data = inference_response
+        else:
+            response_data = {}
+
+        if isinstance(response_data, dict) and response_data:
+            response_data = normalize_json(response_data)
+            if "predictions" in response_data and response_data["predictions"]:
+                top_prediction = response_data["predictions"][0]
+                category_value = top_prediction.get("class") or top_prediction.get("label")
+                confidence = normalize_confidence(top_prediction.get("confidence"))
+                if category_value:
+                    result["category"] = category_value
+                if confidence:
+                    result["confidence"] = confidence
+                result["bin"] = map_bin(result["category"])
+            else:
+                if "category" in response_data:
+                    result["category"] = response_data["category"]
+                    result["bin"] = map_bin(result["category"])
+                if "confidence" in response_data:
+                    result["confidence"] = normalize_confidence(response_data["confidence"])
+    except Exception as exc:
+        app.logger.warning("Model API request failed: %s", exc)
+        result["model_error"] = str(exc)
+
+    db_error = None
+    try:
+        collection.insert_one(result)
+    except PyMongoError as exc:
+        db_error = str(exc)
+        app.logger.error("Failed to save classification result: %s", exc)
+
+    if db_error:
+        result["db_error"] = db_error
+        result["saved"] = False
+    else:
+        result["saved"] = True
+
+    return jsonify(normalize_json(result))
 
 
 if __name__ == "__main__":

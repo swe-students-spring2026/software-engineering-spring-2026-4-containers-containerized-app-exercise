@@ -30,9 +30,47 @@
                                style="max-width:420px; border-radius:15px; margin-top:15px;">`;
     });
 
-    function classifyGarbage() {
-        alert("Calling AI model for classification...");
-        window.location.href = "/result?item=Plastic Bottle";
+    async function classifyGarbage() {
+        const preview = document.getElementById('preview');
+        const fileInput = document.getElementById('imageInput');
+        if (!fileInput.files[0]) {
+            alert("Please select an image first.");
+            return;
+        }
+
+        const itemName = fileInput.files[0].name.split('.')[0].replace(/[-_]/g, ' ');
+        const formData = new FormData();
+        formData.append('image', fileInput.files[0]);
+        formData.append('item', itemName);
+
+        preview.innerHTML = '<p>Calling the AI model, please wait...</p>';
+
+        try {
+            const response = await fetch('/classify', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error(`Server returned ${response.status}`);
+            }
+
+            const data = await response.json();
+            preview.innerHTML = `
+                <div class="result-card" style="max-width:520px; margin:24px auto; padding:24px; background:#fff; border-radius:18px; box-shadow:0 18px 40px rgba(0,0,0,0.08); text-align:left;">
+                    <h2>Classification Result</h2>
+                    <p><strong>Item:</strong> ${data.item}</p>
+                    <p><strong>Category:</strong> ${data.category}</p>
+                    <p><strong>Bin:</strong> ${data.bin}</p>
+                    <p><strong>Confidence:</strong> ${data.confidence}%</p>
+                    <p><strong>Timestamp:</strong> ${data.timestamp}</p>
+                    ${data.model_error ? `<p style="color:red;"><strong>Warning:</strong> ${data.model_error}</p>` : ''}
+                </div>
+            `;
+        } catch (error) {
+            preview.innerHTML = `<p style="color:red;">Failed to classify garbage: ${error.message}</p>`;
+            console.error('Error during classification:', error);
+        }
     }
 </script>
 {% endblock %}
