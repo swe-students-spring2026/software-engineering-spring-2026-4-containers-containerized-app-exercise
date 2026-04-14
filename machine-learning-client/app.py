@@ -14,6 +14,7 @@ model_client = InferenceHTTPClient(
     api_key=ML_MODEL_API_KEY,
 )
 
+
 @app.route("/infer", methods=["POST"])
 def infer():
     item = request.form.get("item")
