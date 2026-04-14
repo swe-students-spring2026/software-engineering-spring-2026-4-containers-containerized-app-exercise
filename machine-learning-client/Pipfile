@@ -6,8 +6,14 @@ name = "pypi"
 [packages]
 pylint = "*"
 black = "*"
+opencv-python = "*"
+mediapipe = "*"
+numpy = "*"
+requests = "*"
+pymongo = "*"
+dill = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.10"
+python_version = "3.13"
