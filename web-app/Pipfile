@@ -10,6 +10,9 @@ pymongo = "*"
 flask = "*"
 inference-sdk = "*"
 python-dotenv = "*"
+pytest = "*"
+pytest-flask = "*"
+coverage = "*"
 
 [dev-packages]
 

@@ -121,23 +121,6 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/result")
-def show_result():
-    """Show static result page."""
-    item = request.args.get("item", "Unknown Item")
-    return render_template(
-        "result.html",
-        result={
-            "item": item,
-            "category": "Recyclable",
-            "bin_color": "Blue",
-            "bin_emoji": "♻️",
-            "confidence": 92,
-            "timestamp": datetime.utcnow().strftime("%Y-%m-%d %H:%M"),
-        },
-    )
-
-
 @app.route("/history")
 def history():
     """Show classification history."""
