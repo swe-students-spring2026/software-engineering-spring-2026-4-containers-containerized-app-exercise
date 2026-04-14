@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Smart Garbage Classifier - Home{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Smart Garbage Classifier</h1>
+    <p style="text-align:center; font-size:18px;">Upload an image and let AI classify your garbage</p>
+
+    <div class="upload-area">
+        <p style="font-size:18px; margin-bottom:20px;">📸 Select Garbage Image</p>
+        <input type="file" id="imageInput" accept="image/*" style="display:none;">
+        <button class="btn" onclick="document.getElementById('imageInput').click()">📁 Choose Image</button>
+        <button class="btn" style="background:#ff9800; margin-left:15px;">📷 Open Camera</button>
+    </div>
+
+    <div style="text-align:center; margin:30px 0;">
+        <button class="btn" style="font-size:18px; padding:16px 40px;" onclick="classifyGarbage()">
+            🔍 Start Classification
+        </button>
+    </div>
+
+    <div id="preview" style="text-align:center; margin-top:20px;"></div>
+</div>
+
+<script>
+    document.getElementById('imageInput').addEventListener('change', function(e) {
+        const preview = document.getElementById('preview');
+        preview.innerHTML = `<img src="${URL.createObjectURL(e.target.files[0])}" 
+                               style="max-width:420px; border-radius:15px; margin-top:15px;">`;
+    });
+
+    function classifyGarbage() {
+        alert("Calling AI model for classification...");
+        window.location.href = "/result?item=Plastic Bottle";
+    }
+</script>
+{% endblock %}

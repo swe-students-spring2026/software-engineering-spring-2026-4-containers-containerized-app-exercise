@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Smart Garbage Classifier{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-brand">🗑️ Smart Garbage</a>
+            <div class="nav-menu">
+                <a href="/">Classify</a>
+                <a href="/history">History</a>
+                <a href="/guide">Guide</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    {% block content %}
+    {% endblock %}
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+flask
+pymongo
+python-dotenv
+pytest
+pytest-flask
+pytest-cov
+coverage
+pylint
+black
