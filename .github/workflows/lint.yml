@@ -26,7 +26,7 @@ jobs:
         run: |
           cd ${{ matrix.subdir }}
           export PYTHONPATH=$PYTHONPATH:.
-          pipenv run python -m pylint **/*.py --ignored-modules=pytest,flask,pytest_flask,cv2,torch,pandas,numpy,torchvision --max-line-length=200 --max-locals=100 --disable=too-few-public-methods, no-name-in-module
+          pipenv run python -m pylint **/*.py --ignored-modules=pytest,flask,pytest_flask,cv2,torch,pandas,numpy,torchvision --max-line-length=200 --max-locals=100 --disable=too-few-public-methods
       - name: Format with black
         if: ${{ hashFiles(format('{0}/**/*.py', matrix.subdir)) != '' }}
         run: |
