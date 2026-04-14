@@ -3,7 +3,7 @@ from llmSetUp import GetLLM
 from langchain_core.prompts import ChatPromptTemplate #need it to make my request into langchain model redable ones
 
 
-class CWAgent(GetLLM):# inherited from myllm.py where I set up the model
+class CMAgent(GetLLM):# inherited from myllm.py where I set up the model
 
     def __init__(self, prompt: str, inputs):
         super().__init__(prompt=prompt)
