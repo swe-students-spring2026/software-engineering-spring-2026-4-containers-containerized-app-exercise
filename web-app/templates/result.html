@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Classification Result{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="result-card">
+        <h1>🎯 Classification Result</h1>
+
+        {% if result.image_url %}
+        <img src="{{ result.image_url }}"
+             style="max-width:420px; border-radius:15px; margin:20px 0;" alt="Garbage Image">
+        {% endif %}
+
+        <h2>Item: {{ result.item }}</h2>
+
+        <p style="font-size:28px; color:#2e8b57; font-weight:bold;">
+            {% if result.category == 'Unknown' %}
+                ❓ Unknown
+            {% elif result.bin == 'Blue' %}
+                ✅ Recyclable
+            {% elif result.bin == 'Green' %}
+                🌱 Compostable
+            {% elif result.bin == 'Gray' %}
+                🗑️ Trash
+            {% else %}
+                {{ result.category }}
+            {% endif %}
+        </p>
+
+        <div class="bin-icon">{{ result.bin_emoji }}</div>
+        <h3>
+            Please throw into
+            <span style="color: {{ result.bin_color }};">
+                {{ result.bin }} Bin
+            </span>
+        </h3>
+
+        <p><strong>Category:</strong> {{ result.category }}</p>
+        <p><strong>Confidence:</strong> {{ result.confidence }}%</p>
+        <p><strong>Timestamp:</strong> {{ result.timestamp }}</p>
+
+        {% if result.model_error %}
+        <p style="color:red;"><strong>Model Warning:</strong> {{ result.model_error }}</p>
+        {% endif %}
+
+        <div style="margin-top:30px;">
+            <a href="/"><button class="btn">🔄 Classify Another</button></a>
+            <a href="/history"><button class="btn btn-secondary" style="margin-left:15px;">📋 View History</button></a>
+        </div>
+    </div>
+</div>
+{% endblock %}
