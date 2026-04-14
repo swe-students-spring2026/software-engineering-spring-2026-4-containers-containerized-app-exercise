@@ -1,9 +1,9 @@
-# Ergonomics & Posture Monitor
+# Sign Language Recognition Dashboard
 
 [![CI Subsystems](https://github.com/swe-students-spring2026/4-containers-next_team/actions/workflows/ci.yml/badge.svg)](https://github.com/swe-students-spring2026/4-containers-next_team/actions/workflows/ci.yml)
 [![lint-free](https://github.com/swe-students-spring2026/4-containers-next_team/actions/workflows/lint.yml/badge.svg)](https://github.com/swe-students-spring2026/4-containers-next_team/actions/workflows/lint.yml)
 
-A containerized health monitoring application to help developers maintain better posture. The project uses a Machine Learning client (with OpenCV and MediaPipe) to detect poor posture like slouching from a video feed, and saves the data to a MongoDB database. A Flask web dashboard reads this database to show the posture data in real-time.
+A containerized computer vision application designed to recognize and translate sign language gestures in real-time. The project uses a Machine Learning client (utilizing OpenCV and a Convolutional Neural Network trained on the Sign Language MNIST dataset) to detect American Sign Language (ASL) alphabet gestures from a video feed, and saves the classification results to a MongoDB database. A Flask web dashboard reads this database to show the translated gestures and confidence scores in real-time.
 
 ## Team Members
 - [Hollan Yuan](https://github.com/hwyuanzi)
@@ -14,9 +14,9 @@ A containerized health monitoring application to help developers maintain better
 
 ## Architecture
 This project is containerized using Docker and is split into three main parts, run together using Docker Compose:
-1. **Machine Learning Client**: A Python script that tracks skeletal posture using OpenCV and MediaPipe.
-2. **Web App**: A Python Flask web server showing a UI dashboard.
-3. **Database**: A MongoDB instance to store the timestamped posture data.
+1. **Machine Learning Client**: A Python script that captures video frames using OpenCV, processes the hand region, and classifies the gesture using a custom CNN model trained on the Sign Language MNIST dataset.
+2. **Web App**: A Python Flask web server showing a UI dashboard that displays the live translation stream and historical gesture data.
+3. **Database**: A MongoDB instance to store the timestamped gesture classification data and confidence scores.
 
 ## Running the Application
 
@@ -31,25 +31,18 @@ git clone https://github.com/swe-students-spring2026/4-containers-next_team.git
 cd 4-containers-next_team
 ```
 
-**3. Provide a sample video (Important!)**
-To avoid permission issues with webcams in Docker, our ML client processes a sample video instead. Since we don't upload large videos to GitHub, you need to create a placeholder or add your own video file in machine-learning-client/data/raw/ *before* running docker-compose.
+**3. Provide a sample video**
+To avoid hardware permission issues with webcams inside Docker containers, our ML client processes a sample video feed for testing. You need to provide a short video of hand gestures or create a placeholder file in `machine-learning-client/data/raw/` *before* running docker-compose.
 *(Note: If you skip this, Docker will create a directory named `sample.mp4` by mistake and crash the ML container!)*
 ```bash
-# either copy a real short video to this path, or just create a blank placeholder file:
+# either copy a real short video containing ASL hand gestures to this path, or just create a blank placeholder file:
 touch machine-learning-client/data/raw/sample.mp4
-```
 
-**3.5. Download datasets**
-Download and extract the skeleton dataset to machine-learning-client/data/raw/
+# Ensure the model directory exists
+mkdir -p machine-learning-client/data/model/
 
-https://github.com/shahroudy/NTURGB-D/blob/master/README.md
-
-Then, download the landmarker and put it in machine-learning-client/data/model/
-
-https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker
-
-
-Modify the config file accordingly
+# Place your trained weights file here (e.g., model.pth for PyTorch or model.h5 for Keras)
+# Path should look like: machine-learning-client/data/model/sign_language_model.pth
 
 
 **4. Set up environment variables**
