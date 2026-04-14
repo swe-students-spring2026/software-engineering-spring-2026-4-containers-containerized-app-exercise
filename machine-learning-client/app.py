@@ -47,7 +47,7 @@ def infer():
 
         return jsonify(response)
 
-    except (OSError, ValueError, RuntimeError) as e:
+    except Exception as e:  # noqa: BLE001 (external API boundary)
         app.logger.exception("Inference failed")
         return jsonify({"error": str(e)}), 500
 
