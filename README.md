@@ -25,3 +25,11 @@ This app **does** require .env file, which is your own LLM api keys and mongodb 
 
 Below is the env.example file: 
 
+
+``` PIPENV_IGNORE_VIRTUALENVS=1
+OPENAI_API_KEY= 
+MONGO_URI=mongodb:
+MONGO_DBNAME=
+
+SECRET_KEY=dev
+```
