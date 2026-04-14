@@ -11,7 +11,16 @@
         <p style="font-size:18px; margin-bottom:20px;">📸 Select Garbage Image</p>
         <input type="file" id="imageInput" accept="image/*" style="display:none;">
         <button class="btn" onclick="document.getElementById('imageInput').click()">📁 Choose Image</button>
-        <button class="btn" style="background:#ff9800; margin-left:15px;">📷 Open Camera</button>
+        <button class="btn btn-orange" onclick="openCamera()">📷 Open Camera</button>
+
+        <!-- Camera UI (hidden by default) -->
+        <div id="cameraSection" class="camera-section">
+            <video id="video" class="camera-video" autoplay playsinline></video>
+            <canvas id="canvas" style="display:none;"></canvas>
+            <br>
+            <button class="btn btn-capture" onclick="capturePhoto()">📸 Capture</button>
+            <button class="btn btn-cancel" onclick="closeCamera()">✖ Cancel</button>
+        </div>
     </div>
 
     <div style="text-align:center; margin:30px 0;">
@@ -24,24 +33,68 @@
 </div>
 
 <script>
+    let videoStream = null;
+    let capturedFile = null;
+
     document.getElementById('imageInput').addEventListener('change', function(e) {
         const preview = document.getElementById('preview');
+        capturedFile = null;
         preview.innerHTML = `<img src="${URL.createObjectURL(e.target.files[0])}" 
                                style="max-width:420px; border-radius:15px; margin-top:15px;">`;
     });
 
+    function openCamera() {
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(stream) {
+                videoStream = stream;
+                const video = document.getElementById('video');
+                video.srcObject = stream;
+                document.getElementById('cameraSection').style.display = 'block';
+            })
+            .catch(function(err) {
+                alert('Could not access camera: ' + err.message);
+            });
+    }
+
+    function capturePhoto() {
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+
+        canvas.toBlob(function(blob) {
+            capturedFile = blob;
+            const url = URL.createObjectURL(blob);
+            document.getElementById('preview').innerHTML =
+                `<img src="${url}" style="max-width:420px; border-radius:15px; margin-top:15px;">`;
+        }, 'image/jpeg');
+
+        closeCamera();
+    }
+
+    function closeCamera() {
+        if (videoStream) {
+            videoStream.getTracks().forEach(t => t.stop());
+            videoStream = null;
+        }
+        document.getElementById('cameraSection').style.display = 'none';
+    }
+
     async function classifyGarbage() {
         const preview = document.getElementById('preview');
         const fileInput = document.getElementById('imageInput');
-        if (!fileInput.files[0]) {
-            alert("Please select an image first.");
+
+        const imageData = capturedFile || (fileInput.files[0] || null);
+        if (!imageData) {
+            alert("Please select or capture an image first.");
             return;
         }
 
-        const itemName = fileInput.files[0].name.split('.')[0].replace(/[-_]/g, ' ');
+        const filename = capturedFile ? 'capture.jpg' : fileInput.files[0].name;
         const formData = new FormData();
-        formData.append('image', fileInput.files[0]);
-        formData.append('item', itemName);
+        formData.append('image', imageData, filename);
+        formData.append('item', filename.split('.')[0].replace(/[-_]/g, ' '));
 
         preview.innerHTML = '<p>Calling the AI model, please wait...</p>';
 
