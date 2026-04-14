@@ -64,7 +64,7 @@ def history():
 
 @app.route("/guide")
 def guide():
-     """Render the recycling guide page."""
+    """Render the recycling guide page."""
     return render_template("guide.html")
 
 
