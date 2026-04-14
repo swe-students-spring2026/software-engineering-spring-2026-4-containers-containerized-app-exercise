@@ -6,6 +6,8 @@ pymongo = "*"
 assemblyai = "*"
 tomli = "*"
 pytest = "*"
+google-genai = "*"
+python-dotenv = "*"
 
 [dev-packages]
 rapidfuzz = "*"
