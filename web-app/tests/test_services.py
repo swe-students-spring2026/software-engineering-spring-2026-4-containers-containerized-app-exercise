@@ -1,4 +1,3 @@
-import json
 import tempfile
 from datetime import datetime
 from io import BytesIO
@@ -114,49 +113,40 @@ def test_soft_delete_inventory_item():
 
 def test_save_detection_results_to_db():
     fake_db = MagicMock()
-
-    temp_dir = Path(tempfile.mkdtemp())
-    output_dir = temp_dir / "output"
-    annotated_dir = output_dir / "annotated"
-    annotated_dir.mkdir(parents=True)
-
-    json_path = output_dir / "detection_results.json"
-    payload = {
-        "total_detections": 3,
-        "results": [
-            {
-                "filename": "fridge.png",
-                "detections": [
-                    {
-                        "class_name": "tomato",
-                        "confidence": 0.4,
-                        "bbox_xyxy": [1, 2, 3, 4],
-                    },
-                    {
-                        "class_name": "tomato",
-                        "confidence": 0.8,
-                        "bbox_xyxy": [5, 6, 7, 8],
-                    },
-                    {
-                        "class_name": "cucumber",
-                        "confidence": 0.5,
-                        "bbox_xyxy": [9, 10, 11, 12],
-                    },
-                ],
-            }
-        ],
+    fake_db.ml_results.find_one.return_value = {
+        "task_id": "task123",
+        "filename": "fridge.png",
+        "detection_json": {
+            "total_detections": 3,
+            "results": [
+                {
+                    "filename": "fridge.png",
+                    "detections": [
+                        {
+                            "class_name": "tomato",
+                            "confidence": 0.4,
+                            "bbox_xyxy": [1, 2, 3, 4],
+                        },
+                        {
+                            "class_name": "tomato",
+                            "confidence": 0.8,
+                            "bbox_xyxy": [5, 6, 7, 8],
+                        },
+                        {
+                            "class_name": "cucumber",
+                            "confidence": 0.5,
+                            "bbox_xyxy": [9, 10, 11, 12],
+                        },
+                    ],
+                }
+            ],
+        },
     }
-    json_path.write_text(json.dumps(payload), encoding="utf-8")
 
     with patch("services.get_db", return_value=fake_db):
-        save_detection_results_to_db(
-            "fridge.png",
-            "task123",
-            output_dir,
-            json_path,
-        )
+        save_detection_results_to_db("task123")
 
-        fake_db.uploads.insert_one.assert_called_once()
+        fake_db.uploads.update_one.assert_called_once()
         fake_db.inventory_items.insert_many.assert_called_once()
 
         inserted_items = fake_db.inventory_items.insert_many.call_args[0][0]

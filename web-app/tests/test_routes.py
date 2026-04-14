@@ -1,5 +1,5 @@
 from io import BytesIO
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 
 def test_home_page(client):
@@ -28,19 +28,11 @@ def test_dashboard_page(client):
 
 
 def test_upload_route_success(client):
-    with patch("routes.run_ml_detection") as mock_run_ml_detection, patch(
-        "routes.save_detection_results_to_db"
-    ) as mock_save_detection_results:
-        mock_run_ml_detection.return_value = (
-            "fake_task",
-            "fake_output_dir",
-            "fake_json_path",
-        )
-
-        data = {
-            "image": (BytesIO(b"fake image data"), "fridge.png"),
-        }
-
+    fake_db = MagicMock()
+    with patch("routes.requests.post") as mock_post, patch(
+        "routes.get_db", return_value=fake_db
+    ):
+        data = {"image": (BytesIO(b"fake image data"), "fridge.png")}
         response = client.post(
             "/upload",
             data=data,
@@ -49,8 +41,36 @@ def test_upload_route_success(client):
         )
 
         assert response.status_code == 302
-        mock_run_ml_detection.assert_called_once()
-        mock_save_detection_results.assert_called_once()
+        fake_db.uploads.insert_one.assert_called_once()
+        mock_post.assert_called_once()
+        posted_json = mock_post.call_args.kwargs["json"]
+        assert "task_id" in posted_json
+        assert "image_b64" in posted_json
+        assert posted_json["filename"].endswith("_fridge.png")
+
+
+def test_ml_callback_done(client):
+    fake_db = MagicMock()
+    with patch("routes.get_db", return_value=fake_db), patch(
+        "routes.save_detection_results_to_db"
+    ) as mock_save:
+        response = client.post(
+            "/ml-callback",
+            json={"task_id": "task123", "status": "done"},
+        )
+        assert response.status_code == 200
+        mock_save.assert_called_once_with("task123")
+
+
+def test_ml_callback_failed(client):
+    fake_db = MagicMock()
+    with patch("routes.get_db", return_value=fake_db):
+        response = client.post(
+            "/ml-callback",
+            json={"task_id": "task123", "status": "failed", "error": "boom"},
+        )
+        assert response.status_code == 200
+        fake_db.uploads.update_one.assert_called_once()
 
 
 def test_upload_route_missing_file(client):
