@@ -159,6 +159,7 @@ def format_record_for_display(record):
     formatted.setdefault("timestamp", "N/A")
     return formatted
 
+
 @app.route("/result/<record_id>")
 def result_detail(record_id):
     """Show a single classification result from the database."""
@@ -168,23 +169,27 @@ def result_detail(record_id):
         record = None
 
     if not record:
-        return render_template(
-            "result.html",
-            result={
-                "item": "Unknown Item",
-                "category": "Unknown",
-                "bin": "Unknown",
-                "bin_color": "#999999",
-                "bin_emoji": "❓",
-                "confidence": 0,
-                "timestamp": "N/A",
-                "model_error": "Record not found.",
-                "image_url": None,
-            },
-        ), 404
+        return (
+            render_template(
+                "result.html",
+                result={
+                    "item": "Unknown Item",
+                    "category": "Unknown",
+                    "bin": "Unknown",
+                    "bin_color": "#999999",
+                    "bin_emoji": "❓",
+                    "confidence": 0,
+                    "timestamp": "N/A",
+                    "model_error": "Record not found.",
+                    "image_url": None,
+                },
+            ),
+            404,
+        )
 
     result = format_record_for_display(record)
     return render_template("result.html", result=result)
+
 
 @app.route("/history")
 def history():
@@ -225,7 +230,6 @@ def classify():
         result["db_error"] = str(exc)
 
     return jsonify(normalize_json(result))
-
 
 
 if __name__ == "__main__":
