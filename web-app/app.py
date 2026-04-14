@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 
-from flask import Flask, jsonify, redirect, render_template, request, url_for
+from flask import Flask, jsonify, render_template, request
 from pymongo import MongoClient
 
 app = Flask(__name__)
@@ -17,11 +17,21 @@ collection = db["detections"]  # Store classification results
 
 @app.route("/")
 def index():
+    """Render the home page."""
     return render_template("index.html")
 
 
 @app.route("/result")
 def result():
+    """
+    Display classification result for a given item.
+
+    Retrieves the item name from query parameters and returns
+    a placeholder classification result.
+
+    Returns:
+        str: Rendered HTML page with classification result.
+    """
     item = request.args.get("item", "Unknown Item")
     # Placeholder result data - later replaced with real ML model output
     result_data = {
@@ -37,6 +47,14 @@ def result():
 
 @app.route("/history")
 def history():
+    """
+    Display recent classification history.
+
+    Fetches the latest 20 classification records from MongoDB.
+
+    Returns:
+        str: Rendered HTML page with history records.
+    """
     # Get latest 20 records from database
     records = list(collection.find().sort("timestamp", -1).limit(20))
     for r in records:
@@ -46,12 +64,22 @@ def history():
 
 @app.route("/guide")
 def guide():
+     """Render the recycling guide page."""
     return render_template("guide.html")
 
 
 # API endpoint for future ML integration (upload image)
 @app.route("/classify", methods=["POST"])
 def classify():
+    """
+    Classify an item and store the result.
+
+    Accepts JSON input, generates a placeholder classification,
+    and stores the result in MongoDB.
+
+    Returns:
+        Response: JSON response containing classification result.
+    """
     # Placeholder - will connect to ML client later
     data = request.json or {}
     item = data.get("item", "Plastic Bottle")
