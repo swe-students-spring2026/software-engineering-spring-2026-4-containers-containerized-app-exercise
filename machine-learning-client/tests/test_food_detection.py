@@ -1,4 +1,3 @@
-
 import json
 from argparse import Namespace
 from pathlib import Path
@@ -6,7 +5,6 @@ from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pytest
-
 
 
 class TestParseArgs:
@@ -65,6 +63,7 @@ class TestParseArgs:
             with pytest.raises(SystemExit):
                 parse_args()
 
+
 class TestGetImageFiles:
     def test_finds_image_files(self, tmp_path):
         from food_detection import get_image_files
@@ -100,6 +99,7 @@ class TestGetImageFiles:
 
         files = get_image_files(str(tmp_path))
         assert len(files) == 7
+
 
 class TestDrawDetections:
     def test_returns_copy_with_annotations(self):
@@ -169,6 +169,7 @@ class TestDrawDetections:
         result = draw_detections(img, detections)
         assert result is not img
 
+
 class TestLoadModel:
     def test_load_groundingdino_backend(self):
         from food_detection import load_model
@@ -188,9 +189,7 @@ class TestLoadModel:
                 "groundingdino.util": mock_gd_module.util,
                 "groundingdino.util.inference": mock_gd_module.util.inference,
             },
-        ), patch("food_detection.Path") as mock_path_cls, patch(
-            "food_detection.torch"
-        ):
+        ), patch("food_detection.Path") as mock_path_cls, patch("food_detection.torch"):
             mock_gd_dir = MagicMock()
             mock_config = MagicMock()
             mock_config.exists.return_value = True
@@ -250,6 +249,7 @@ class TestLoadModel:
         with patch("builtins.__import__", side_effect=_side_effect):
             with pytest.raises(SystemExit):
                 load_model("cpu")
+
 
 class TestDetectBackends:
     def test_groundingdino_returns_detections_and_image(self):
@@ -323,9 +323,9 @@ class TestDetectBackends:
         mock_pil.Image.open.return_value = fake_pil_image
 
         with patch.dict("sys.modules", {"PIL": mock_pil, "PIL.Image": mock_pil.Image}):
-            with patch("food_detection.cv2.cvtColor", return_value=fake_np_array), patch(
-                "food_detection.np.array", return_value=fake_np_array
-            ):
+            with patch(
+                "food_detection.cv2.cvtColor", return_value=fake_np_array
+            ), patch("food_detection.np.array", return_value=fake_np_array):
                 detections, _ = detect_transformers(
                     (mock_model, mock_processor),
                     "/fake/img.jpg",
@@ -525,6 +525,7 @@ class TestRunDetection:
             assert "rice" in report
             # format is f"{d['confidence']:.2%}" -> "75.00%"
             assert "75.00%" in report
+
 
 class TestConstants:
     def test_default_food_classes_not_empty(self):
