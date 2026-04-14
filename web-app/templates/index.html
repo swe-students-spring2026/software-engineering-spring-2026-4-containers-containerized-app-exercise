@@ -21,7 +21,7 @@
                 <div>
                     <img src="/images/{{ record._id }}">
                     <p>{{ record.timestamp.strftime('%Y-%m-%d %H:%M:%S') if record.timestamp else 'N/A' }}</p>
-                    <p>confidence: {{ '%.1f' | format(record.confidence * 100) }}%</p>
+                    <p>confidence: {{ "%.1f" % (record.confidence * 100) }}%</p>
                 </div>
                 {% endif %}
                 {% endfor %}

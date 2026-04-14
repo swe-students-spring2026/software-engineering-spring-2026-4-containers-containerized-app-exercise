@@ -17,7 +17,7 @@ services:
       - ./img:/shared/img
 
   web-app:
-    build: .
+    build: ./web-app
     ports:
       - "5000:5000"
     depends_on:
