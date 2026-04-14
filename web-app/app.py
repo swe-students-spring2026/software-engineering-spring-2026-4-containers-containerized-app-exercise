@@ -4,6 +4,9 @@ import os
 from werkzeug.utils import secure_filename
 from flask import Flask, jsonify, request, render_template
 from db import get_db
+from pydub import AudioSegment
+import uuid
+
 
 app = Flask(__name__, template_folder="app/templates", static_folder="app/static")
 UPLOAD_FOLDER = "uploads"
@@ -43,7 +46,7 @@ def trigger_practice():
 
 @app.route("/api/upload-audio", methods=["POST"])
 def upload_audio():
-    """Upload an audio file and queue it for processing."""
+    """Upload an audio file, convert to WAV, and queue it for processing."""
     if "audio" not in request.files:
         return jsonify({"error": "No audio file uploaded"}), 400
 
@@ -51,20 +54,39 @@ def upload_audio():
 
     if file.filename == "":
         return jsonify({"error": "Empty filename"}), 400
+    
+    # generate unique filenames
+    unique_id = str(uuid.uuid4())
+    webm_filename = f"{unique_id}.webm"
+    wav_filename = f"{unique_id}.wav"
 
-    filename = secure_filename(file.filename)
-    save_path = os.path.join(UPLOAD_FOLDER, filename)
-    file.save(save_path)
+    webm_path = os.path.join(UPLOAD_FOLDER, webm_filename)
+    wav_path = os.path.join(UPLOAD_FOLDER, wav_filename)
+
+    # save original file
+    file.save(webm_path)
+
+    try:
+        # convert to WAV
+        audio = AudioSegment.from_file(webm_path, format="webm")
+        audio.export(wav_path, format="wav")
+    except Exception as e:
+        return jsonify({"error": f"Conversion failed: {str(e)}"}), 500
 
     database = get_db()
+
     command = {
         "action": "process_audio",
-        "audio_file": save_path,
+        "audio_file": wav_path,  # 👈 now using WAV
         "status": "pending",
     }
+
     database.commands.insert_one(command)
 
-    return jsonify({"message": "Audio uploaded and queued."}), 202
+    return jsonify({
+        "message": "Audio uploaded, converted, and queued.",
+        "wav_file": wav_path
+    }), 202
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
