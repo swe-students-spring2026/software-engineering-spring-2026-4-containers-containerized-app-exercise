@@ -114,6 +114,39 @@ def extract_prediction(response_data, result):
 
     result["bin"] = map_bin(result["category"])
 
+def build_dashboard_stats(records):
+    """Build summary stats for dashboard."""
+    stats = {
+        "total_records": len(records),
+        "blue_bin": 0,
+        "green_bin": 0,
+        "gray_bin": 0,
+        "unknown_bin": 0,
+        "top_category": "Unknown",
+    }
+
+    category_counts = {}
+
+    for record in records:
+        category = record.get("category", "Unknown")
+        bin_name = record.get("bin", "Unknown")
+
+        category_counts[category] = category_counts.get(category, 0) + 1
+
+        if bin_name == "Blue":
+            stats["blue_bin"] += 1
+        elif bin_name == "Green":
+            stats["green_bin"] += 1
+        elif bin_name == "Gray":
+            stats["gray_bin"] += 1
+        else:
+            stats["unknown_bin"] += 1
+
+    if category_counts:
+        stats["top_category"] = max(category_counts, key=category_counts.get)
+
+    return stats
+
 
 @app.route("/")
 def index():
