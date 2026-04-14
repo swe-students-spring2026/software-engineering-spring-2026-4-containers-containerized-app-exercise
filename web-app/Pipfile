@@ -5,11 +5,12 @@ name = "pypi"
 
 [packages]
 black = "*"
+pytest = "*"
+pytest-flask = "*"
 flask = "*"
 pylint = "*"
 tomli = "*"
-pytest = "*"
-pytest-flask = "*"
+typing-extensions = "*"
 
 [dev-packages]
 
