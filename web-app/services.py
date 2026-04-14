@@ -93,10 +93,12 @@ def save_detection_results_to_db(task_id):
 
     db.uploads.update_one(
         {"task_id": task_id},
-        {"$set": {
-            "status": "done",
-            "total_detections": detection_data.get("total_detections", 0),
-        }},
+        {
+            "$set": {
+                "status": "done",
+                "total_detections": detection_data.get("total_detections", 0),
+            }
+        },
     )
 
     items_by_class = {}

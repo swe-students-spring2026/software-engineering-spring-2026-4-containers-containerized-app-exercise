@@ -24,29 +24,33 @@ def _run(task_id, filename, image_bytes):
     (input_dir / filename).write_bytes(image_bytes)
 
     try:
-        run_detection(Namespace(
-            input=str(input_dir),
-            output=str(output_dir),
-            classes=DEFAULT_FOOD_CLASSES,
-            box_thresh=0.35,
-            text_thresh=0.25,
-            device="",
-            save_crop=False,
-        ))
+        run_detection(
+            Namespace(
+                input=str(input_dir),
+                output=str(output_dir),
+                classes=DEFAULT_FOOD_CLASSES,
+                box_thresh=0.35,
+                text_thresh=0.25,
+                device="",
+                save_crop=False,
+            )
+        )
         with open(output_dir / "detection_results.json", encoding="utf-8") as fh:
             detection_json = json.load(fh)
-        db.ml_results.insert_one({
-            "task_id": task_id,
-            "filename": filename,
-            "detection_json": detection_json,
-            "created_at": datetime.utcnow(),
-        })
+        db.ml_results.insert_one(
+            {
+                "task_id": task_id,
+                "filename": filename,
+                "detection_json": detection_json,
+                "created_at": datetime.utcnow(),
+            }
+        )
         requests.post(
             Config.WEB_APP_CALLBACK_URL,
             json={"task_id": task_id, "status": "done"},
             timeout=10,
         )
-    except Exception as exc:
+    except Exception as exc:  # pylint: disable=broad-exception-caught
         requests.post(
             Config.WEB_APP_CALLBACK_URL,
             json={"task_id": task_id, "status": "failed", "error": str(exc)},

@@ -44,12 +44,14 @@ def upload():
     task_id = uuid.uuid4().hex
     saved_filename, saved_path = save_uploaded_file(image_file)
 
-    get_db().uploads.insert_one({
-        "task_id": task_id,
-        "filename": saved_filename,
-        "status": "pending",
-        "created_at": datetime.utcnow(),
-    })
+    get_db().uploads.insert_one(
+        {
+            "task_id": task_id,
+            "filename": saved_filename,
+            "status": "pending",
+            "created_at": datetime.utcnow(),
+        }
+    )
 
     with open(saved_path, "rb") as fh:
         image_b64 = base64.b64encode(fh.read()).decode()
