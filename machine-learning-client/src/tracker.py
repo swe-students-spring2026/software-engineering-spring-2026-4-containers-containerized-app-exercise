@@ -13,6 +13,14 @@ import requests
 from gaze_math import FeaturePoint, SimpleCalibrator, extract_feature_point
 
 
+if not hasattr(mp, "solutions"):
+    raise RuntimeError(
+        "This ML client needs MediaPipe FaceMesh via mp.solutions, which is not "
+        "available in the currently installed MediaPipe build. "
+        "Use Python 3.11 and recreate the pipenv environment in "
+        "machine-learning-client."
+    )
+
 mp_face_mesh = mp.solutions.face_mesh
 CALIBRATION_ORDER = ["center", "top_left", "top_right", "bottom_left", "bottom_right"]
 

@@ -21,6 +21,15 @@ Team Member 5
 
 ## Run
 
+Requires Python 3.11 for MediaPipe FaceMesh compatibility.
+
+If you previously created this env with another Python version, recreate it first:
+
+```bash
+python -m pipenv --rm
+python -m pipenv --python 3.11
+```
+
 1. Move into the service folder:
 
 ```bash
