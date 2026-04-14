@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 import numpy as np
 
 
@@ -45,28 +45,26 @@ def _mean_landmark_xy(landmarks, indices: List[int]) -> np.ndarray:
     points = np.array([_landmark_xy(landmarks, i) for i in indices], dtype=np.float32)
     return np.mean(points, axis=0)
 
-
-def extract_feature_point(landmarks) -> Optional[FeaturePoint]:
-    """Compute a normalized iris-position feature from face landmarks."""
-    left_iris = _mean_landmark_xy(landmarks, LEFT_IRIS)
-    right_iris = _mean_landmark_xy(landmarks, RIGHT_IRIS)
+def _eye_dimensions(landmarks):
+    """Return average eye width and height from landmarks."""
     left_outer = _landmark_xy(landmarks, LEFT_EYE_OUTER)
     left_inner = _landmark_xy(landmarks, LEFT_EYE_INNER)
     right_inner = _landmark_xy(landmarks, RIGHT_EYE_INNER)
     right_outer = _landmark_xy(landmarks, RIGHT_EYE_OUTER)
-
     left_top = _landmark_xy(landmarks, LEFT_EYE_TOP)
     left_bottom = _landmark_xy(landmarks, LEFT_EYE_BOTTOM)
     right_top = _landmark_xy(landmarks, RIGHT_EYE_TOP)
     right_bottom = _landmark_xy(landmarks, RIGHT_EYE_BOTTOM)
 
-    left_eye_width = np.linalg.norm(left_inner - left_outer)
-    right_eye_width = np.linalg.norm(right_outer - right_inner)
-    eye_width = (left_eye_width + right_eye_width) / 2.0
+    width = (np.linalg.norm(left_inner - left_outer) + np.linalg.norm(right_outer - right_inner)) / 2.0
+    height = (np.linalg.norm(left_bottom - left_top) + np.linalg.norm(right_bottom - right_top)) / 2.0
+    return left_outer, right_outer, width, height
 
-    left_eye_height = np.linalg.norm(left_bottom - left_top)
-    right_eye_height = np.linalg.norm(right_bottom - right_top)
-    eye_height = (left_eye_height + right_eye_height) / 2.0
+def extract_feature_point(landmarks) -> Optional[FeaturePoint]:
+    """Compute a normalized iris-position feature from face landmarks."""
+    left_iris = _mean_landmark_xy(landmarks, LEFT_IRIS)
+    right_iris = _mean_landmark_xy(landmarks, RIGHT_IRIS)
+    left_outer, right_outer, eye_width, eye_height = _eye_dimensions(landmarks)
 
     if eye_width < 1e-6 or eye_height < 1e-6:
         return None
@@ -83,6 +81,7 @@ def extract_feature_point(landmarks) -> Optional[FeaturePoint]:
 class SimpleCalibrator:
     """Calibrates for targets."""
     def __init__(self) -> None:
+        """Initialize buckets for the five targets"""
         self.samples: Dict[str, List[FeaturePoint]] = {
             "center": [],
             "top_left": [],
