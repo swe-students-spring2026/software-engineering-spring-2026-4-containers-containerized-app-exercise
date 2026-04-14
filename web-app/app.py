@@ -2,12 +2,16 @@
 
 import os
 from werkzeug.utils import secure_filename
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from db import get_db
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="app/templates", static_folder="app/static")
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+@app.route("/")
+def home():
+    return render_template("index.html")
 
 @app.route("/api/sessions", methods=["GET"])
 def get_sessions():
