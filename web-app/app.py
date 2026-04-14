@@ -1,4 +1,5 @@
 import os
+import pymongo
 from flask import Flask, render_template
 from dotenv import load_dotenv
 
@@ -13,8 +14,10 @@ def create_app(test_config=None):
     if test_config:
         app.config.update(test_config)
 
-    # Initialize db as None for offline testing
+    mongo_uri = os.getenv("MONGO_URI")
+    connection = pymongo.MongoClient(mongo_uri)
     app.db = None
+    ''''change to app.db = connection[actual name] '''
 
     @app.route("/")
     def home():
