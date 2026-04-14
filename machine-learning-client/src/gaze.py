@@ -56,9 +56,9 @@ def _eye_dimensions(landmarks):
     right_top = _landmark_xy(landmarks, RIGHT_EYE_TOP)
     right_bottom = _landmark_xy(landmarks, RIGHT_EYE_BOTTOM)
 
-    width = (np.linalg.norm(left_inner - left_outer) 
+    width = (np.linalg.norm(left_inner - left_outer)
              + np.linalg.norm(right_outer - right_inner)) / 2.0
-    height = (np.linalg.norm(left_bottom - left_top) 
+    height = (np.linalg.norm(left_bottom - left_top)
               + np.linalg.norm(right_bottom - right_top)) / 2.0
     return left_outer, right_outer, width, height
 
