@@ -10,11 +10,11 @@ let interval = null;
 function updateTimer(){
     seconds++;
     let minutes = Math.floor(seconds/60);
-    let seconds = seconds%60;
+    let secs = seconds%60;
     //make into text and 2 digits
     minutes = minutes.toString().padStart(2,"0");
-    seconds = seconds.toString().padStart(2,"0");
-    document.getElementById("timer").textContent = `${minutes}:${seconds}`;
+    secs = seconds.toString().padStart(2,"0");
+    document.getElementById("timer").textContent = `${minutes}:${secs}`;
 }
 
 btn.addEventListener("click", () => {
@@ -34,6 +34,9 @@ btn.addEventListener("click", () => {
 
         // later: call backend API
         // fetch("/start")
+
+        fetch("/start").then(response => response.json()).then(data => console.log(data));
+
     } else {
         btn.textContent = "Start Listening";
         btn.classList.remove("stop");
@@ -44,7 +47,8 @@ btn.addEventListener("click", () => {
         statusDot.classList.add("idle");
 
         clearInterval(interval);
+        interval = null;
 
-        // fetch("/stop")
+        fetch("/stop").then(response => response.json()).then(data => console.log(data));
     }
 });
