@@ -1,4 +1,4 @@
-FROM python:3.10-slim
+FROM python:3.12-slim
 WORKDIR /app
 
 # COPY Pipfile Pipfile.lock ./
@@ -12,7 +12,5 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
-EXPOSE 3000
 
-
-CMD ["python3", "-m", "flask",  "run", "app.py", "--host=0.0.0.0", "--port", "3000"]
+CMD ["flask",  "run", "--host", "0.0.0.0", "--port", "3000"]

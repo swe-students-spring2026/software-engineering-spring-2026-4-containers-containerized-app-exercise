@@ -15,6 +15,7 @@ av = "*"
 pyright = "*"
 gunicorn = "*"
 flask = {extras = ["async"], version = "*"}
+flask-cors = "*"
 
 [dev-packages]
 tomli = "*"

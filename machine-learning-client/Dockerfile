@@ -22,6 +22,8 @@ COPY . ./
 
 RUN python config.py
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8000",  "--worker-tmp-dir","/dev/shm/", "--workers", "65", "--threads", "260" , "app:app"]
+#CMD ["gunicorn", "--bind", "0.0.0.0:8000",  "--worker-tmp-dir","/dev/shm/", "--workers", "65", "--threads", "260" , "app:app"]
 
-# CMD ["gunicorn", "--worker-tmp-dir","/dev/shm/", "--workers", "4", "--threads", "8" , "app:app"]
+#CMD ["gunicorn",  "--bind", "0.0.0.0:8000",  "--worker-tmp-dir","/dev/shm/", "--workers", "4", "--threads", "8" , "app:app"]
+
+CMD ["flask",  "run", "--host=0.0.0.0", "--port", "8000"]

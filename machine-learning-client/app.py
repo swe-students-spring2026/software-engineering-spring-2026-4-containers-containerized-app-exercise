@@ -5,15 +5,26 @@ import tempfile
 
 import av
 
+# disabled pylint no-name-in-module
+# as it cannot find FFmpegError
+
 from av.error import FFmpegError
+
 import birdnet
 from flask import Flask, jsonify, render_template, request
 import numpy as np
 from numpy import float32
 import numpy.typing as npt
 
-# import .config
+from dotenv import load_dotenv
 
+# import .config 
+# pylint complains about relative imports.
+# machine-learning-client is not a valid module name
+# so, we cannot import anything.
+# TODO: fix this later
+
+load_dotenv()
 
 app = Flask(__name__)
 
