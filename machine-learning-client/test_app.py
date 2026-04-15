@@ -204,3 +204,74 @@ class TestGetDb:
         assert db is not None
         mock_client.assert_called_once()
 """
+
+class TestLoadModel:
+    @patch("app.main.YOLO")
+    def test_loads_default_model(self, mock_yolo):
+        from app.main import load_model
+        load_model()
+        mock_yolo.assert_called_once_with("yolov8n.pt")
+
+    @patch("app.main.YOLO")
+    def test_loads_custom_model(self, mock_yolo):
+        from app.main import load_model
+        load_model("yolov8s.pt")
+        mock_yolo.assert_called_once_with("yolov8s.pt")
+
+
+class TestGetDb:
+    @patch("app.main.pymongo.MongoClient")
+    def test_returns_db_object(self, mock_client):
+        from app.main import get_db
+        db = get_db()
+        assert db is not None
+        mock_client.assert_called_once()
+
+    @patch("app.main.pymongo.MongoClient")
+    def test_uses_env_vars(self, mock_client):
+        from app.main import get_db
+        with patch.dict("os.environ", {"MONGO_URI": "mongodb://test:27017", "MONGO_DBNAME": "testdb"}):
+            get_db()
+        mock_client.assert_called_once_with("mongodb://test:27017", serverSelectionTimeoutMS=3000)
+
+
+class TestGetCameraNoArgs:
+    @patch("cv2.VideoCapture")
+    def test_uses_env_var_source(self, mock_vc):
+        from app.main import get_camera
+        mock_vc.return_value.isOpened.return_value = True
+        with patch.dict("os.environ", {"VIDEO_SOURCE": "1"}):
+            get_camera()
+        mock_vc.assert_called_once_with(1)
+
+
+class TestMain:
+    @patch("app.main.cv2.destroyAllWindows")
+    @patch("app.main.cv2.waitKey", return_value=ord("q"))
+    @patch("app.main.cv2.imshow")
+    @patch("app.main.annotate_frame")
+    @patch("app.main.detect_objects", return_value=[])
+    @patch("app.main.capture_frame", return_value=None)  # immediately breaks loop
+    @patch("app.main.get_db")
+    @patch("app.main.load_model")
+    @patch("app.main.get_camera")
+    def test_main_runs_and_exits(self, mock_cam, mock_model, mock_db, mock_cap,
+                                  mock_det, mock_ann, mock_show, mock_wait, mock_destroy):
+        from app.main import main
+        main()
+        mock_cam.assert_called_once()
+        mock_model.assert_called_once()
+
+    @patch("app.main.cv2.destroyAllWindows")
+    @patch("app.main.detect_objects", return_value=[{"label": "cat", "confidence": 0.9, "bbox": [0,0,1,1]}])
+    @patch("app.main.capture_frame", side_effect=[make_frame(), None])
+    @patch("app.main.save_detections")
+    @patch("app.main.get_db")
+    @patch("app.main.load_model")
+    @patch("app.main.get_camera")
+    def test_main_headless_saves(self, mock_cam, mock_model, mock_db,
+                                  mock_save, mock_cap, mock_det, mock_destroy):
+        from app.main import main
+        with patch.dict("os.environ", {"HEADLESS": "1"}):
+            main()
+        mock_save.assert_called_once()
