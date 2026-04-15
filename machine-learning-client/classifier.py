@@ -4,7 +4,6 @@ import os
 import math
 import mediapipe as mp
 import cv2
-import numpy as np
 
 # Landmark indices: MCP, PIP, DIP, TIP for each finger (excluding thumb)
 FINGER_LANDMARKS = {
