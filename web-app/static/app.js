@@ -35,6 +35,8 @@ async function recordChunk() {
         });
         const detections = await res.json();
         console.log("Birds detected:", detections);
+
+        loadDetections(); // refresh detections list after each recording
     };
 
     recorder.start();
@@ -44,15 +46,27 @@ async function recordChunk() {
 //detections
 function renderDetections(detections) {
     detectionList.innerHTML = "";
+
     detections.forEach(d => {
         const item = document.createElement("div");
         item.className = "detection-item";
+
+        const confidencePercent =
+            d.confidence !== null && d.confidence !== undefined
+                ? (d.confidence * 100).toFixed(2)
+                : "N/A";
+
+        const createdAt = d.created_at
+            ? new Date(d.created_at).toLocaleString()
+            : "Unknown time";
+
         item.innerHTML = `
-            <div class="bird-name">${d.name}</div>
+            <div class="bird-name">${d.species_name ?? "Unknown species"}</div>
             <div class="meta">
-                Confidence: ${d.confidence}% • ${d.time}
+                Confidence: ${confidencePercent}% • ${createdAt}
             </div>
         `;
+
         detectionList.appendChild(item);
     });
 }
