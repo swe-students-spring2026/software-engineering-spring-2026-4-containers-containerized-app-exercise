@@ -1,5 +1,5 @@
 ![Lint-free](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/lint.yml/badge.svg)
-
+![Web-app](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/web-app-ci.yml/badge.svg)
 # AI Speech Coach
 
 This project is a containerized multiservice audio analysis application. A user interacts with the Flask web application, audio files are shared via a Docker volume, the machine-learning client processes the audio using a local Whisper model, and the metadata is stored in MongoDB.
