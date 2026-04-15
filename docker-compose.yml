@@ -33,6 +33,9 @@ services:
     environment:
       MONGO_URI: mongodb://admin:admin123@mongodb:27017/?authSource=admin
       MONGO_DB_NAME: birdnet_db
+    ports:
+      - "8000:8000"
+
 
 volumes:
   mongo_data:

@@ -5,7 +5,6 @@ name = "pypi"
 
 [packages]
 black = "*"
-pymongo = "*"
 soundfile = "*"
 dotenv = "*"
 pylint = "*"
@@ -16,6 +15,7 @@ pyright = "*"
 gunicorn = "*"
 flask = {extras = ["async"], version = "*"}
 flask-cors = "*"
+pymongo = "*"
 
 [dev-packages]
 tomli = "*"
