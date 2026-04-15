@@ -169,4 +169,3 @@ if __name__ == "__main__":
 
     print("Ml client starting")
     app.run(host="0.0.0.0", port=5002)
-
