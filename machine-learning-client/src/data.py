@@ -9,7 +9,6 @@ from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 from src_config import BATCH_SIZE, DATA_ROOT, NUM_WORKERS
 
-# Global transform configuration
 transform = transforms.Compose(
     [transforms.ToTensor(), transforms.Normalize((0.5,), (0.5,))]
 )
