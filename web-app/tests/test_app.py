@@ -1,6 +1,9 @@
 """Unit tests for the Flask application."""
 
-# pylint: disable=redefined-outer-name, unused-argument, too-few-public-methods, no-name-in-module
+# pylint: disable=redefined-outer-name
+# pylint: disable=unused-argument
+# pylint: disable=too-few-public-methods
+# pylint: disable=no-name-in-module
 
 import pytest
 import db
@@ -107,7 +110,7 @@ def test_get_db(monkeypatch):
             self.uri = uri
 
         @property
-        def speech_coach_db(self):
+        def ai_speech_coach(self):
             """Mock database attribute."""
             return "mocked_db_instance"
 
