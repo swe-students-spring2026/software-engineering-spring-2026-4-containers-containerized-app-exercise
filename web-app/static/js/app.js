@@ -16,14 +16,16 @@ let targetStart = 0;
 let committedOnCurrent = false;
 
 function renderKeyboard() {
-  keys.forEach((key)=> {
-    const button = document.createElement('button');
-    button.className = 'key';
-    button.dataset.key = label;
-    button.textContent = label;
-    if(label === "Space") {
-      button.classList.add('wide');
+  keys.forEach((key) => {
+    const button = document.createElement("button");
+    button.className = "key";
+    button.dataset.key = key;
+    button.textContent = key;
+
+    if (key === "SPACE") {
+      button.classList.add("wide");
     }
+
     keyboardRoot.appendChild(button);
   });
 }
