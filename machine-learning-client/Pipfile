@@ -4,10 +4,15 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+opencv-python = "*"
+mediapipe = "==0.10.21"
+tomli = "*"
+typing-extensions = "*"
+pymongo = "*"
+
+[dev-packages]
 pylint = "*"
 black = "*"
 
-[dev-packages]
-
 [requires]
-python_version = "3.10"
+python_version = "3.12"
