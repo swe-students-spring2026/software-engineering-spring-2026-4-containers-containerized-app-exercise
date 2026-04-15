@@ -4,6 +4,9 @@ const btn = document.getElementById("toggleBtn");
 const statusText = document.getElementById("statusText");
 const statusDot = document.getElementById("statusDot");
 const detectionList = document.getElementById("detectionList");
+const currentBirdName = document.getElementById("currentBirdName");
+const currentBirdMeta = document.getElementById("currentBirdMeta");
+const currentResultCard = document.getElementById("currentResultCard");
 
 let seconds = 0;
 let timer_interval = null;
@@ -15,7 +18,7 @@ function updateTimer() {
     let secs = seconds % 60;
     //make into text and 2 digits
     minutes = minutes.toString().padStart(2, "0");
-    secs = seconds.toString().padStart(2, "0");
+    secs = secs.toString().padStart(2, "0");
     document.getElementById("timer").textContent = `${minutes}:${secs}`;
 }
 
@@ -36,6 +39,7 @@ async function recordChunk() {
         const detections = await res.json();
         console.log("Birds detected:", detections);
 
+        renderCurrentResult(detections);
         loadDetections(); // refresh detections list after each recording
     };
 
@@ -75,6 +79,21 @@ function loadDetections() {
     fetch("/detections")
         .then(res => res.json())
         .then(data => renderDetections(data));
+}
+
+//for our current detections card
+function renderCurrentResult(apiResponse){
+    if(!apiResponse.detections || apiResponse.detections.length ==0){
+        currentBirdName.textContent = "No detection yet";
+        currentBirdMeta.textContent = "Listening...";
+        currentResultCard.classList.add("empty");
+        return;
+    }
+    const top = apiResponse.detections[0];
+    const confidencePercent = top.confidence!==null && top.confidence !== undefined ? (top.confidence*100).toFixed(2): "N/A";
+    currentBirdName.textContent = top.species_name ?? "Unkown species";
+    currentBirdMeta.textContent = `Confidence: ${confidencePercent}%`;
+    currentResultCard.classList.remove("empty");
 }
 
 //start listening and stop listening
