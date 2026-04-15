@@ -95,7 +95,7 @@ btn.addEventListener("click", () => {
 
         statusText.textContent = "Idle";
         statusDot.classList.remove("active");
-        statusDot.classList.add("idle")
+        statusDot.classList.add("idle");
 
         clearInterval(timer_interval);
         timer_interval = null;
