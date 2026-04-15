@@ -80,26 +80,6 @@ def rate_pace(pace):
         return "too fast"
     return "good"
 
-def run_test(audio_path):
-    """Run full analysis pipeline on audio file."""
-    model = whisper.load_model("base")
-    print("whisper model loaded\n")
-
-    transcript = transcribe_audio(audio_path, model)
-    print(f"transcrpt: {transcript}\n")
-
-    print("Analyzing audio with librosa...")
-    acoustic = analyze_audio(audio_path)
-    filler = count_filler_words(transcript)
-    wpm = compute_words_per_minute(transcript, acoustic["duration_seconds"])
-
-    print("--- RESULTS ---")
-    print(f"Duration:          {acoustic['duration_seconds']}s")
-    print(f"Words per minute:  {wpm}")
-    print(f"Avg volume:        {acoustic['avg_volume_db']} dB")
-    print(f"Pitch variance:    {acoustic['pitch_variance']}")
-    print(f"Filler word total: {filler}")
-
 @app.route("/analyze", methods=["POST"])
 def analyze():
     """Recieve audio files and run speech analysis"""
@@ -116,7 +96,7 @@ def analyze():
     filler = count_filler_words(transcript)
     wpm = compute_words_per_minute(transcript, acoustic["duration_seconds"])
     volume_rating = rate_volume(acoustic["avg_volume_db"])
-    pitch_rating = rate_pitch(acoustic["pitch_vaiance"])
+    pitch_rating = rate_pitch(acoustic["pitch_variance"])
     pace_rating = rate_pace(wpm)
 
     result = {
@@ -124,13 +104,14 @@ def analyze():
         "title": request.form.get("title"),
         "timestamp": datetime.utcnow(),
         "transcript": transcript,
-        "wmp": wpm,
+        "wpm": wpm,
         "filler_count": filler,
         "volume_rating": volume_rating,
         "pitch_rating": pitch_rating,
         "pace_rating": pace_rating,
     }
     speeches_collection.insert_one(result)
+    return jsonify({"status": "success"}), 200
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5001)
