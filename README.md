@@ -7,7 +7,7 @@ This repository now contains an EyeWrite MVP split into two services:
 - `machine-learning-client/`: webcam + eye tracking + calibration + gaze sending
 - `web-app/`: Flask UI + large keyboard + dwell typing + message + speech
 
-## Current Structure
+##  Structure
 
 - `machine-learning-client/src/tracker.py`: OpenCV + MediaPipe tracking loop
 - `machine-learning-client/src/gaze_math.py`: gaze feature extraction and simple calibration mapping
@@ -16,7 +16,14 @@ This repository now contains an EyeWrite MVP split into two services:
 - `web-app/static/js/app.js`: gaze cursor + dwell logic + text entry + speech
 - `web-app/static/css/styles.css`: responsive interface styling
 
-## Quick Start
+## Team
+Angelina Wu[https://github.com/TangelinaWu]
+Han Xiao
+Adam Shin
+Alejandro
+Wonden
+
+##  How to run 
 
 Start the web app first:
 
@@ -54,4 +61,24 @@ Standup reports:
 ## Adam Shin @aus2005
 - **did** Reviewed and merged PRs, did initial task board setup.
 - **doing** Refining web app.
-- **blockers** Need some details from machie learning to finalize the size of the keyboard.
+- **blockers** Need some details from machine learning to finalize the size of the keyboard.
+
+## Angelina Wu @tangelinawu
+- **did** Eyewrite idea, flask + ml client Reviewed and merged PRs
+- **doing** Refining ml client and webapp .
+- **blockers** None
+
+## Alejandro @
+- **did** docker set up.
+- **doing** docker containization and mangodb .
+- **blockers** waiting for linting errors to be fixed
+
+##  Han Xiao @
+- **did** researched ml libraries 
+- **doing** working on refining accuracy of ml client 
+- **blockers** None. possibly missing some smaller files
+
+## Wonden  @
+- **did** working on web app, 
+- **doing** Refining web app.
+- **blockers** None

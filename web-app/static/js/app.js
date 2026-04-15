@@ -1,9 +1,8 @@
 const keyboardRoot = document.getElementById("keyboard");
 const messageBox = document.getElementById("messageBox");
 const gazeCursor = document.getElementById("gazeCursor");
-const speakBtn = document.getElementById("speakBtn");
 
-const KEYS = [
+const keys = [
   ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""),
   "SPACE",
   "BACKSPACE",
@@ -16,16 +15,16 @@ let currentTarget = null;
 let targetStart = 0;
 let committedOnCurrent = false;
 
-function createKeyboard() {
-  KEYS.forEach((label) => {
-    const btn = document.createElement("button");
-    btn.className = "key";
-    btn.dataset.key = label;
-    btn.textContent = label === "SPACE" ? "Space" : label === "BACKSPACE" ? "Bksp" : label;
-    if (label === "SPACE") {
-      btn.classList.add("wide");
+function renderKeyboard() {
+  keys.forEach((key)=> {
+    const button = document.createElement('button');
+    button.className = 'key';
+    button.dataset.key = label;
+    button.textContent = label;
+    if(label === "Space") {
+      button.classList.add('wide');
     }
-    keyboardRoot.appendChild(btn);
+    keyboardRoot.appendChild(button);
   });
 }
 
@@ -49,18 +48,6 @@ function applyAction(action) {
   } else if (action === "CLEAR") {
     messageBox.value = "";
   }
-}
-
-function speakText() {
-  const text = messageBox.value.trim();
-  if (!text || !("speechSynthesis" in window)) {
-    return;
-  }
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.rate = 0.95;
-  utterance.pitch = 1.0;
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(utterance);
 }
 
 async function fetchGaze() {
@@ -148,10 +135,8 @@ function wireControls() {
       messageBox.value += button.textContent;
     });
   });
-
-  speakBtn.addEventListener("click", speakText);
 }
 
-createKeyboard();
+renderKeyboard();
 wireControls();
 setInterval(gazeLoop, GAZE_POLL_MS);

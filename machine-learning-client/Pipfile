@@ -11,6 +11,7 @@ mediapipe = "==0.10.18"
 numpy = ">=1.26.0,<2.0.0"
 requests = "*"
 pymongo = "*"
+dill = "*"
 
 [dev-packages]
 
