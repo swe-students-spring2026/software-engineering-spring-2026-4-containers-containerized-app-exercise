@@ -10,7 +10,7 @@ DATA_ROOT = "./data"
 MODEL_PATH = "./data/processed/sign_language_model.pth"
 MOMENTUM = 0.9
 
-DEVICE = torch.device("cuda:0")
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 CLASSES = (
     "A",
