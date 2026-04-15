@@ -104,10 +104,6 @@
             isDrawing = false;
         });
 
-        setInterval(() => {
-            // TODO
-        }, 500);
-
         function undo() {
             if(undoHistory.length == 0) return;
             let img = undoHistory.pop();
