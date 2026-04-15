@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | Sign Language Recognition{% endblock %}
+
+{% block content %}
+<section class="dashboard-grid">
+  <article class="panel hero-panel">
+    <div class="panel-header">
+      <h2>Live Translation</h2>
+      <span class="status-dot"></span>
+    </div>
+
+    <div class="camera-box">
+      <video id="camera-preview" autoplay playsinline muted></video>
+      <button id="camera-toggle-btn" type="button">📷 Start Camera</button>
+    </div>
+
+    <div class="live-letter-wrap">
+      <div class="live-letter" id="latest-label">
+        {{ latest.predicted_label if latest else "N/A" }}
+      </div>
+
+      <div class="live-meta">
+        <p>
+          <strong>Confidence:</strong>
+          <span id="latest-confidence">{{ latest.confidence if latest else 0.0 }}</span>
+        </p>
+        <p>
+          <strong>Timestamp:</strong>
+          <span id="latest-timestamp">{{ latest.timestamp if latest else "N/A" }}</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="translation-box">
+      <label for="accumulated-text">Translated Text</label>
+      <textarea id="accumulated-text" rows="3" readonly>{{
+        latest.current_text if latest and latest.current_text else (latest.predicted_label if latest else "N/A")
+      }}</textarea>
+
+      <div class="button-row">
+        <button id="speak-current-btn" type="button">🔊 Speak Current</button>
+        <button id="speak-text-btn" type="button">🗣 Speak Text</button>
+        <button id="clear-text-btn" type="button" class="secondary">🗑 Clear</button>
+      </div>
+
+      <div class="toggle-row">
+        <input type="checkbox" id="auto-speak-toggle" />
+        <label for="auto-speak-toggle">Auto speak new predictions</label>
+      </div>
+    </div>
+  </article>
+
+  <article class="panel stat-panel">
+    <h3>Total Predictions</h3>
+    <div class="stat-value" id="total-predictions">{{ stats.total_predictions }}</div>
+  </article>
+
+  <article class="panel stat-panel">
+    <h3>Average Confidence</h3>
+    <div class="stat-value" id="avg-confidence">{{ stats.average_confidence }}</div>
+  </article>
+
+  <article class="panel stat-panel">
+    <h3>Top Label</h3>
+    <div class="stat-value" id="top-label">{{ stats.top_label }}</div>
+  </article>
+
+  <article class="panel history-panel">
+    <div class="panel-header">
+      <h2>Recent Predictions</h2>
+      <a href="{{ url_for('pages.history') }}" class="mini-link">View all</a>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Label</th>
+            <th>Confidence</th>
+          </tr>
+        </thead>
+        <tbody id="recent-table-body">
+          {% for item in recent %}
+          <tr>
+            <td>{{ item.timestamp }}</td>
+            <td>{{ item.predicted_label }}</td>
+            <td>{{ item.confidence }}</td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="3">No prediction data available yet.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <article class="panel stats-panel">
+    <div class="panel-header">
+      <h2>Label Frequency</h2>
+    </div>
+
+    <div class="chips" id="label-chips">
+      {% if stats.label_counts %}
+        {% for label, count in stats.label_counts.items() %}
+          <span class="chip">{{ label }} · {{ count }}</span>
+        {% endfor %}
+      {% else %}
+        <span class="chip">No data</span>
+      {% endif %}
+    </div>
+  </article>
+</section>
+{% endblock %}

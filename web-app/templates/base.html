@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, user-scalable=no"
+    />
+    <title>{% block title %}Sign Language Recognition Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  </head>
+  <body class="is-preload" data-refresh-ms="{{ refresh_ms|default(3000) }}">
+    <div id="app-shell">
+      <header id="header">
+        <nav class="top-nav">
+          <a href="{{ url_for('pages.index') }}" class="nav-link">Dashboard</a>
+          <a href="{{ url_for('pages.history') }}" class="nav-link">History</a>
+        </nav>
+
+        <h1>Sign Language Recognition Dashboard</h1>
+        <p>
+          Real-time ASL alphabet recognition, live confidence updates, MongoDB-backed
+          history, and one-click speech output.
+        </p>
+      </header>
+
+      <main>
+        {% block content %}{% endblock %}
+      </main>
+
+      <footer id="footer">
+        <ul class="copyright">
+          <li>Next Team</li>
+          <li>Flask + MongoDB + Docker</li>
+        </ul>
+      </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/speaker.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+  </body>
+</html>

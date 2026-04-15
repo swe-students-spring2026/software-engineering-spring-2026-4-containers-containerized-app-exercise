@@ -1,3 +1,5 @@
+*.pth
+
 # mac junk
 .DS_Store
 
@@ -147,3 +149,7 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# Video Overrides
+*.mp4
+data/
