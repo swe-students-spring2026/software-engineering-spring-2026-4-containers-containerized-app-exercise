@@ -5,6 +5,53 @@ let stream;
 const startButton = document.querySelector(".btn-start");
 const statusText = document.querySelector("section p i");
 
+const latestDuration = document.querySelector("#latest-duration");
+const latestWpm = document.querySelector("#latest-wpm");
+const latestFillerCount = document.querySelector("#latest-filler-count");
+const latestPaceFeedback = document.querySelector("#latest-pace-feedback");
+const latestTranscript = document.querySelector("#latest-transcript");
+const latestFillerFeedback = document.querySelector("#latest-filler-feedback");
+
+function renderLatestSession(session) {
+  if (!session) {
+    latestDuration.textContent = "No session yet";
+    latestWpm.textContent = "--";
+    latestFillerCount.textContent = "--";
+    latestPaceFeedback.textContent = "--";
+    latestTranscript.textContent = "No transcript yet.";
+    latestFillerFeedback.innerHTML = "<i>No feedback yet.</i>";
+    return;
+  }
+
+  latestDuration.textContent = `${session.duration_seconds} seconds`;
+  latestWpm.textContent = session.analysis.wpm;
+  latestFillerCount.textContent = session.analysis.total_filler_count;
+  latestPaceFeedback.textContent = session.analysis.pace_feedback;
+  latestTranscript.textContent = session.transcript || "No transcript available.";
+  latestFillerFeedback.innerHTML = `<i>${session.analysis.filler_feedback}</i>`;
+}
+
+async function loadLatestSession() {
+  try {
+    const response = await fetch("/api/sessions");
+    const sessions = await response.json();
+
+    if (!response.ok) {
+      throw new Error("Failed to load sessions");
+    }
+
+    if (!Array.isArray(sessions) || sessions.length === 0) {
+      renderLatestSession(null);
+      return;
+    }
+
+    const latestSession = sessions[sessions.length - 1];
+    renderLatestSession(latestSession);
+  } catch (error) {
+    console.error("Error loading latest session:", error);
+  }
+}
+
 async function startRecording() {
   try {
     stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -38,6 +85,8 @@ async function startRecording() {
         }
 
         statusText.textContent = "Audio uploaded and queued for processing.";
+
+        setTimeout(loadLatestSession, 5000);
       } catch (error) {
         statusText.textContent = `Upload failed: ${error.message}`;
       }
@@ -75,3 +124,5 @@ startButton.addEventListener("click", async () => {
     stopRecording();
   }
 });
+
+loadLatestSession();
