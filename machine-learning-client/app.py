@@ -26,11 +26,12 @@ RATE = 48000
 
 @app.after_request
 def add_cors_headers(response):
-    """enable cors """
+    """enable cors"""
     response.headers.add("Access-Control-Allow-Origin", "*")
     response.headers.add("Access-Control-Allow-Headers", "*")
     response.headers.add("Access-Control-Allow-Methods", "*")
     return response
+
 
 @app.route("/")
 def test():
@@ -68,7 +69,9 @@ async def analyze():
 
 
 def extract_audio(
-    input_path: Path, rate=48000, max_sec=3.0, 
+    input_path: Path,
+    rate=48000,
+    max_sec=3.0,
     # min_sec=1.5
 ) -> npt.NDArray[np.float32]:
     """from input file, extract 3 second long recording at 48000hz"""
