@@ -3,6 +3,6 @@ WORKDIR /app
 RUN pip install --no-cache-dir pipenv
 COPY Pipfile Pipfile.lock ./
 RUN pipenv install --system --deploy
+ADD https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task .
 COPY . .
-EXPOSE 8000
 CMD ["python", "mlclient.py"]
