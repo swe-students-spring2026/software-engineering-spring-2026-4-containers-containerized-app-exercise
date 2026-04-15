@@ -1,10 +1,10 @@
 """Main application module for the web app."""
 
+import uuid
 import os
+from pydub import AudioSegment
 from flask import Flask, jsonify, request, render_template
 from db import get_db
-from pydub import AudioSegment
-import uuid
 
 app = Flask(
     __name__,
@@ -17,6 +17,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 @app.route("/")
 def home():
+    """Render the index HTML page."""
     return render_template("index.html")
 
 
@@ -81,7 +82,7 @@ def upload_audio():
         # convert to WAV
         audio = AudioSegment.from_file(webm_path, format="webm")
         audio.export(wav_path, format="wav")
-    except Exception as e:
+    except Exception as e:# pylint: disable=broad-exception-caught
         return (
             jsonify({"error": f"Conversion failed: {str(e)}"}),
             500,

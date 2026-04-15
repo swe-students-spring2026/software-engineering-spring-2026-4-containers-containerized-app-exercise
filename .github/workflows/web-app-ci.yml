@@ -4,12 +4,12 @@ on:
   push:
     paths:
       - 'web-app/**'
-      - '.github/workflows/ci-webapp.yml'
+      - '.github/workflows/web-app-ci.yml'
   pull_request:
     paths:
       - 'web-app/**'
-      - '.github/workflows/ci-webapp.yml'
-
+      - '.github/workflows/web-app-ci.yml'
+      
 jobs:
   test:
     runs-on: ubuntu-latest
