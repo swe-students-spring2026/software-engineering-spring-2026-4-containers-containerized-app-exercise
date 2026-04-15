@@ -3,10 +3,10 @@ Flask API server for analyzing text using a machine learning model.
 This service determines whether input text contains humor and assigns a funniness score.
 """
 
+import os
 from flask import Flask, request, jsonify, render_template
 import requests
 from pymongo import MongoClient
-import os
 
 mongo_url = os.getenv("MONGO_URI") or "mongodb://mongodb:27017"
 
@@ -37,14 +37,22 @@ def add_analysis():
     """
     Accepts audio input, runs ML analysis, and returns classification + score.
     """
+    if "username" not in request.files:
+        return jsonify({"error": "missing username"}), 400
     if "joke" not in request.files:
         return jsonify({"error": "missing input"}), 400
     joke = request.files["joke"]
+    username = request.files["username"]
+    if username == "":
+        username = "Anonymous"
 
     # Run joke to machine-learning-client where it is analyzed
-    response = requests.post(
-        "http://machine-learning-client:5001/process", files={"joke": open(joke, 'rb')}, timeout=45
-    )
+    with open(joke, "rb") as file:
+        response = requests.post(
+            "http://machine-learning-client:5001/process",
+            files={"joke": file},
+            timeout=45,
+        )
 
     # check it ran correctly
     if response.status_code != 200:
@@ -56,7 +64,7 @@ def add_analysis():
     # Build database record (to be saved later)
     record = {
         "text": result.text,
-        "username": result.text,  # @TODO replace with real username field
+        "username": username,
         "classification": result.classification,
         "funniness_score": result.score,
     }
