@@ -2,18 +2,16 @@
 
 from pathlib import Path
 import tempfile
+from datetime import datetime, timezone
+import os
 
 import av
-
 from av.error import FFmpegError
 import birdnet
 from flask import Flask, jsonify, render_template, request
 import numpy as np
 from numpy import float32
 import numpy.typing as npt
-
-import os
-from datetime import datetime
 from pymongo import MongoClient
 
 # import .config
@@ -72,17 +70,17 @@ async def analyze():
             prediction = audio_model.predict(data_file_path)
 
             df = prediction.to_dataframe()
-            
+
             recording_doc = {
                 "file_name": data_file_path.name,
                 "source": "uploaded_audio",
                 "status": "processed",
-                "created_at": datetime.utcnow(),
+                "created_at": datetime.now(timezone.utc),
             }
 
             recording_result = recordings_collection.insert_one(recording_doc)
             recording_id = recording_result.inserted_id
-            
+
             detection_docs = []
 
             for _, row in df.iterrows():
@@ -110,7 +108,6 @@ async def analyze():
 
             if detection_docs:
                 detections_collection.insert_many(detection_docs)
-            
 
             response_detections = [
                 {
@@ -130,8 +127,6 @@ async def analyze():
                     "detections": response_detections,
                 }
             )
-
-
 
         except (FFmpegError, ValueError) as e:
             return jsonify(error=str(e), message="PyAV error:"), 400
