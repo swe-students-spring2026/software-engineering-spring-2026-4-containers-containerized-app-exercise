@@ -23,7 +23,7 @@ def utc_now() -> datetime:
 class MLClient:
     """Background worker for sound-analysis jobs in MongoDB."""
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
         mongo_uri: str,
         db_name: str,

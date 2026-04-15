@@ -1,10 +1,15 @@
 """Audio analysis utilities for environmental sound detection."""
 
+# pylint: disable=too-many-instance-attributes,too-few-public-methods,too-many-locals
+
 from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+
+import librosa
+from transformers import pipeline as hf_pipeline
 
 
 @dataclass
@@ -109,7 +114,9 @@ def parse_sound_event_predictions(
     }
 
     alert_type, alert_confidence = _best_match(normalized_predictions, alert_keywords)
-    category, category_confidence = _best_match(normalized_predictions, category_keywords)
+    category, category_confidence = _best_match(
+        normalized_predictions, category_keywords
+    )
     confidence = max(alert_confidence, category_confidence)
 
     return alert_type, alert_confidence, category, confidence
@@ -173,7 +180,9 @@ def build_caption_segments(
                     start_time=chunk_start_seconds + start_offset,
                     end_time=chunk_start_seconds + end_offset,
                     text=text,
-                    confidence=float(chunk.get("score", transcription_result.get("score", 0.0))),
+                    confidence=float(
+                        chunk.get("score", transcription_result.get("score", 0.0))
+                    ),
                 )
             )
         return caption_segments
@@ -193,10 +202,10 @@ def build_caption_segments(
     return caption_segments
 
 
-class HuggingFaceAudioAnalyzer:
+class HuggingFaceAudioAnalyzer:  # pylint: disable=too-many-instance-attributes
     """Sound-event analyzer backed by a Hugging Face audio-classification model."""
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
         sound_model_id: str,
         asr_model_id: str,
@@ -216,14 +225,7 @@ class HuggingFaceAudioAnalyzer:
         if self._classifier is not None:
             return
 
-        try:
-            from transformers import pipeline
-        except ImportError as exc:
-            raise RuntimeError(
-                "transformers is not installed. Install dependencies first."
-            ) from exc
-
-        self._classifier = pipeline(
+        self._classifier = hf_pipeline(
             task="audio-classification",
             model=self.sound_model_id,
         )
@@ -232,19 +234,14 @@ class HuggingFaceAudioAnalyzer:
         if self._transcriber is not None:
             return
 
-        try:
-            from transformers import pipeline
-        except ImportError as exc:
-            raise RuntimeError(
-                "transformers is not installed. Install dependencies first."
-            ) from exc
-
-        self._transcriber = pipeline(
+        self._transcriber = hf_pipeline(
             task="automatic-speech-recognition",
             model=self.asr_model_id,
         )
 
-    def analyze(self, audio_path: str) -> dict[str, Any]:
+    def analyze(
+        self, audio_path: str
+    ) -> dict[str, Any]:  # pylint: disable=too-many-locals
         """Run inference for one audio file and return normalized predictions."""
         file_path = Path(audio_path)
         if not file_path.exists():
@@ -252,11 +249,6 @@ class HuggingFaceAudioAnalyzer:
 
         self._ensure_classifier()
         self._ensure_transcriber()
-
-        try:
-            import librosa
-        except ImportError as exc:
-            raise RuntimeError("librosa is not installed. Install dependencies first.") from exc
 
         audio, sample_rate = librosa.load(str(file_path), sr=16000, mono=True)
         sound_chunk_size = max(1, int(sample_rate * self.sound_chunk_seconds))
