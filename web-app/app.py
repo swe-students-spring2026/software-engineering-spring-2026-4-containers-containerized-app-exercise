@@ -15,6 +15,7 @@ app = Flask(
 UPLOAD_FOLDER = os.environ.get("UPLOAD_FOLDER", "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+
 @app.route("/")
 def home():
     """Render the index HTML page."""
@@ -25,9 +26,7 @@ def home():
 def get_sessions():
     """Retrieve all practice sessions from the database."""
     database = get_db()
-    sessions = list(
-        database.practice_sessions.find({}, {"_id": 0})
-    )
+    sessions = list(database.practice_sessions.find({}, {"_id": 0}))
     return jsonify(sessions), 200
 
 
@@ -82,7 +81,7 @@ def upload_audio():
         # convert to WAV
         audio = AudioSegment.from_file(webm_path, format="webm")
         audio.export(wav_path, format="wav")
-    except Exception as e:# pylint: disable=broad-exception-caught
+    except Exception as e:  # pylint: disable=broad-exception-caught
         return (
             jsonify({"error": f"Conversion failed: {str(e)}"}),
             500,
