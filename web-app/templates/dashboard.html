@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+        <h2>Your Speech Dashboard</h2>
+        <a href="/record">
+            <button type="button" class="btn-success">+ Add New Speech</button>
+        </a>
+    </div>
+</div>
+
+{% if speeches %}
+    {% for speech in speeches %}
+        <div class="speech-card">
+            <h3>{{ speech.title }}</h3>
+
+            {% if speech.timestamp %}
+                <p class="speech-meta"><strong>Date:</strong> {{ speech.timestamp }}</p>
+            {% endif %}
+
+            {% if speech.overall_score is defined %}
+                <p><strong>Overall Score:</strong> {{ speech.overall_score }}</p>
+            {% endif %}
+
+            {% if speech.words_per_minute is defined %}
+                <p><strong>Words Per Minute:</strong> {{ speech.words_per_minute }}</p>
+            {% endif %}
+
+            {% if speech.filler_word_total is defined %}
+                <p><strong>Filler Words:</strong> {{ speech.filler_word_total }}</p>
+            {% endif %}
+
+            {% if speech.pitch_variance is defined %}
+                <p><strong>Pitch Variance:</strong> {{ speech.pitch_variance }}</p>
+            {% endif %}
+
+            {% if speech.avg_volume_db is defined %}
+                <p><strong>Average Volume:</strong> {{ speech.avg_volume_db }} dB</p>
+            {% endif %}
+
+            <form method="POST" action="/delete/{{ speech.id }}">
+                <button type="submit" class="btn-danger">Delete</button>
+            </form>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="card">
+        <h3>No speeches yet</h3>
+        <p>You haven’t submitted any speeches yet. Record your first one to see your results here.</p>
+    </div>
+{% endif %}
+{% endblock %}
