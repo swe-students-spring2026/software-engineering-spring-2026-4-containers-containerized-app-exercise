@@ -1,8 +1,8 @@
-librosa
-sounddevice
+flask
 pymongo[srv]
 python-dotenv
 pytest
+pytest-flask
 pytest-cov
 black
 pylint
