@@ -11,10 +11,10 @@ from flask_login import (
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 from bson.objectid import ObjectId
-from database import get_users_collection, get_speeches_collection
+from db import users_collection, speeches_collection
 
-users_coll = get_users_collection()
-speeches_coll = get_speeches_collection()
+users_coll = users_collection
+speeches_coll = speeches_collection
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key")
@@ -22,6 +22,9 @@ app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key")
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
 login_manager.login_message = None
+
+from dotenv import load_dotenv
+load_dotenv()
 
 class User(UserMixin):
 
@@ -66,6 +69,7 @@ def index():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    ""
     if current_user.is_authenticated:
         return redirect(url_for("dashboard"))
 
