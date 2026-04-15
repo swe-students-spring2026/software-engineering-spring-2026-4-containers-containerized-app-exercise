@@ -11,7 +11,7 @@ services:
     depends_on:
       - mongodb
     environment:
-      - MONGO_URI=mongodb+srv://vfc2016_db_user:silly-sealions@cluster0.oogyatw.mongodb.net/speech_rater?retryWrites=true&w=majority
+      - MONGO_URI=mongodb://mongodb:27017/
 
   web-app:
     build: ./web-app
@@ -21,4 +21,4 @@ services:
     depends_on:
       - mongodb
     environment:
-      - MONGO_URI=mongodb+srv://vfc2016_db_user:silly-sealions@cluster0.oogyatw.mongodb.net/speech_rater?retryWrites=true&w=majority
+      - MONGO_URI=mongodb://mongodb:27017/
