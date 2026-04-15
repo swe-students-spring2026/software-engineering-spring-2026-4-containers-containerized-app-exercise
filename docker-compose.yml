@@ -11,7 +11,7 @@ services:
     volumes:
       - mongo_data:/data/db
       - ./database/mongo-init.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
-  
+
   web-app:
     build: ./web-app
     depends_on:
@@ -19,9 +19,13 @@ services:
     environment:
       MONGO_URI: mongodb://admin:admin123@mongodb:27017/?authSource=admin
       MONGO_DB_NAME: birdnet_db
+    ports:
+      - "3000:3000"
 
   machine-learning-client:
     build: ./machine-learning-client
+    volumes: 
+      - ./machine-learning-client:/app
     depends_on:
       - mongodb
     environment:

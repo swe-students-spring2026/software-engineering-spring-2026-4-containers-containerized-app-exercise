@@ -5,18 +5,44 @@ const statusText = document.getElementById("statusText");
 const statusDot = document.getElementById("statusDot");
 
 let seconds = 0;
-let interval = null;
+let interval = 0;
 
-function updateTimer(){
+function updateTimer() {
     seconds++;
-    let minutes = Math.floor(seconds/60);
-    let secs = seconds%60;
+    let minutes = Math.floor(seconds / 60);
+    let secs = seconds % 60;
     //make into text and 2 digits
-    minutes = minutes.toString().padStart(2,"0");
-    secs = seconds.toString().padStart(2,"0");
+    minutes = minutes.toString().padStart(2, "0");
+    secs = seconds.toString().padStart(2, "0");
     document.getElementById("timer").textContent = `${minutes}:${secs}`;
 }
 
+async function recordChunk() {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true, mimeType: 'audio/ogg' });
+
+    const recorder = new MediaRecorder(stream);
+    const chunks = [];
+
+    recorder.ondataavailable = e => chunks.push(e.data);
+    recorder.onstop = async () => {
+        const blob = new Blob(chunks, { type: "audio/ogg; codecs=opus" });
+        const res = await fetch("http://localhost:8000/analyze", {
+            method: "POST",
+            headers: { "Content-Type": "audio/ogg" },
+            body: blob,
+        });
+        const detections = await res.json();
+        console.log("Birds detected:", detections);
+    };
+
+    recorder.start();
+    setTimeout(() => recorder.stop(), 3000);
+}
+
+
+
+
+btn.addEventListener("click", async () => {
 //detections
 function renderDetections(detections) {
     detectionList.innerHTML = "";
@@ -51,14 +77,15 @@ btn.addEventListener("click", () => {
         statusText.textContent = "Listening...";
         statusDot.classList.remove("idle");
         statusDot.classList.add("active");
-        
-        seconds=0;
-        interval=setInterval(updateTimer,1000);
+
+        recordChunk()
+        interval = setInterval(recordChunk, 3000); // new recorder every 3s
+
 
         // later: call backend API
         // fetch("/start")
 
-        fetch("/start").then(response => response.json()).then(data => console.log(data));
+        // fetch("/start").then(response => response.json()).then(data => console.log(data));
 
     } else {
         btn.textContent = "Start Listening";
@@ -69,10 +96,11 @@ btn.addEventListener("click", () => {
         statusDot.classList.remove("active");
         statusDot.classList.add("idle");
 
-        clearInterval(interval);
-        interval = null;
 
-        fetch("/stop").then(response => response.json()).then(data => console.log(data));
+        clearInterval(interval);
+        interval = 0;
+
+        // fetch("/stop").then(response => response.json()).then(data => console.log(data));
     }
 });
 

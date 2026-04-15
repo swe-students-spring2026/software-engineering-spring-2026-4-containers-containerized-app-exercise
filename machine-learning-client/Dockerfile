@@ -6,14 +6,22 @@ RUN apt-get update && apt-get install -y libsndfile1
 
 RUN rm -rf /var/lib/apt/lists/*
 
-#RUN pip install pipenv
+
 # COPY Pipfile Pipfile.lock ./
 
-# RUN pipenv install --system --deploy
+# RUN pip install pipenv
 
-COPY . .
+# RUN pipenv requirements > requirements.txt
+
+
+COPY requirements.txt ./
+
 RUN pip install --ignore-installed -r requirements.txt
 
-RUN python load_model.py
+COPY . ./
 
-CMD ["python3", "flask",  "run", "app.py", "--host=0.0.0.0"]
+RUN python config.py
+
+CMD ["gunicorn", "--bind", "0.0.0.0:8000",  "--worker-tmp-dir","/dev/shm/", "--workers", "65", "--threads", "260" , "app:app"]
+
+# CMD ["gunicorn", "--worker-tmp-dir","/dev/shm/", "--workers", "4", "--threads", "8" , "app:app"]
