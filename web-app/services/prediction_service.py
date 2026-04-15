@@ -33,11 +33,24 @@ def get_latest_prediction():
     return _serialize_prediction(doc)
 
 
-def get_recent_predictions(limit: int = 10):
-    """Return a list of recent prediction documents."""
+def get_recent_predictions(limit: int = 10, search_query: str = "", sort_order: str = "desc"):
+    """Return a list of recent prediction documents, optionally filtered by predicted label."""
     collection = get_predictions_collection()
-    docs = collection.find().sort("timestamp", -1).limit(limit)
+
+    query = {}
+    if search_query:
+        query = {
+            "predicted_label": {
+                "$regex": search_query,
+                "$options": "i",
+            }
+        }
+
+    sort_direction = 1 if sort_order == "asc" else -1
+
+    docs = collection.find(query).sort("timestamp", -1).limit(limit)
     return [_serialize_prediction(doc) for doc in docs]
+
 
 
 def get_prediction_stats(limit: int = 100):

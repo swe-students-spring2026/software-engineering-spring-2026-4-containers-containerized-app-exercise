@@ -423,6 +423,20 @@ tbody tr:hover {
   padding-left: 0;
 }
 
+.history-page-panel .history-search-form {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.history-page-panel .history-search-input {
+  width: 260px;
+  max-width: 260px;
+  flex: 0 0 260px;
+}
+
 @media screen and (max-width: 1180px) {
   .dashboard-grid {
     grid-template-columns: 1fr 1fr;
@@ -462,4 +476,5 @@ tbody tr:hover {
   .button-row {
     flex-direction: column;
   }
+
 }
