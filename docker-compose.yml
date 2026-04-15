@@ -1,0 +1,24 @@
+services:
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+
+  machine-learning-client:
+    build: ./machine-learning-client
+    container_name: machine-learning-client
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_URI=mongodb+srv://vfc2016_db_user:silly-sealions@cluster0.oogyatw.mongodb.net/speech_rater?retryWrites=true&w=majority
+
+  web-app:
+    build: ./web-app
+    container_name: web-app
+    ports:
+      - "5001:5000"
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_URI=mongodb+srv://vfc2016_db_user:silly-sealions@cluster0.oogyatw.mongodb.net/speech_rater?retryWrites=true&w=majority
