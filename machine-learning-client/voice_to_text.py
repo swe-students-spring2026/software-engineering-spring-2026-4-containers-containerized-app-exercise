@@ -5,6 +5,7 @@ import assemblyai as aai
 
 aai.settings.api_key = os.getenv("VTT_API_KEY")
 
+
 def voice_to_text(audio):
     """Transcribe jokes passed"""
     # takes the joke audio, and uploads to assemblyAI, also translates to english when necessary
