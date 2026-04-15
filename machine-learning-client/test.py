@@ -2,12 +2,14 @@
 
 import birdnet
 
-model = birdnet.load("acoustic", "2.4", "tf")
+import io
+import soundfile as sf
 
-predictions = model.predict(
-    "example/soundscape.wav",
+audio_model = birdnet.load("acoustic", "2.4", "pb")
+
+predictions = audio_model.predict(
+    "example/Colaptes_auratus.ogg",
     # predict only the species from the file
-    custom_species_list="example/species_list.txt",
+    # custom_species_list="example/species_list.txt",
+    # batch_size=64,
 )
-
-predictions.to_csv("example/predictions.csv")

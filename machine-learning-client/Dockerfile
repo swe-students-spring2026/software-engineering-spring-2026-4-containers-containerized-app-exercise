@@ -16,4 +16,4 @@ RUN pip install --ignore-installed -r requirements.txt
 
 RUN python load_model.py
 
-CMD ["python3", "flask",  "run", "app.py", "--host=0.0.0.0"]
+CMD ["python3", "-m", "flask",  "run", "app.py", "--host=0.0.0.0"]

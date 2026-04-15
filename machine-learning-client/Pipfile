@@ -7,8 +7,11 @@ name = "pypi"
 pylint = "*"
 black = "*"
 pymongo = "*"
-birdnet = "*"
 flask = "*"
+av = "*"
+soundfile = "*"
+birdnet = {extras = ["and-cuda"], version = "*"}
+dotenv = "*"
 
 [dev-packages]
 tomli = "*"
