@@ -7,6 +7,7 @@ from fer.fer import FER  # pylint: disable=import-error
 import cv2  # pylint: disable=import-error
 from db import save_record
 
+
 def analyze_and_store():
     """Captures an image, analyzes it for emotion, and saves it utilizing db.py."""
     print(f"[{datetime.datetime.now()}] Waking up to process data...")
