@@ -21,7 +21,9 @@ STRAIGHTNESS_THRESHOLDS = {
     "pinky": 0.96,
 }
 
-MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "hand_landmarker.task")
+MODEL_PATH = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "hand_landmarker.task"
+)
 
 
 def _dist(a, b):
@@ -36,9 +38,9 @@ def straightness_ratio(mcp, pip, dip, tip):
     (MCP->PIP->DIP->TIP). A straight finger gets about 1.0, a curled finger
     is lower.
 
-    Initially, I wanted to simply use the PIP joint angle to classify 
+    Initially, I wanted to simply use the PIP joint angle to classify
     straightness. That didn't work very well, even after testing every
-    possible angle for each finger. So I came up with this method which 
+    possible angle for each finger. So I came up with this method which
     works much better.
     """
     path = _dist(mcp, pip) + _dist(pip, dip) + _dist(dip, tip)
@@ -74,8 +76,8 @@ def classify_gesture(finger_states):
     I elected to disregard the thumb because, if you think about it,
     the thumb can kinda do whatever it wants in rock/paper/scissors.
 
-    A thumbs-up is still a rock; a German three (re: Inglorious Basterds) 
-    is still scissors; an American four is still paper. 
+    A thumbs-up is still a rock; a German three (re: Inglorious Basterds)
+    is still scissors; an American four is still paper.
     """
     index = finger_states["index"]
     middle = finger_states["middle"]
@@ -125,7 +127,7 @@ def classify_frame(frame, landmarker=None):
         gesture is one of "rock", "paper", "scissors", "unknown", "no_hand".
         landmarks is the list of 21 landmark objects, or None if no hand found.
     """
-    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) # pylint: disable=no-member
+    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # pylint: disable=no-member
     mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
 
     owns_landmarker = landmarker is None

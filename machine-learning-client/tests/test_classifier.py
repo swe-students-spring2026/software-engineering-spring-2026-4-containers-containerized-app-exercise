@@ -38,11 +38,7 @@ def _mock_landmarker(landmarks):
     """Make a mock landmarker returning given landmarks."""
     result = SimpleNamespace(
         hand_landmarks=[landmarks] if landmarks else [],
-        handedness=(
-            [[SimpleNamespace(category_name="Right")]]
-            if landmarks
-            else []
-        ),
+        handedness=([[SimpleNamespace(category_name="Right")]] if landmarks else []),
     )
     mock = MagicMock()
     mock.detect.return_value = result
@@ -51,17 +47,13 @@ def _mock_landmarker(landmarks):
 
 def test_straight_finger_ratio():
     """Straight finger should have ratio near 1."""
-    r = straightness_ratio(
-        _lm(0, 0), _lm(0, 0.1), _lm(0, 0.2), _lm(0, 0.3)
-    )
+    r = straightness_ratio(_lm(0, 0), _lm(0, 0.1), _lm(0, 0.2), _lm(0, 0.3))
     assert abs(r - 1.0) < 0.001
 
 
 def test_curled_finger_ratio():
     """Curled finger should have ratio far below 1."""
-    r = straightness_ratio(
-        _lm(0, 0), _lm(0, 0.2), _lm(0.2, 0.2), _lm(0.2, 0)
-    )
+    r = straightness_ratio(_lm(0, 0), _lm(0, 0.2), _lm(0.2, 0.2), _lm(0.2, 0))
     assert r < 0.5
 
 
@@ -73,9 +65,7 @@ def test_zero_path_ratio():
 
 def test_all_extended():
     """Straight fingers should be labeled as extended."""
-    states = get_finger_states(
-        _make_landmarks({"index", "middle", "ring", "pinky"})
-    )
+    states = get_finger_states(_make_landmarks({"index", "middle", "ring", "pinky"}))
     assert all(states.values())
 
 
@@ -87,9 +77,7 @@ def test_all_curled():
 
 def test_scissors_fingers():
     """Index and middle extended, ring and pinky curled."""
-    states = get_finger_states(
-        _make_landmarks({"index", "middle"})
-    )
+    states = get_finger_states(_make_landmarks({"index", "middle"}))
     assert states["index"] and states["middle"]
     assert not states["ring"] and not states["pinky"]
 
@@ -97,8 +85,10 @@ def test_scissors_fingers():
 def test_rock():
     """All curled should be rock."""
     states = {
-        "index": False, "middle": False,
-        "ring": False, "pinky": False,
+        "index": False,
+        "middle": False,
+        "ring": False,
+        "pinky": False,
     }
     assert classify_gesture(states) == "rock"
 
@@ -106,8 +96,10 @@ def test_rock():
 def test_paper():
     """All extended should be paper."""
     states = {
-        "index": True, "middle": True,
-        "ring": True, "pinky": True,
+        "index": True,
+        "middle": True,
+        "ring": True,
+        "pinky": True,
     }
     assert classify_gesture(states) == "paper"
 
@@ -115,8 +107,10 @@ def test_paper():
 def test_scissors():
     """Index and middle extended should be scissors."""
     states = {
-        "index": True, "middle": True,
-        "ring": False, "pinky": False,
+        "index": True,
+        "middle": True,
+        "ring": False,
+        "pinky": False,
     }
     assert classify_gesture(states) == "scissors"
 
@@ -124,8 +118,10 @@ def test_scissors():
 def test_unknown():
     """Only index extended should be unknown."""
     states = {
-        "index": True, "middle": False,
-        "ring": False, "pinky": False,
+        "index": True,
+        "middle": False,
+        "ring": False,
+        "pinky": False,
     }
     assert classify_gesture(states) == "unknown"
 
@@ -133,9 +129,7 @@ def test_unknown():
 def test_no_hand():
     """No hand detected should return no_hand."""
     frame = np.zeros((480, 640, 3), dtype=np.uint8)
-    gesture, lm = classify_frame(
-        frame, landmarker=_mock_landmarker(None)
-    )
+    gesture, lm = classify_frame(frame, landmarker=_mock_landmarker(None))
     assert gesture == "no_hand"
     assert lm is None
 
@@ -153,9 +147,7 @@ def test_paper_frame():
     """Frame with all fingers extended should classify as paper."""
     frame = np.zeros((480, 640, 3), dtype=np.uint8)
     lm = _make_landmarks({"index", "middle", "ring", "pinky"})
-    gesture, _ = classify_frame(
-        frame, landmarker=_mock_landmarker(lm)
-    )
+    gesture, _ = classify_frame(frame, landmarker=_mock_landmarker(lm))
     assert gesture == "paper"
 
 
@@ -163,8 +155,5 @@ def test_scissors_frame():
     """Frame with index+middle extended should be scissors."""
     frame = np.zeros((480, 640, 3), dtype=np.uint8)
     lm = _make_landmarks({"index", "middle"})
-    gesture, _ = classify_frame(
-        frame, landmarker=_mock_landmarker(lm)
-    )
+    gesture, _ = classify_frame(frame, landmarker=_mock_landmarker(lm))
     assert gesture == "scissors"
-    
