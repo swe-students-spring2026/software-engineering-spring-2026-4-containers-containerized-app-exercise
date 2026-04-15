@@ -24,7 +24,7 @@ jobs:
 
       - name: Lint with pylint
         working-directory: machine-learning-client
-        run: pylint ml_client.py database.py --fail-under=8.0
+        run: pylint app.py --fail-under=8.0
 
       - name: Format check with black
         working-directory: machine-learning-client
