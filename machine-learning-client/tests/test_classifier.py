@@ -167,3 +167,4 @@ def test_scissors_frame():
         frame, landmarker=_mock_landmarker(lm)
     )
     assert gesture == "scissors"
+    
