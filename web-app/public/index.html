@@ -64,14 +64,14 @@
                 <button id="button-color-blue"  onclick="switchColor('blue')" class="button-color" style="color: blue">&#9632;</button>
             </div>
             <div class="spacer"></div>
-            <div class="canvas"><canvas id="drawingCanvas" width="500" height="500" style="border:1px solid black;"></canvas></div>
+            <div class="canvas"><canvas id="canvas" width="500" height="500" style="border:1px solid black;"></canvas></div>
             <div class="spacer"></div>
-            <div class="button-upload"><button id="myButton" onclick="upload()" class="button-upload-inner">Upload</button></div>
+            <div class="button-upload"><button onclick="upload()" class="button-upload-inner">Upload</button></div>
         </div>
     </body>
 
     <script>
-        const canvas = document.getElementById('drawingCanvas');
+        const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         let isDrawing = false;
         let currColor = 'black';
@@ -116,10 +116,14 @@
         }
 
         function upload() {
-            console.log("Button was clicked!");
-            const imageURL = canvas.toDataURL('image/png');
-            // TODO: convert to bytes & send to server
-            console.log(imageURL);
+            canvas.toBlob(async (blob) => {
+                let response = await fetch('localhost:5000', {
+                    method: 'POST',
+                    body: new Uint8Array(blob.arrayBuffer()),
+                    headers: { 'Content-Type': 'application/octet-stream' }
+                });
+                console.log(response);
+            }, 'image/png');
         }
 
     </script>
