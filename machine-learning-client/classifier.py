@@ -125,7 +125,7 @@ def classify_frame(frame, landmarker=None):
         gesture is one of "rock", "paper", "scissors", "unknown", "no_hand".
         landmarks is the list of 21 landmark objects, or None if no hand found.
     """
-    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) # pylint: disable=no-member
     mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
 
     owns_landmarker = landmarker is None
