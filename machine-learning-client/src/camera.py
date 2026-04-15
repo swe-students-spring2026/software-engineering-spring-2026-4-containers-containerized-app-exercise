@@ -6,7 +6,7 @@ import numpy as np
 
 from inference import load_model, predict
 from preprocessing import preprocess_frame
-
+from prediction_log import log_prediction
 
 def run(camera_index: int = 0, frame_step: int = 10, invert: bool = False):
     """Capture webcam frames, sample every 10 frame, and print predictions."""
@@ -39,6 +39,14 @@ def run(camera_index: int = 0, frame_step: int = 10, invert: bool = False):
 
                 idx, label, conf = predict(model, gray_28, device)
                 last_label, last_conf = label, conf
+
+                log_prediction(
+                    predicted_label=label,
+                    confidence=conf,
+                    current_text=label,
+                    source="webcam",
+                    frame_number=frame_count,
+                )
 
                 print(
                     f"frame={frame_count} class={label} "
