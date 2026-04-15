@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}History | Sign Language Recognition{% endblock %}
+
+{% block content %}
+<section class="panel history-page-panel">
+  <div class="panel-header">
+    <h2>Prediction History</h2>
+    <a href="{{ url_for('pages.index') }}" class="mini-link">← Back to dashboard</a>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Predicted Label</th>
+          <th>Confidence</th>
+          <th>Current Text</th>
+          <th>Source</th>
+          <th>Frame</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in recent %}
+        <tr>
+          <td>{{ item.timestamp }}</td>
+          <td>{{ item.predicted_label }}</td>
+          <td>{{ item.confidence }}</td>
+          <td>{{ item.current_text or "N/A" }}</td>
+          <td>{{ item.source or "N/A" }}</td>
+          <td>{{ item.frame_number if item.frame_number is not none else "N/A" }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6">No prediction history available yet.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
