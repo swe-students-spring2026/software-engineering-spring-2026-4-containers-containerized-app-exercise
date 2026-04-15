@@ -9,7 +9,7 @@ import uuid
 
 
 app = Flask(__name__, template_folder="app/templates", static_folder="app/static")
-UPLOAD_FOLDER = "uploads"
+UPLOAD_FOLDER = "/app/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 @app.route("/")
