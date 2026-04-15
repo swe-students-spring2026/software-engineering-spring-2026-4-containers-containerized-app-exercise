@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if db_error %}
+<div class="error-banner">
+  Database unavailable. Check that MongoDB is running and MONGO_URI is correct.
+</div>
+{% endif %}
+
+<section class="camera-panel">
+  <h2>Camera Capture</h2>
+  <p class="muted">This uses your browser camera, sends snapshots to the ML container, and stores detections in MongoDB.</p>
+  <div class="camera-actions">
+    <button id="start-camera" type="button">Start camera</button>
+    <button id="toggle-capture" type="button" disabled>Start detecting</button>
+    <span id="camera-status" class="muted">Camera idle</span>
+  </div>
+  <video id="camera-preview" autoplay playsinline muted></video>
+  <canvas id="camera-canvas" style="display:none;"></canvas>
+  <div id="last-result" class="feed"><p class="muted">No camera detections yet.</p></div>
+</section>
+
+<section class="stats">
+  <div class="card">
+    <span class="card-label">Total Snapshots</span>
+    <span class="card-value" id="stat-snapshots">{{ stats.total_snapshots }}</span>
+  </div>
+  <div class="card">
+    <span class="card-label">Unique Labels</span>
+    <span class="card-value" id="stat-labels">{{ stats.unique_labels }}</span>
+  </div>
+  <div class="card wide">
+    <span class="card-label">Most Common Objects</span>
+    <div class="tag-list" id="stat-common">
+      {% for item in stats.most_common %}
+        <span class="tag">{{ item.label }} ({{ item.count }})</span>
+      {% else %}
+        <span class="muted">No data yet</span>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Live Feed <span class="muted">(auto-refreshes every 5s)</span></h2>
+  <div id="feed" class="feed">
+    {% if detections %}
+      {% set latest = detections[0] %}
+      <div class="feed-item">
+        <span class="timestamp">{{ latest.timestamp }}</span>
+        <div class="tag-list">
+          {% for det in latest.get('detections', []) %}
+            <span class="tag">{{ det.label }} {{ "%.0f"|format(det.confidence * 100) }}%</span>
+          {% else %}
+            <span class="muted">No objects detected</span>
+          {% endfor %}
+        </div>
+      </div>
+    {% else %}
+      <p class="muted">Waiting for detections...</p>
+    {% endif %}
+  </div>
+</section>
+
+<section>
+  <h2>Detection History</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Timestamp</th>
+        <th>Objects Detected</th>
+        <th>Count</th>
+      </tr>
+    </thead>
+    <tbody id="history-body">
+      {% for doc in detections %}
+        <tr>
+          <td>{{ doc.timestamp }}</td>
+          <td>
+            {% for det in doc.get('detections', []) %}
+              <span class="tag">{{ det.label }}</span>
+            {% else %}
+              <span class="muted">—</span>
+            {% endfor %}
+          </td>
+          <td>{{ doc.get('detections', [])|length }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="3" class="muted">No records yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<script>
+  const ML_API_URL = {{ ml_api_url|tojson }};
+  const videoEl = document.getElementById("camera-preview");
+  const canvasEl = document.getElementById("camera-canvas");
+  const startBtn = document.getElementById("start-camera");
+  const detectBtn = document.getElementById("toggle-capture");
+  const statusEl = document.getElementById("camera-status");
+  const lastResultEl = document.getElementById("last-result");
+
+  let mediaStream = null;
+  let captureTimer = null;
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  async function startCamera() {
+    try {
+      mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      videoEl.srcObject = mediaStream;
+      detectBtn.disabled = false;
+      statusEl.textContent = "Camera ready";
+    } catch (err) {
+      statusEl.textContent = `Camera error: ${err.message}`;
+    }
+  }
+
+  function stopDetecting() {
+    if (captureTimer) {
+      clearInterval(captureTimer);
+      captureTimer = null;
+    }
+    detectBtn.textContent = "Start detecting";
+    statusEl.textContent = "Camera ready";
+  }
+
+  async function captureAndSend() {
+    if (!mediaStream || videoEl.videoWidth === 0) {
+      return;
+    }
+    const ctx = canvasEl.getContext("2d");
+    canvasEl.width = videoEl.videoWidth;
+    canvasEl.height = videoEl.videoHeight;
+    ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
+    const image = canvasEl.toDataURL("image/jpeg", 0.8);
+
+    try {
+      const res = await fetch(ML_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image, source: "browser-camera" })
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        statusEl.textContent = `Detect error: ${data.error || res.statusText}`;
+        return;
+      }
+      const tags = (data.detections || []).length
+        ? data.detections.map(d => `<span class="tag">${escapeHtml(d.label)} ${Math.round(d.confidence * 100)}%</span>`).join("")
+        : `<span class="muted">No objects detected in this frame</span>`;
+      lastResultEl.innerHTML = `<div class="feed-item"><div class="tag-list">${tags}</div></div>`;
+      statusEl.textContent = data.saved ? "Detection saved to MongoDB" : "Frame processed";
+      await refresh();
+    } catch (err) {
+      statusEl.textContent = `Network error: ${err.message}`;
+    }
+  }
+
+  function toggleDetecting() {
+    if (captureTimer) {
+      stopDetecting();
+      return;
+    }
+    captureAndSend();
+    captureTimer = setInterval(captureAndSend, 2500);
+    detectBtn.textContent = "Stop detecting";
+    statusEl.textContent = "Detecting every 2.5s";
+  }
+
+  async function refreshFeed() {
+    const res = await fetch("/api/detections");
+    const data = await res.json();
+    if (data.error || !Array.isArray(data) || !data.length) return;
+
+    const latest = data[0];
+    const dets = latest.detections || [];
+    const tags = dets.length
+      ? dets.map(d => `<span class="tag">${escapeHtml(d.label)} ${Math.round(d.confidence * 100)}%</span>`).join("")
+      : `<span class="muted">No objects detected</span>`;
+
+    document.getElementById("feed").innerHTML = `
+      <div class="feed-item">
+        <span class="timestamp">${escapeHtml(latest.timestamp)}</span>
+        <div class="tag-list">${tags}</div>
+      </div>`;
+
+    const tbody = document.getElementById("history-body");
+    tbody.innerHTML = data.map(doc => {
+      const docDets = doc.detections || [];
+      const tagHtml = docDets.length
+        ? docDets.map(d => `<span class="tag">${escapeHtml(d.label)}</span>`).join("")
+        : `<span class="muted">—</span>`;
+      return `<tr><td>${escapeHtml(doc.timestamp)}</td><td>${tagHtml}</td><td>${docDets.length}</td></tr>`;
+    }).join("");
+  }
+
+  async function refreshStats() {
+    const res = await fetch("/api/stats");
+    const data = await res.json();
+    if (data.error) return;
+
+    document.getElementById("stat-snapshots").textContent = data.total_snapshots;
+    document.getElementById("stat-labels").textContent = data.unique_labels;
+
+    const tagList = document.getElementById("stat-common");
+    tagList.innerHTML = data.most_common.length
+      ? data.most_common.map(d => `<span class="tag">${escapeHtml(d.label)} (${d.count})</span>`).join("")
+      : `<span class="muted">No data yet</span>`;
+  }
+
+  async function refresh() {
+    await Promise.all([refreshFeed(), refreshStats()]);
+  }
+
+  startBtn.addEventListener("click", startCamera);
+  detectBtn.addEventListener("click", toggleDetecting);
+  setInterval(refresh, 5000);
+</script>
+
+{% endblock %}
