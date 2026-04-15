@@ -3,9 +3,11 @@ let isListening = false;
 const btn = document.getElementById("toggleBtn");
 const statusText = document.getElementById("statusText");
 const statusDot = document.getElementById("statusDot");
+const detectionList = document.getElementById("detectionList");
 
 let seconds = 0;
-let interval = 0;
+let timer_interval = null;
+let record_interval = null;
 
 function updateTimer() {
     seconds++;
@@ -39,10 +41,6 @@ async function recordChunk() {
     setTimeout(() => recorder.stop(), 3000);
 }
 
-
-
-
-btn.addEventListener("click", async () => {
 //detections
 function renderDetections(detections) {
     detectionList.innerHTML = "";
@@ -77,9 +75,12 @@ btn.addEventListener("click", () => {
         statusText.textContent = "Listening...";
         statusDot.classList.remove("idle");
         statusDot.classList.add("active");
+        seconds = 0;
+        document.getElementById("timer").textContent = "00:00";
+        timer_interval = setInterval(updateTimer, 1000); // update timer every second
 
-        recordChunk()
-        interval = setInterval(recordChunk, 3000); // new recorder every 3s
+        recordChunk();
+        record_interval = setInterval(recordChunk, 3000); // new recorder every 3s
 
 
         // later: call backend API
@@ -94,11 +95,13 @@ btn.addEventListener("click", () => {
 
         statusText.textContent = "Idle";
         statusDot.classList.remove("active");
-        statusDot.classList.add("idle");
+        statusDot.classList.add("idle")
 
+        clearInterval(timer_interval);
+        timer_interval = null;
 
-        clearInterval(interval);
-        interval = 0;
+        clearInterval(record_interval); 
+        record_interval = null;
 
         // fetch("/stop").then(response => response.json()).then(data => console.log(data));
     }

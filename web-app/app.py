@@ -21,7 +21,7 @@ def start():
 
 
 @app.route("/stop")
-def end():
+def stop():
     """End listening"""
     print("listening stopped")
     return {"status": "listening stopped"}
