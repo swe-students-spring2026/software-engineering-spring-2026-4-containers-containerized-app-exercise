@@ -35,8 +35,7 @@ def create_app(test_config: dict | None = None) -> Flask:
     @flask_app.get("/")
     def index():
         """Render the landing page."""
-        return render_template("interview.html")
-        #return render_template("index.html")
+        return render_template("index.html")
 
     @flask_app.post("/api/sessions")
     def create_session():
