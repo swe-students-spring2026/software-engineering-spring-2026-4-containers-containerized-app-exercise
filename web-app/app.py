@@ -20,10 +20,11 @@ def index():
     """Displays the page"""
     return render_template("index.html")
 
+
 @app.route("/api/process_frame", methods=["POST"])
 def process_frame():
     """
-    Receives a base64 image frame, sends it to the ML-Client and updates 
+    Receives a base64 image frame, sends it to the ML-Client and updates
     the latest gaze position.
     """
     payload = request.get_json(silent=True) or {}
@@ -40,7 +41,6 @@ def process_frame():
             y = float(data.get("y", 0.5))
             ts = time.time()
 
-
             with _gaze_lock:
                 _latest_gaze["x"] = x
                 _latest_gaze["y"] = y
@@ -54,6 +54,7 @@ def process_frame():
 
     return jsonify({"error": "Frame processing failed"}), 500
 
+
 @app.route("/api/calibrate", methods=["POST"])
 def calibrate_frame():
     """
@@ -63,7 +64,7 @@ def calibrate_frame():
     if not payload:
         return jsonify({"error": "No payload"}), 400
     try:
-        calib_url =  ML_CLIENT_URL.replace("/process", "/calibrate")
+        calib_url = ML_CLIENT_URL.replace("/process", "/calibrate")
         ml_response = requests.post(calib_url, json=payload, timeout=2)
         return jsonify(ml_response.json()), ml_response.status_code
 
