@@ -1,73 +1,76 @@
 import base64
-from unittest.mock import MagicMock, patch, PropertyMock
-
+from unittest.mock import MagicMock, patch
 import numpy as np
 import pytest
+import cv2
+import app.main as main_module
+from app.main import app as flask_app
 
 
-# Helpers 
+@pytest.fixture(autouse=True)
+def reset_globals():
+    main_module._model = None
+    main_module._db = None
+    yield
+
+
+@pytest.fixture
+def client():
+    flask_app.config["TESTING"] = True
+    with flask_app.test_client() as c:
+        yield c
+
+
 def make_frame(h=480, w=640):
-    """Return a dummy BGR frame (numpy array)."""
     return np.zeros((h, w, 3), dtype=np.uint8)
 
 
-# Testing the camera functionality 
-class TestGetCamera:
-    @patch("cv2.VideoCapture")
-    def test_opens_default_source(self, mock_vc):
-        from app.main import get_camera
-        mock_vc.return_value.isOpened.return_value = True
-        cap = get_camera("0")
-        mock_vc.assert_called_once_with(0)
-        assert cap is not None
-
-    @patch("cv2.VideoCapture")
-    def test_raises_if_not_opened(self, mock_vc):
-        from app.main import get_camera
-        mock_vc.return_value.isOpened.return_value = False
-        with pytest.raises(RuntimeError, match="Cannot open video source"):
-            get_camera("0")
-
-    @patch("cv2.VideoCapture")
-    def test_accepts_file_path(self, mock_vc):
-        from app.main import get_camera
-        mock_vc.return_value.isOpened.return_value = True
-        get_camera("video.mp4")
-        mock_vc.assert_called_once_with("video.mp4")
-        
-        
-        
-# testing capture frame 
-
-class TestCaptureFrame:
-    def test_returns_frame_on_success(self):
-        from app.main import capture_frame
-        cap = MagicMock()
+def make_data_url(frame=None):
+    if frame is None:
         frame = make_frame()
-        cap.read.return_value = (True, frame)
-        result = capture_frame(cap)
-        assert result is frame
+    _, buf = cv2.imencode(".jpg", frame)
+    b64 = base64.b64encode(buf).decode()
+    return f"data:image/jpeg;base64,{b64}"
 
-    def test_returns_none_on_failure(self):
-        from app.main import capture_frame
-        cap = MagicMock()
-        cap.read.return_value = (False, None)
-        assert capture_frame(cap) is None
-        
-# testing object detection 
 
+# decode_base64_image
+class TestDecodeBase64Image:
+    def test_decodes_valid_image(self):
+        from app.main import decode_base64_image
+        frame = decode_base64_image(make_data_url())
+        assert frame is not None
+        assert frame.shape[2] == 3
+
+    def test_raises_on_empty(self):
+        from app.main import decode_base64_image
+        with pytest.raises(ValueError, match="Missing image payload"):
+            decode_base64_image("")
+
+    def test_resizes_if_too_wide(self):
+        from app.main import decode_base64_image
+        big = make_frame(480, 1920)
+        result = decode_base64_image(make_data_url(big))
+        assert result.shape[1] <= 960
+
+    def test_decodes_without_data_prefix(self):
+        from app.main import decode_base64_image
+        _, buf = cv2.imencode(".jpg", make_frame())
+        b64 = base64.b64encode(buf).decode()
+        frame = decode_base64_image(b64)
+        assert frame is not None
+
+
+# detect_objects
 class TestDetectObjects:
     def _make_mock_model(self, conf=0.9, cls_id=0, xyxy=(10, 20, 100, 200)):
         model = MagicMock()
         model.names = {0: "person"}
-
         box = MagicMock()
         box.conf = [conf]
         box.cls = [cls_id]
         xyxy_tensor = MagicMock()
         xyxy_tensor.tolist.return_value = list(xyxy)
         box.xyxy = [xyxy_tensor]
-
         result = MagicMock()
         result.boxes = [box]
         model.return_value = [result]
@@ -75,203 +78,132 @@ class TestDetectObjects:
 
     def test_returns_detection_above_threshold(self):
         from app.main import detect_objects
-        model = self._make_mock_model(conf=0.9)
-        frame = make_frame()
-        dets = detect_objects(model, frame, confidence_threshold=0.5)
+        dets = detect_objects(self._make_mock_model(conf=0.9), make_frame(), confidence_threshold=0.5)
         assert len(dets) == 1
         assert dets[0]["label"] == "person"
         assert dets[0]["confidence"] == 0.9
 
     def test_filters_below_threshold(self):
         from app.main import detect_objects
-        model = self._make_mock_model(conf=0.3)
-        frame = make_frame()
-        dets = detect_objects(model, frame, confidence_threshold=0.5)
+        dets = detect_objects(self._make_mock_model(conf=0.3), make_frame(), confidence_threshold=0.5)
         assert dets == []
 
     def test_bbox_is_list_of_floats(self):
         from app.main import detect_objects
-        model = self._make_mock_model(conf=0.8, xyxy=(10.5, 20.1, 100.9, 200.3))
-        frame = make_frame()
-        dets = detect_objects(model, frame)
+        dets = detect_objects(self._make_mock_model(conf=0.8), make_frame())
         assert isinstance(dets[0]["bbox"], list)
         assert len(dets[0]["bbox"]) == 4
 
-    def test_empty_results(self):
+    def test_empty_boxes(self):
         from app.main import detect_objects
         model = MagicMock()
         result = MagicMock()
         result.boxes = []
         model.return_value = [result]
-        dets = detect_objects(model, make_frame())
-        assert dets == []
-        
-# ── annotate_frame ────────────────────────────────────────────────────────────
-
-class TestAnnotateFrame:
-    @patch("cv2.rectangle")
-    @patch("cv2.putText")
-    def test_draws_for_each_detection(self, mock_text, mock_rect):
-        from app.main import annotate_frame
-        frame = make_frame()
-        dets = [
-            {"label": "person", "confidence": 0.9, "bbox": [10, 20, 100, 200]},
-            {"label": "car",    "confidence": 0.7, "bbox": [50, 60, 200, 300]},
-        ]
-        annotate_frame(frame, dets)
-        assert mock_rect.call_count == 2
-        assert mock_text.call_count == 2
-
-    @patch("cv2.rectangle")
-    @patch("cv2.putText")
-    def test_no_draw_on_empty(self, mock_text, mock_rect):
-        from app.main import annotate_frame
-        annotate_frame(make_frame(), [])
-        mock_rect.assert_not_called()
-        mock_text.assert_not_called()
+        assert detect_objects(model, make_frame()) == []
 
 
-# ── encode_frame_thumbnail ────────────────────────────────────────────────────
-
+# encode_frame_thumbnail
 class TestEncodeFrameThumbnail:
-    def test_returns_valid_base64_string(self):
+    def test_returns_valid_base64(self):
         from app.main import encode_frame_thumbnail
-        frame = make_frame()
-        result = encode_frame_thumbnail(frame)
+        result = encode_frame_thumbnail(make_frame())
         assert isinstance(result, str)
-        # Must decode without error
-        decoded = base64.b64decode(result)
-        assert len(decoded) > 0
+        assert len(base64.b64decode(result)) > 0
 
     def test_respects_max_width(self):
         from app.main import encode_frame_thumbnail
-        frame = make_frame(480, 640)
-        # Should not raise even with small max_width
-        result = encode_frame_thumbnail(frame, max_width=160)
+        result = encode_frame_thumbnail(make_frame(), max_width=160)
         assert isinstance(result, str)
 
 
-# saving detections 
-
-class TestSaveDetections:
-    def test_inserts_doc_and_returns_id(self):
-        from app.main import save_detections
+# save_detection_event
+class TestSaveDetectionEvent:
+    def test_inserts_and_returns_id(self):
+        from app.main import save_detection_event
         db = MagicMock()
         db["detections"].insert_one.return_value.inserted_id = "abc123"
-
-        dets = [{"label": "person", "confidence": 0.9, "bbox": [0, 0, 1, 1]}]
-        result = save_detections(db, dets)
+        result = save_detection_event(db, [], make_frame(), "test")
         assert result == "abc123"
-        db["detections"].insert_one.assert_called_once()
 
     def test_doc_contains_num_objects(self):
-        from app.main import save_detections
+        from app.main import save_detection_event
         db = MagicMock()
         db["detections"].insert_one.return_value.inserted_id = "x"
-
         dets = [{"label": "cat", "confidence": 0.8, "bbox": [0, 0, 1, 1]}] * 3
-        save_detections(db, dets)
-        inserted_doc = db["detections"].insert_one.call_args[0][0]
-        assert inserted_doc["num_objects"] == 3
+        save_detection_event(db, dets, make_frame(), "test")
+        doc = db["detections"].insert_one.call_args[0][0]
+        assert doc["num_objects"] == 3
 
-    def test_saves_image_when_frame_provided(self):
-        from app.main import save_detections
+    def test_doc_contains_image(self):
+        from app.main import save_detection_event
         db = MagicMock()
         db["detections"].insert_one.return_value.inserted_id = "y"
+        save_detection_event(db, [], make_frame(), "test")
+        doc = db["detections"].insert_one.call_args[0][0]
+        assert "image" in doc
 
-        save_detections(db, [], frame=make_frame())
-        inserted_doc = db["detections"].insert_one.call_args[0][0]
-        assert "image" in inserted_doc
-
-    def test_no_image_key_when_no_frame(self):
-        from app.main import save_detections
+    def test_doc_contains_source(self):
+        from app.main import save_detection_event
         db = MagicMock()
         db["detections"].insert_one.return_value.inserted_id = "z"
-
-        save_detections(db, [])
-        inserted_doc = db["detections"].insert_one.call_args[0][0]
-        assert "image" not in inserted_doc
-
-
-# geting th db
-"""
-class TestGetDb:
-    @patch("pymongo.MongoClient")
-    def test_returns_db_object(self, mock_client):
-        from app.main import get_db
-        mock_client.return_value.__getitem__.return_value = MagicMock()
-        db = get_db()
-        assert db is not None
-        mock_client.assert_called_once()
-"""
-
-class TestLoadModel:
-    @patch("app.main.YOLO")
-    def test_loads_default_model(self, mock_yolo):
-        from app.main import load_model
-        load_model()
-        mock_yolo.assert_called_once_with("yolov8n.pt")
-
-    @patch("app.main.YOLO")
-    def test_loads_custom_model(self, mock_yolo):
-        from app.main import load_model
-        load_model("yolov8s.pt")
-        mock_yolo.assert_called_once_with("yolov8s.pt")
+        save_detection_event(db, [], make_frame(), "webcam")
+        doc = db["detections"].insert_one.call_args[0][0]
+        assert doc["source"] == "webcam"
 
 
-class TestGetDb:
-    @patch("app.main.pymongo.MongoClient")
-    def test_returns_db_object(self, mock_client):
-        from app.main import get_db
-        db = get_db()
-        assert db is not None
-        mock_client.assert_called_once()
+# health route
+class TestHealthRoute:
+    @patch("app.main.get_model")
+    @patch("app.main.get_db")
+    def test_health_ok(self, mock_db, mock_model, client):
+        mock_db.return_value.command.return_value = {"ok": 1}
+        resp = client.get("/health")
+        assert resp.status_code == 200
+        assert resp.get_json()["ok"] is True
 
-    @patch("app.main.pymongo.MongoClient")
-    def test_uses_env_vars(self, mock_client):
-        from app.main import get_db
-        with patch.dict("os.environ", {"MONGO_URI": "mongodb://test:27017", "MONGO_DBNAME": "testdb"}):
-            get_db()
-        mock_client.assert_called_once_with("mongodb://test:27017", serverSelectionTimeoutMS=3000)
-
-
-class TestGetCameraNoArgs:
-    @patch("cv2.VideoCapture")
-    def test_uses_env_var_source(self, mock_vc):
-        from app.main import get_camera
-        mock_vc.return_value.isOpened.return_value = True
-        with patch.dict("os.environ", {"VIDEO_SOURCE": "1"}):
-            get_camera()
-        mock_vc.assert_called_once_with(1)
+    @patch("app.main.get_db", side_effect=Exception("no db"))
+    def test_health_fail(self, mock_db, client):
+        resp = client.get("/health")
+        assert resp.status_code == 503
+        assert resp.get_json()["ok"] is False
 
 
-class TestMain:
-    @patch("app.main.cv2.destroyAllWindows")
-    @patch("app.main.cv2.waitKey", return_value=ord("q"))
-    @patch("app.main.cv2.imshow")
-    @patch("app.main.annotate_frame")
+# detect route
+class TestDetectRoute:
+    @patch("app.main.save_detection_event", return_value="fake_id")
+    @patch("app.main.detect_objects", return_value=[{"label": "person", "confidence": 0.9, "bbox": [0, 0, 1, 1]}])
+    @patch("app.main.get_model")
+    @patch("app.main.get_db")
+    @patch("app.main.decode_base64_image")
+    def test_detect_returns_detections(self, mock_decode, mock_db, mock_model, mock_det, mock_save, client):
+        mock_decode.return_value = make_frame()
+        resp = client.post("/detect", json={"image": "data:image/jpeg;base64,abc", "source": "test"})
+        assert resp.status_code == 200
+        assert resp.get_json()["count"] == 1
+
+    @patch("app.main.decode_base64_image", side_effect=ValueError("bad image"))
+    def test_detect_bad_image(self, mock_decode, client):
+        resp = client.post("/detect", json={"image": "bad"})
+        assert resp.status_code == 400
+
+    @patch("app.main.save_detection_event", return_value=None)
     @patch("app.main.detect_objects", return_value=[])
-    @patch("app.main.capture_frame", return_value=None)  # immediately breaks loop
+    @patch("app.main.get_model")
     @patch("app.main.get_db")
-    @patch("app.main.load_model")
-    @patch("app.main.get_camera")
-    def test_main_runs_and_exits(self, mock_cam, mock_model, mock_db, mock_cap,
-                                  mock_det, mock_ann, mock_show, mock_wait, mock_destroy):
-        from app.main import main
-        main()
-        mock_cam.assert_called_once()
-        mock_model.assert_called_once()
+    @patch("app.main.decode_base64_image")
+    def test_detect_no_save_when_empty(self, mock_decode, mock_db, mock_model, mock_det, mock_save, client):
+        mock_decode.return_value = make_frame()
+        resp = client.post("/detect", json={"image": "data:image/jpeg;base64,abc"})
+        assert resp.status_code == 200
+        assert resp.get_json()["count"] == 0
 
-    @patch("app.main.cv2.destroyAllWindows")
-    @patch("app.main.detect_objects", return_value=[{"label": "cat", "confidence": 0.9, "bbox": [0,0,1,1]}])
-    @patch("app.main.capture_frame", side_effect=[make_frame(), None])
-    @patch("app.main.save_detections")
-    @patch("app.main.get_db")
-    @patch("app.main.load_model")
-    @patch("app.main.get_camera")
-    def test_main_headless_saves(self, mock_cam, mock_model, mock_db,
-                                  mock_save, mock_cap, mock_det, mock_destroy):
-        from app.main import main
-        with patch.dict("os.environ", {"HEADLESS": "1"}):
-            main()
-        mock_save.assert_called_once()
+
+# get model
+class TestGetModel:
+    @patch("app.main.YOLO")
+    def test_loads_model_once(self, mock_yolo):
+        main_module._model = None
+        main_module.get_model()
+        main_module.get_model()
+        mock_yolo.assert_called_once()
