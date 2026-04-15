@@ -16,7 +16,6 @@ db = mongo_client[MONGO_DB_NAME]
 detections_collection = db["detections"]
 
 
-
 @app.route("/")
 def home():
     """Render the homepage."""
