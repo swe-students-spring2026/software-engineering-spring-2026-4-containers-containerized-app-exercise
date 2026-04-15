@@ -22,31 +22,33 @@
         <hr>
 
         <section class="container">
-            <h2>Latest Session:  Practice</h2>
-            <p><strong>Date:</strong> April 10, 2026 | <strong>Duration:</strong> 2m 14s</p>
+            <h2>Latest Session: Practice</h2>
+            <p>
+                <strong>Duration:</strong> <span id="latest-duration">No session yet</span>
+            </p>
 
             <div class="stats-grid">
                 <div class="stat-item">
-                    <h3>145</h3>
+                    <h3 id="latest-wpm">--</h3>
                     <p>Words Per Minute (WPM)</p>
                 </div>
                 <div class="stat-item">
-                    <h3>12</h3>
+                    <h3 id="latest-filler-count">--</h3>
                     <p>Filler Words Detected</p>
                 </div>
                 <div class="stat-item">
-                    <h3>Positive</h3>
-                    <p>Detected Tone</p>
+                    <h3 id="latest-pace-feedback">--</h3>
+                    <p>Pace Feedback</p>
                 </div>
             </div>
-            <!-- mock transcript -->
+
             <h3>Transcript Analysis</h3>
-            <p class="transcript-box">
-                Hi everyone, <span class="filler-word">um</span>, thank you for being here today. I am <span class="filler-word">literally</span> so excited to share our new product with you. 
-                As you can see on the slides, <span class="filler-word">uh</span>, the growth curve has been, <span class="filler-word">you know</span>, very steep over the last quarter. 
-                We have, <span class="filler-word">like</span>, managed to capture twenty percent of the market share. 
-                <span class="filler-word">Um</span>, moving forward, we plan to, <span class="filler-word">uh</span>, expand into the European market. 
-                So, <span class="filler-word">yeah</span>, that's the main idea. Any questions?
+            <p class="transcript-box" id="latest-transcript">
+                No transcript yet.
+            </p>
+
+            <p id="latest-filler-feedback">
+                <i>No feedback yet.</i>
             </p>
         </section>
 
@@ -109,5 +111,7 @@
         </section>
     </main>
 
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    
 </body>
 </html>

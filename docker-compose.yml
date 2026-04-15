@@ -1,24 +1,34 @@
-version: '3.8'
-
 services:
   mongodb:
     image: mongo:latest
-    container_name: speech_coach_db
+    container_name: mongodb
     ports:
       - "27017:27017"
     volumes:
-      - mongo_data:/data/db
+      - mongodb_data:/data/db
 
-  web-app:
-    build:
-      context: ./web-app
-    container_name: speech_coach_web
-    ports:
-      - "5001:5000"  # Host Port 5001 maps to Container Port 5000
-    environment:
-      - MONGO_URI=mongodb://mongodb:27017/speech_coach
+  ml-client:
+    build: ./machine-learning-client
+    container_name: ml-client
     depends_on:
       - mongodb
+    env_file:
+      - .env
+    volumes:
+      - shared_audio:/app/uploads
+
+  web-app:
+    build: ./web-app
+    container_name: web-app
+    depends_on:
+      - mongodb
+    env_file:
+      - .env
+    ports:
+      - "5001:5000"
+    volumes:
+      - shared_audio:/app/uploads
 
 volumes:
-  mongo_data:
+  mongodb_data:
+  shared_audio:
