@@ -1,0 +1,39 @@
+services:
+  mongodb:
+    image: mongo:7
+    container_name: birdnet-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+    volumes:
+      - mongo_data:/data/db
+      - ./database/mongo-init.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+
+  web-app:
+    build: ./web-app
+    depends_on:
+      - mongodb
+    environment:
+      MONGO_URI: mongodb://admin:admin123@mongodb:27017/?authSource=admin
+      MONGO_DB_NAME: birdnet_db
+    ports:
+      - "3000:3000"
+
+  machine-learning-client:
+    build: ./machine-learning-client
+    volumes: 
+      - ./machine-learning-client:/app
+    depends_on:
+      - mongodb
+    environment:
+      MONGO_URI: mongodb://admin:admin123@mongodb:27017/?authSource=admin
+      MONGO_DB_NAME: birdnet_db
+    ports:
+      - "8000:8000"
+
+
+volumes:
+  mongo_data:

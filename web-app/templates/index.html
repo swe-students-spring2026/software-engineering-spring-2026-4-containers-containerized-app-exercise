@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bird Detection Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <h1>Bird Detection Dashboard</h1>
+        <p class="subtitle">Real-time bird sound detection</p>
+    </header>
+
+    <!-- LIVE CONTROL -->
+    <section class="control">
+        <button id="toggleBtn" class="start">
+            Start Listening
+        </button>
+    </section>
+
+    <!-- STATUS -->
+    <section class="status">
+        <span id="statusText">Idle</span>
+        <span id="statusDot" class="dot idle"></span>
+    </section>
+
+    <div id = "timer">00:00</div>
+
+    <section class="results-section">
+        <h2>Current Results</h2>
+        <div id="currentResultCard" class="current-result empty">
+            <div id="currentBirdName" class="current-bird-name">No detection yet</div>
+            <div id="currentBirdMeta" class="current-bird-meta">
+                Start listening to see live bird detections.
+            </div>
+        </div>
+        <div id ="currentResultList" class="current-result-list"></div>
+    </section>
+
+    <!-- RECENT DETECTIONS -->
+    <section class="detections">
+        <h2>Recent Detections</h2>
+        <div id="detectionList" class="detection-list">
+            <!-- Items will be inserted here -->
+        </div>
+    </section>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

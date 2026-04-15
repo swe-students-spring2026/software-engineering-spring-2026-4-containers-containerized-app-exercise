@@ -8,7 +8,11 @@
     ],
     "afterFileEdit": [
       {
+<<<<<<< HEAD
+        "command": "python3 \"$CURSOR_PROJECT_DIR/.automations/give-student-credit.py\" --event=cursor || python \"$CURSOR_PROJECT_DIR/.automations/give-student-credit.py\" --event=cursor"
+=======
         "command": "python3 \"$CURSOR_PROJECT_DIR/.automations/launch-give-student-credit.py\" --event=cursor || python \"$CURSOR_PROJECT_DIR/.automations/launch-give-student-credit.py\" --event=cursor"
+>>>>>>> upstream/main
       }
     ]
   }

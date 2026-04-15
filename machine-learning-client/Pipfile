@@ -4,10 +4,20 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pylint = "*"
 black = "*"
+soundfile = "*"
+dotenv = "*"
+pylint = "*"
+numpy = "*"
+birdnet = "*"
+av = "*"
+pyright = "*"
+gunicorn = "*"
+flask = {extras = ["async"], version = "*"}
+pymongo = "*"
 
 [dev-packages]
-
-[requires]
-python_version = "3.10"
+tomli = "*"
+basedpyright = "*"
+pylint = "*"
+black = "*"
