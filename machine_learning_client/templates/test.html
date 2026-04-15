@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blank Page</title>
+</head>
+<body>
+
+<button id="myBtn">
+  Say Hello</button>
+
+<script>
+async function startBirdStream() {
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true, mimeType: 'audio/ogg'  });
+
+  function recordChunk() {
+    const recorder = new MediaRecorder(stream);
+    const chunks = [];
+
+    recorder.ondataavailable = e => chunks.push(e.data);
+    recorder.onstop = async () => {
+      const blob = new Blob(chunks, { type: "audio/ogg; codecs=opus" });
+      const res = await fetch("/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "audio/ogg" },
+        body: blob,
+      });
+      const detections = await res.json();
+      console.log("Birds detected:", detections);
+    };
+
+    recorder.start();
+    setTimeout(() => recorder.stop(), 3000);
+  }
+
+  recordChunk();
+  setInterval(recordChunk, 3000); // new recorder every 3s
+}
+
+const myButton = document.querySelector("#myBtn");
+myButton.addEventListener("click", () => {
+    print("stuff")
+    startBirdStream()
+});
+</script>
+</body>
+</html>
