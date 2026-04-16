@@ -33,7 +33,9 @@ def test_build_polling_endpoint_uses_transcript_id():
 
 def test_capture_microphone_audio_is_not_implemented():
     """Test that the microphone capture stub fails explicitly."""
-    with pytest.raises(NotImplementedError, match="Microphone capture is not implemented yet"):
+    with pytest.raises(
+        NotImplementedError, match="Microphone capture is not implemented yet"
+    ):
         transcriber.capture_microphone_audio()
 
 
