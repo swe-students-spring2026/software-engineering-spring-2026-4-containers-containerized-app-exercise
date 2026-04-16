@@ -72,17 +72,11 @@ def upload():
 @app.route("/analysis/<job_id>")
 def analysis_page(job_id):
     audio = analysis_jobs_collection.find_one({"_id": ObjectId(job_id)})
+    file = bucket.open_download_stream(audio["gridfs_file_id"])
 
     return render_template("analysis.html", 
-        filename = audio["original_filename"],
-        gridfs_id=str(audio["gridfs_file_id"])
+        filename = audio["original_filename"]
     )
-
-@app.route("/playback/<gridfs_id>", methods=["GET"])
-def analysis_page(gridfs_id):
-    file = bucket.open_download_stream(ObjectId(gridfs_id))
-
-
 
 
 if __name__ == "__main__":
