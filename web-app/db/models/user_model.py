@@ -1,7 +1,10 @@
-def make_user(fridge_id, user_name, user_email, user_password_hash):
+from bson import ObjectId
+
+
+def make_user(user_name, user_email, user_password_hash, fridge_id):
     return {
-        "fridge_id": fridge_id,
         "user_name": user_name,
         "user_email": user_email,
-        "user_password_hash": user_password_hash
+        "user_password_hash": user_password_hash,
+        "fridge_id": fridge_id,
     }

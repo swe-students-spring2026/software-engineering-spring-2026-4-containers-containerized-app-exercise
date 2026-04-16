@@ -1,12 +1,14 @@
 import os
 from pymongo import MongoClient
 
+
 def get_database():
     mongo_uri = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
     db_name = os.getenv("MONGO_DB_NAME", "fridge_app_db")
 
     client = MongoClient(mongo_uri)
     return client[db_name]
+
 
 db = get_database()
 
