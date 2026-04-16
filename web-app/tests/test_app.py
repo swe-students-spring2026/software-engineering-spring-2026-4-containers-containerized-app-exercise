@@ -4,10 +4,14 @@
 # pylint: disable=unused-argument
 # pylint: disable=too-few-public-methods
 # pylint: disable=no-name-in-module
-
+# pylint: disable=import-error
+import sys
+import os
 import pytest
 import db
 from app import app
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
 @pytest.fixture
