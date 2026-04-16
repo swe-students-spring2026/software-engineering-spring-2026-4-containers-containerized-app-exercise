@@ -32,18 +32,20 @@ def get_wav_duration(file_path: str) -> float:
 def run_pipeline(audio_path: str) -> dict:
     """
     Run the full audio processing pipeline.
-
-    Args:
-        audio_path: Path to the audio file.
-
-    Returns:
-        Dictionary containing transcript and analysis results.
     """
     print(f"Using audio file: {audio_path}")
 
     duration_seconds = get_wav_duration(audio_path)
+    print("Duration (seconds):", duration_seconds)
+
     transcript = transcribe_audio(audio_path)
+    print("Transcript repr:", repr(transcript))
+
+    if not isinstance(transcript, str) or not transcript.strip():
+        raise ValueError("No speech was detected in the recording")
+
     analysis = analyze_transcript(transcript, duration_seconds)
+    print("Analysis:", analysis)
 
     session = {
         "audio_file": audio_path,
@@ -54,6 +56,8 @@ def run_pipeline(audio_path: str) -> dict:
 
     inserted_id = save_practice_session(session)
     session["inserted_id"] = str(inserted_id)
+
+    print("Saved session with ID:", inserted_id)
 
     return session
 
@@ -87,7 +91,12 @@ def process_commands():
                     },
                 )
 
-            except (ValueError, FileNotFoundError, OSError, wave.Error) as error:
+            except (
+                ValueError,
+                FileNotFoundError,
+                OSError,
+                wave.Error,
+            ) as error:
                 database.commands.update_one(
                     {"_id": command["_id"]},
                     {"$set": {"status": "error", "error": str(error)}},

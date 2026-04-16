@@ -214,7 +214,6 @@ async function loadLatestSession() {
     renderLatestSession(latestSession);
     renderSessionsTable(sessions);
     updateCharts(sessions);
-
   } catch (error) {
     console.error("Error loading latest session:", error);
   }
@@ -225,16 +224,31 @@ async function startRecording() {
     stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
     audioChunks = [];
-    mediaRecorder = new MediaRecorder(stream);
+
+    let options = {};
+    if (MediaRecorder.isTypeSupported("audio/webm;codecs=opus")) {
+      options.mimeType = "audio/webm;codecs=opus";
+    } else if (MediaRecorder.isTypeSupported("audio/webm")) {
+      options.mimeType = "audio/webm";
+    }
+
+    mediaRecorder = new MediaRecorder(stream, options);
+    console.log("Recorder mime type:", mediaRecorder.mimeType);
 
     mediaRecorder.ondataavailable = (event) => {
-      if (event.data.size > 0) {
+      if (event.data && event.data.size > 0) {
         audioChunks.push(event.data);
       }
     };
 
     mediaRecorder.onstop = async () => {
-      const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
+      const mimeType = mediaRecorder.mimeType || "audio/webm";
+      const audioBlob = new Blob(audioChunks, { type: mimeType });
+
+      console.log("chunk count:", audioChunks.length);
+      console.log("blob size:", audioBlob.size);
+      console.log("blob type:", audioBlob.type);
+
       const formData = new FormData();
       formData.append("audio", audioBlob, "recording.webm");
 
@@ -252,16 +266,17 @@ async function startRecording() {
           throw new Error(data.error || "Upload failed");
         }
 
-const commandId = data.command_id;
-
+        const commandId = data.command_id;
         statusText.textContent = "Processing audio (waiting for ML results)...";
 
-        if (statusPollTimer) clearInterval(statusPollTimer);
+        if (statusPollTimer) {
+          clearInterval(statusPollTimer);
+        }
+
         statusPollTimer = setInterval(async () => {
           try {
             const statusRes = await fetch(`/api/commands/${commandId}`);
             const statusData = await statusRes.json();
-
 
             if (statusData.status === "done" && statusData.result_id) {
               clearInterval(statusPollTimer);
@@ -272,13 +287,22 @@ const commandId = data.command_id;
               return;
             }
 
+            if (statusData.status === "error") {
+              clearInterval(statusPollTimer);
+              statusPollTimer = null;
+              statusText.textContent = `Processing failed: ${
+                statusData.error || "Unknown error"
+              }`;
+              return;
+            }
+
             statusText.textContent = `Processing audio... (${statusData.status})`;
-          
           } catch (error) {
-            statusText.textContent = `Upload failed: ${error.message}`;
+            clearInterval(statusPollTimer);
+            statusPollTimer = null;
+            statusText.textContent = `Status check failed: ${error.message}`;
           }
         }, 2000);
-
       } catch (error) {
         statusText.textContent = `Upload failed: ${error.message}`;
       }
@@ -307,14 +331,16 @@ function stopRecording() {
   }
 }
 
-startButton.addEventListener("click", async () => {
-  const isRecording = startButton.dataset.recording === "true";
+if (startButton) {
+  startButton.addEventListener("click", async () => {
+    const isRecording = startButton.dataset.recording === "true";
 
-  if (!isRecording) {
-    await startRecording();
-  } else {
-    stopRecording();
-  }
-});
+    if (!isRecording) {
+      await startRecording();
+    } else {
+      stopRecording();
+    }
+  });
+}
 
 loadLatestSession();

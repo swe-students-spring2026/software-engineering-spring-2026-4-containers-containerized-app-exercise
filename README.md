@@ -50,6 +50,7 @@ Edit `.env` with your actual values, transcription is local, so an OpenAI API ke
 MONGO_URI=mongodb://mongodb:27017
 MONGO_DB_NAME=ai_speech_coach
 MONGO_COLLECTION_NAME=practice_sessions
+UPLOAD_FOLDER=/app/uploads
 ```
 
 ### 3\. Start all containers
@@ -88,6 +89,7 @@ docker compose down -v
 | `MONGO_URI` | MongoDB connection string | `mongodb://mongodb:27017` |
 | `MONGO_DB_NAME` | MongoDB database name | `ai_speech_coach` |
 | `MONGO_COLLECTION_NAME` | Collection name for saved practice sessions | `practice_sessions` |
+| `UPLOAD_FOLDER` | Path for storing uploaded audio files | `/app/uploads` |
 
 ## Running Tests
 

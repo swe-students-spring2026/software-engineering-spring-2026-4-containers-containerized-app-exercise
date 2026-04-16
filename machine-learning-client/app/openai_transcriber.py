@@ -36,8 +36,14 @@ def transcribe_audio(file_path: str) -> str:
     if not path.exists():
         raise ValueError(f"Audio file not found: {file_path}")
 
+    print("Transcribing file:", path)
+
     model = get_model()
     result = model.transcribe(str(path))
 
+    print("Whisper raw result:", result)
+
     text = result.get("text", "").strip()
+    print("Whisper text repr:", repr(text))
+
     return text
