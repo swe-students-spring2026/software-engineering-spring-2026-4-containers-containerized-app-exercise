@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "748f4be08c326660ea7c92797e76e23cb26562e329ff6dc65469c6c6d52e7d07"
+            "sha256": "10c432a6343cb4a20277aed3d3d64583c62fc7b089eb0e2dac937d5c6400edab"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -275,11 +275,11 @@
         },
         "filelock": {
             "hashes": [
-                "sha256:b64ece2b38f4ca29dd3e810287aa8c48182bbecd1ae6e9ae126c9b35f1382694",
-                "sha256:ca8afb0da15f229774c9ad1b455ed96e85a81373065fb10446672f64444ddf70"
+                "sha256:4ed1010aae813c4ee8d9c660e4792475ee60c4a0ba76073ceaf862bd317e3ca6",
+                "sha256:de9af6712788e7171df1b28b15eba2446c69721433fa427a9bee07b17820a9db"
             ],
             "markers": "python_version >= '3.10'",
-            "version": "==3.25.2"
+            "version": "==3.28.0"
         },
         "fire": {
             "hashes": [
@@ -321,11 +321,11 @@
         },
         "gdown": {
             "hashes": [
-                "sha256:247c2ad1f579db5b66b54c04e6a871995fc8fd7021708b950b8ba7b32cf90323",
-                "sha256:391f0480d495fb87644d1a1ee3ddfeb2144e1de31408fbc74f7e3b3ba927052b"
+                "sha256:1f1f735a174ef3599fca95786aafac1219b9d85d4c729ccb95e674996c47fd44",
+                "sha256:c82d39a6b09ed7778012515c2fa4ab4dc36d7789300cd0b16b87d3a3e4a09955"
             ],
-            "markers": "python_version >= '3.8'",
-            "version": "==5.2.1"
+            "markers": "python_version >= '3.10'",
+            "version": "==6.0.0"
         },
         "google-pasta": {
             "hashes": [
@@ -1007,11 +1007,11 @@
         },
         "packaging": {
             "hashes": [
-                "sha256:00243ae351a257117b6a241061796684b084ed1c516a08c48a3f7e147a9d80b4",
-                "sha256:b36f1fef9334a5588b4166f8bcd26a14e521f2b55e6b9de3aaa80d3ff7a37529"
+                "sha256:5d9c0669c6285e491e0ced2eee587eaf67b670d94a19e94e3984a481aba6802f",
+                "sha256:f042152b681c4bfac5cae2742a55e103d27ab2ec0f3d88037136b6bfe7c9c5de"
             ],
             "markers": "python_version >= '3.8'",
-            "version": "==26.0"
+            "version": "==26.1"
         },
         "pandas": {
             "hashes": [
@@ -1385,11 +1385,11 @@
         },
         "rich": {
             "hashes": [
-                "sha256:793431c1f8619afa7d3b52b2cdec859562b950ea0d4b6b505397612db8d5362d",
-                "sha256:b8daa0b9e4eef54dd8cf7c86c03713f53241884e814f4e2f5fb342fe520f639b"
+                "sha256:33bd4ef74232fb73fe9279a257718407f169c09b78a87ad3d296f548e27de0bb",
+                "sha256:edd07a4824c6b40189fb7ac9bc4c52536e9780fbbfbddf6f1e2502c31b068c36"
             ],
-            "markers": "python_full_version >= '3.8.0'",
-            "version": "==14.3.3"
+            "markers": "python_full_version >= '3.9.0'",
+            "version": "==15.0.0"
         },
         "setuptools": {
             "hashes": [
@@ -1452,6 +1452,15 @@
             ],
             "markers": "python_version >= '3.10'",
             "version": "==3.3.0"
+        },
+        "tf-keras": {
+            "hashes": [
+                "sha256:f858bf3d97f892304e7fbcf5eb0942ed91674e27204f940a85de8c93cf07fe62",
+                "sha256:f9af0f2546cd5532de0fae7a481f34a1ca2253737d4cd1000f6b713dc733f770"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.10'",
+            "version": "==2.21.0"
         },
         "tomlkit": {
             "hashes": [
@@ -1822,11 +1831,11 @@
         },
         "packaging": {
             "hashes": [
-                "sha256:00243ae351a257117b6a241061796684b084ed1c516a08c48a3f7e147a9d80b4",
-                "sha256:b36f1fef9334a5588b4166f8bcd26a14e521f2b55e6b9de3aaa80d3ff7a37529"
+                "sha256:5d9c0669c6285e491e0ced2eee587eaf67b670d94a19e94e3984a481aba6802f",
+                "sha256:f042152b681c4bfac5cae2742a55e103d27ab2ec0f3d88037136b6bfe7c9c5de"
             ],
             "markers": "python_version >= '3.8'",
-            "version": "==26.0"
+            "version": "==26.1"
         },
         "pathspec": {
             "hashes": [

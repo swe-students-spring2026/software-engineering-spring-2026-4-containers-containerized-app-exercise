@@ -1,5 +1,15 @@
 {
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.automations/launch-give-student-credit.py\" --event=claude --record-prompt-only || python \"$CLAUDE_PROJECT_DIR/.automations/launch-give-student-credit.py\" --event=claude --record-prompt-only"
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Edit|Write",
