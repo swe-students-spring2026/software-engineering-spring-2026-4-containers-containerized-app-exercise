@@ -41,3 +41,4 @@ jobs:
       - name: Enforce coverage >= 80%
         working-directory: machine-learning-client
         run: pipenv run coverage report --fail-under=80
+      

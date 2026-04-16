@@ -1,5 +1,7 @@
 """Tests for app.openai_transcriber."""
 
+# pylint: disable=redefined-outer-name,too-few-public-methods
+
 import sys
 import types
 import importlib
@@ -36,9 +38,14 @@ def test_transcribe_audio_returns_stripped_text(
         """Fake Whisper model."""
 
         def transcribe(self, _path):
+            """Return fake transcript."""
             return {"text": "  hello world  "}
 
-    monkeypatch.setattr(transcriber_module, "get_model", lambda: FakeModel())
+    def fake_get_model():
+        """Return fake model."""
+        return FakeModel()
+
+    monkeypatch.setattr(transcriber_module, "get_model", fake_get_model)
 
     result = transcriber_module.transcribe_audio(str(audio_file))
 
@@ -56,9 +63,14 @@ def test_transcribe_audio_returns_empty_string_when_text_missing(
         """Fake Whisper model."""
 
         def transcribe(self, _path):
+            """Return empty fake result."""
             return {}
 
-    monkeypatch.setattr(transcriber_module, "get_model", lambda: FakeModel())
+    def fake_get_model():
+        """Return fake model."""
+        return FakeModel()
+
+    monkeypatch.setattr(transcriber_module, "get_model", fake_get_model)
 
     result = transcriber_module.transcribe_audio(str(audio_file))
 

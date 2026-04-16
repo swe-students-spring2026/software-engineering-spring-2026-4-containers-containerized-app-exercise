@@ -1,5 +1,7 @@
 """Tests for app.pipeline."""
 
+# pylint: disable=redefined-outer-name,too-few-public-methods
+
 import sys
 import types
 import importlib
@@ -27,22 +29,26 @@ def test_get_wav_duration(monkeypatch, pipeline_module):
         """Fake wave file."""
 
         def getnframes(self):
+            """Return fake frame count."""
             return 88200
 
         def getframerate(self):
+            """Return fake frame rate."""
             return 44100
 
         def __enter__(self):
+            """Enter context."""
             return self
 
         def __exit__(self, exc_type, exc_val, exc_tb):
+            """Exit context."""
             return False
 
-    monkeypatch.setattr(
-        pipeline_module.wave,
-        "open",
-        lambda *_args, **_kwargs: FakeWave(),
-    )
+    def fake_wave_open(*_args, **_kwargs):
+        """Return fake wave object."""
+        return FakeWave()
+
+    monkeypatch.setattr(pipeline_module.wave, "open", fake_wave_open)
 
     duration = pipeline_module.get_wav_duration("fake.wav")
 
@@ -51,28 +57,41 @@ def test_get_wav_duration(monkeypatch, pipeline_module):
 
 def test_run_pipeline_happy_path(monkeypatch, pipeline_module):
     """Test full pipeline flow with mocked dependencies."""
-    monkeypatch.setattr(pipeline_module, "get_wav_duration", lambda _path: 10)
-    monkeypatch.setattr(
-        pipeline_module,
-        "transcribe_audio",
-        lambda _path: "hello um world",
-    )
-    monkeypatch.setattr(
-        pipeline_module,
-        "analyze_transcript",
-        lambda _text, _duration: {
+
+    def fake_get_wav_duration(_path):
+        """Return fake duration."""
+        return 10
+
+    def fake_transcribe_audio(_path):
+        """Return fake transcript."""
+        return "hello um world"
+
+    def fake_analyze_transcript(_text, _duration):
+        """Return fake transcript analysis."""
+        return {
             "word_count": 3,
             "filler_words": {"um": 1},
             "total_filler_count": 1,
             "wpm": 18,
             "pace_feedback": "slowwww...",
             "filler_feedback": "Good fluency. Only a few filler words were used.",
-        },
+        }
+
+    def fake_save_practice_session(_session):
+        """Return fake inserted id."""
+        return "abc123"
+
+    monkeypatch.setattr(pipeline_module, "get_wav_duration", fake_get_wav_duration)
+    monkeypatch.setattr(pipeline_module, "transcribe_audio", fake_transcribe_audio)
+    monkeypatch.setattr(
+        pipeline_module,
+        "analyze_transcript",
+        fake_analyze_transcript,
     )
     monkeypatch.setattr(
         pipeline_module,
         "save_practice_session",
-        lambda _session: "abc123",
+        fake_save_practice_session,
     )
 
     result = pipeline_module.run_pipeline("sample_audio/test.wav")
@@ -87,8 +106,17 @@ def test_run_pipeline_happy_path(monkeypatch, pipeline_module):
 
 def test_run_pipeline_raises_for_empty_transcript(monkeypatch, pipeline_module):
     """Test empty transcript raises ValueError."""
-    monkeypatch.setattr(pipeline_module, "get_wav_duration", lambda _path: 10)
-    monkeypatch.setattr(pipeline_module, "transcribe_audio", lambda _path: "   ")
+
+    def fake_get_wav_duration(_path):
+        """Return fake duration."""
+        return 10
+
+    def fake_transcribe_audio(_path):
+        """Return blank transcript."""
+        return "   "
+
+    monkeypatch.setattr(pipeline_module, "get_wav_duration", fake_get_wav_duration)
+    monkeypatch.setattr(pipeline_module, "transcribe_audio", fake_transcribe_audio)
 
     with pytest.raises(ValueError, match="No speech was detected"):
         pipeline_module.run_pipeline("sample_audio/test.wav")
@@ -102,9 +130,11 @@ def test_process_commands_handles_success(monkeypatch, pipeline_module):
         """Fake commands collection."""
 
         def __init__(self):
+            """Initialize fake command state."""
             self.called = False
 
         def find_one(self, _query):
+            """Return one fake pending command."""
             if self.called:
                 raise KeyboardInterrupt
             self.called = True
@@ -116,27 +146,38 @@ def test_process_commands_handles_success(monkeypatch, pipeline_module):
             }
 
         def update_one(self, query, update):
+            """Record updates."""
             updates.append((query, update))
 
     class FakeDatabase:
         """Fake database wrapper."""
 
         def __init__(self):
+            """Initialize fake database."""
             self.commands = FakeCommands()
 
     class FakeClient:
         """Fake Mongo client."""
 
         def __getitem__(self, _name):
+            """Return fake database."""
             return FakeDatabase()
 
-    monkeypatch.setattr(pipeline_module, "MongoClient", lambda _uri: FakeClient())
-    monkeypatch.setattr(
-        pipeline_module,
-        "run_pipeline",
-        lambda _audio_path: {"inserted_id": "result123"},
-    )
-    monkeypatch.setattr(pipeline_module.time, "sleep", lambda _seconds: None)
+    def fake_mongo_client(_uri):
+        """Return fake Mongo client."""
+        return FakeClient()
+
+    def fake_run_pipeline(_audio_path):
+        """Return fake pipeline result."""
+        return {"inserted_id": "result123"}
+
+    def fake_sleep(_seconds):
+        """Do nothing."""
+        return None
+
+    monkeypatch.setattr(pipeline_module, "MongoClient", fake_mongo_client)
+    monkeypatch.setattr(pipeline_module, "run_pipeline", fake_run_pipeline)
+    monkeypatch.setattr(pipeline_module.time, "sleep", fake_sleep)
 
     try:
         pipeline_module.process_commands()
@@ -160,9 +201,11 @@ def test_process_commands_handles_error(monkeypatch, pipeline_module):
         """Fake commands collection."""
 
         def __init__(self):
+            """Initialize fake command state."""
             self.called = False
 
         def find_one(self, _query):
+            """Return one fake pending command."""
             if self.called:
                 raise KeyboardInterrupt
             self.called = True
@@ -174,26 +217,38 @@ def test_process_commands_handles_error(monkeypatch, pipeline_module):
             }
 
         def update_one(self, query, update):
+            """Record updates."""
             updates.append((query, update))
 
     class FakeDatabase:
         """Fake database wrapper."""
 
         def __init__(self):
+            """Initialize fake database."""
             self.commands = FakeCommands()
 
     class FakeClient:
         """Fake Mongo client."""
 
         def __getitem__(self, _name):
+            """Return fake database."""
             return FakeDatabase()
 
+    def fake_mongo_client(_uri):
+        """Return fake Mongo client."""
+        return FakeClient()
+
     def fake_run_pipeline(_audio_path):
+        """Raise fake pipeline error."""
         raise ValueError("No speech was detected in the recording")
 
-    monkeypatch.setattr(pipeline_module, "MongoClient", lambda _uri: FakeClient())
+    def fake_sleep(_seconds):
+        """Do nothing."""
+        return None
+
+    monkeypatch.setattr(pipeline_module, "MongoClient", fake_mongo_client)
     monkeypatch.setattr(pipeline_module, "run_pipeline", fake_run_pipeline)
-    monkeypatch.setattr(pipeline_module.time, "sleep", lambda _seconds: None)
+    monkeypatch.setattr(pipeline_module.time, "sleep", fake_sleep)
 
     try:
         pipeline_module.process_commands()
