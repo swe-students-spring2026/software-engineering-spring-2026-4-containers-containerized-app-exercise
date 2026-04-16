@@ -1,5 +1,6 @@
 """Tests for the web application."""
 
+# pylint: disable=redefined-outer-name
 import datetime
 
 import pytest
@@ -10,7 +11,7 @@ from db import speeches_collection, users_collection  # pylint: disable=import-e
 
 
 @pytest.fixture
-def tester():
+def client():
     """Set up Flask test client."""
     app.config["TESTING"] = True
     with app.test_client() as client:
