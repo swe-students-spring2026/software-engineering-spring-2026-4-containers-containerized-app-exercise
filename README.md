@@ -52,6 +52,80 @@ Standup reports:
 # Standup Report - 14 April 2026
 
 ## Adam Shin @aus2005
-- **did** Reviewed and merged PRs, did initial task board setup.
-- **doing** Refining web app.
-- **blockers** Need some details from machie learning to finalize the size of the keyboard.
+- **did**: Web app and API integration; README and run instructions.
+- **doing**: Polish Flask UI and env defaults for local vs Docker.
+- **blockers**: None.
+
+## Angelina Wu @TangelinaWu
+- **did**: EyeWrite scope, reviews, ML + web coordination. 
+- **doing**: Refine ML client and web app behavior.
+- **blockers**: None.
+
+## Han Xiao @vick12333
+- **did**: ML accuracy experiments, `gaze_math` and tracker work Add web-app pytest.
+- **doing**: Continue calibration / smoothing improvements.
+- **blockers**: None.
+
+## Alejandro
+- **did**: Docker Compose, MongoDB wiring, container builds.
+- **doing**: Container hardening and docs alignment.
+- **blockers**: Waiting on any remaining lint or CI fixes from teammates.
+
+## Wonden
+- **did**: Web app UI work.
+- **doing**: Refine typing and dwell UX.
+- **blockers**: None.
+
+# Standup Report - 15 April 2026 Evening Meeting
+
+## Adam Shin @aus2005
+- **did**: Polished UI and env.
+- **doing**: Handle Linting Errors and github reversion issues.
+- **blockers**: None.
+
+## Angelina Wu @TangelinaWu
+- **did**: Refined web app behavior.
+- **doing**: Refine task boards.
+- **blockers**: None.
+
+## Han Xiao @vick12333
+- **did**: Continued calibration / smoothing
+- **doing**: Still working on calibration / smoothing improvements.
+- **blockers**: None.
+
+## Alejandro
+- **did**: Worked more on the Container
+- **doing**: Docs Alignment
+- **blockers**: None.
+
+## Wonden
+- **did**: Refined Typing
+- **doing**: Continue to work on UX. 
+- **blockers**: None.
+
+# Standup Report - 16 April 2026
+
+## Adam Shin @aus2005
+- **did**: Handled Linting Errors and github.
+- **doing**: Updating ReadMe.
+- **blockers**: None.
+
+## Angelina Wu @TangelinaWu
+- **did**: Finalized Task Boards.
+- **doing**: Review Code.
+- **blockers**: None.
+
+## Han Xiao @vick12333
+- **did**: Finished Calibration and smoothing improvements
+- **doing**: Final code review.
+- **blockers**: None.
+
+## Alejandro
+- **did**: Finished container and Docs Alignment.
+- **doing**: Working through app to find bugs. 
+- **blockers**: None.
+
+## Wonden
+- **did**: Refined UX.
+- **doing**: Final checkover of project.
+- **blockers**: None.
