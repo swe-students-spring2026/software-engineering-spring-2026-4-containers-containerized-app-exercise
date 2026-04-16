@@ -1,4 +1,9 @@
+"""Tests for the ML Client module."""
+
 from unittest.mock import patch, MagicMock
+
+# pylint: disable=missing-function-docstring
+
 import mlclient
 
 
@@ -8,8 +13,9 @@ import mlclient
 @patch("mlclient.classify_frame")
 @patch("mlclient._create_landmarker")
 @patch("mlclient.cv2.VideoCapture")
+# pylint: disable=too-many-arguments, too-many-positional-arguments
 def test_mlclient_main(
-    mock_cap, mock_landmarker, mock_classify, mock_imencode, mock_save, mock_sleep
+    mock_cap, _mock_landmarker, mock_classify, mock_imencode, mock_save, _mock_sleep
 ):
     mock_vid = MagicMock()
     mock_vid.read.return_value = (True, "dummy_frame")
