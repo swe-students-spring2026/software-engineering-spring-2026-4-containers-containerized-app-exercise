@@ -1,5 +1,7 @@
 """Tests for database connection."""
+
 from db import speeches_collection
+
 # pylint: disable=import-error
 
 
