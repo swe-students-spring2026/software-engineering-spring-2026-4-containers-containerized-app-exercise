@@ -17,4 +17,6 @@ class Config:
     UPLOAD_FOLDER = BASE_DIR / "uploads"
     RUNTIME_FOLDER = BASE_DIR / "runtime"
     ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
-    ML_SERVICE_URL = os.getenv("ML_SERVICE_URL", "http://ml-client:10990")
+    WEB_APP_CALLBACK_URL = os.getenv(
+        "WEB_APP_CALLBACK_URL", "http://web-app:5000/ml-callback"
+    )

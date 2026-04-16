@@ -1,4 +1,3 @@
-import json
 import shutil
 import subprocess
 import uuid
@@ -83,22 +82,23 @@ def run_ml_detection(uploaded_file_path):
     return task_id, output_dir, json_path
 
 
-def save_detection_results_to_db(image_filename, task_id, output_dir, json_path):
+def save_detection_results_to_db(task_id):
     db = get_db()
 
-    with open(json_path, "r", encoding="utf-8") as file:
-        detection_data = json.load(file)
+    raw = db.ml_results.find_one({"task_id": task_id})
+    if not raw:
+        return
+    detection_data = raw["detection_json"]
+    image_filename = raw.get("filename")
 
-    annotated_image_path = output_dir / "annotated" / image_filename
-
-    db.uploads.insert_one(
+    db.uploads.update_one(
+        {"task_id": task_id},
         {
-            "task_id": task_id,
-            "filename": image_filename,
-            "annotated_path": str(annotated_image_path),
-            "total_detections": detection_data.get("total_detections", 0),
-            "created_at": datetime.utcnow(),
-        }
+            "$set": {
+                "status": "done",
+                "total_detections": detection_data.get("total_detections", 0),
+            }
+        },
     )
 
     items_by_class = {}
