@@ -69,12 +69,21 @@ def upload():
         print(f"io error: {e}")
         return jsonify({"success": False, "error": "file io error"}), 500
     
-@app.route("/analysis/<job_id>", methods=["GET"])
+@app.route("/analysis/<job_id>")
 def analysis_page(job_id):
     audio = analysis_jobs_collection.find_one({"_id": ObjectId(job_id)})
+
     return render_template("analysis.html", 
-        filename = audio["original_filename"]
+        filename = audio["original_filename"],
+        gridfs_id=str(audio["gridfs_file_id"])
     )
+
+@app.route("/playback/<gridfs_id>", methods=["GET"])
+def analysis_page(gridfs_id):
+    file = bucket.open_download_stream(ObjectId(gridfs_id))
+
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
