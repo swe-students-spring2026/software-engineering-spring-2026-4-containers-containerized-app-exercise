@@ -1,3 +1,4 @@
+# pylint: disable=duplicate-code
 """Tests for page routes."""
 
 from __future__ import annotations
