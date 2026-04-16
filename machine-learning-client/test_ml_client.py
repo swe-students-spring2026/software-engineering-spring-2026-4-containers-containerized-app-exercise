@@ -14,6 +14,8 @@ from ml_client import (
     rate_volume,
     rate_pitch,
     rate_pace,
+    transcribe_audio,
+    analyze_audio,
     app,
 )
 
@@ -115,3 +117,62 @@ def test_rate_pace_too_fast():
 def test_rate_pace_good():
     """Test pace rated as good"""
     assert rate_pace(130) == "good"
+#transcribe_audio test
+
+def test_transcribe_audio_returns_text():
+    """Test that transcribe_audio returns stripped transcript"""
+    mock_model = MagicMock()
+    mock_model.transcribe.return_value = {"text": "  um hello world  "}
+    result = transcribe_audio("fake.wav", mock_model)
+    assert result == "um hello world"
+
+
+def test_transcribe_audio_empty():
+    """Test that transcribe_audio handles empty transcript"""
+    mock_model = MagicMock()
+    mock_model.transcribe.return_value = {"text": "   "}
+    result = transcribe_audio("fake.wav", mock_model)
+    assert result == ""
+#anaylze_audio tests
+
+def test_analyze_audio_duration(mocker):
+    """Test that analyze_audio returns correct duration"""
+    mocker.patch("ml_client.librosa.load", return_value=(MagicMock(), 44100))
+    mocker.patch("ml_client.librosa.get_duration", return_value=45.0)
+    mocker.patch("ml_client.librosa.feature.rms", return_value=[[0.05] * 100])
+    mocker.patch("ml_client.librosa.amplitude_to_db", return_value=-20.0)
+    mocker.patch("ml_client.librosa.pyin", return_value=(MagicMock(), None, None))
+    mocker.patch("ml_client.np.isnan", return_value=MagicMock())
+    mocker.patch("ml_client.np.mean", return_value=0.05)
+    mocker.patch("ml_client.np.var", return_value=500.0)
+
+    result = analyze_audio("fake.wav")
+    assert result["duration_seconds"] == 45.0
+
+#flask route tests
+def test_analyze_no_audio(client):
+    """Test analyze endpoint returns 400 when no audio file provided"""
+    response = client.post("/analyze")
+    assert response.status_code == 400
+    assert response.json["error"] == "no audio file"
+
+
+def test_analyze_success(client, mocker):
+    """Test analyze endpoint returns 200 on success"""
+    mocker.patch("ml_client.whisper.load_model", return_value=MagicMock())
+    mocker.patch("ml_client.transcribe_audio", return_value="um hello world")
+    mocker.patch("ml_client.analyze_audio", return_value={
+        "duration_seconds": 30.0,
+        "avg_volume_db": -20.0,
+        "pitch_variance": 500.0,
+    })
+    mocker.patch("ml_client.speeches_collection.insert_one", return_value=MagicMock())
+
+    data = {
+        "audio": (open("audio_test.wav", "rb"), "audio_test.wav"),
+        "title": "Test Speech",
+        "user_id": "123",
+    }
+    response = client.post("/analyze", data=data, content_type="multipart/form-data")
+    assert response.status_code == 200
+    assert response.json["status"] == "success"
