@@ -83,7 +83,7 @@ def test_get_session_details_found(client, monkeypatch):
         practice_sessions = MockCollection()
 
     monkeypatch.setattr("app.get_db", MockDB)
-    response = client.get("/api/sessions/123")
+    response = client.get("/api/sessions/507f1f77bcf86cd799439011")
     assert response.status_code == 200
 
 
@@ -103,7 +103,7 @@ def test_get_session_details_not_found(client, monkeypatch):
         practice_sessions = MockCollection()
 
     monkeypatch.setattr("app.get_db", MockDB)
-    response = client.get("/api/sessions/999")
+    response = client.get("/api/sessions/507f1f77bcf86cd799439012")
     assert response.status_code == 404
 
 
