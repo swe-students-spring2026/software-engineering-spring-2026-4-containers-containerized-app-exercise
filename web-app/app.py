@@ -1,16 +1,16 @@
 """Main Flask application for the web app."""
 
 import datetime # pylint: disable=import-error
-import os
-import pymongo
+import os # pylint: disable=import-error
+import pymongo # pylint: disable=import-error
 
-from dotenv import load_dotenv
-from bson.objectid import ObjectId
+from dotenv import load_dotenv # pylint: disable=import-error
+from bson.objectid import ObjectId # pylint: disable=import-error
 from flask import Flask, flash, redirect, render_template, request, url_for # pylint: disable=import-error
 from flask_login import (
     LoginManager, UserMixin, current_user, login_required, login_user, logout_user
 ) # pylint: disable=import-error
-from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash # pylint: disable=import-error
 
 try:
     from zoneinfo import ZoneInfo
@@ -52,10 +52,11 @@ login_manager.login_message_category = "info"
 class User(UserMixin):
     """User class for Flask-Login integration."""
     def __init__(self, user_doc):
+        """Initializes the User class."""
         self.user_doc = user_doc
 
-    # returns the user's id from MongoDB
     def get_id(self):
+        """Returns the user's ID."""
         return str(self.user_doc["_id"])
 
     @property
