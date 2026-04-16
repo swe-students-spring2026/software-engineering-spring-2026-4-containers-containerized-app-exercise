@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 fer = "*"
 setuptools = "*"
-pymongo = "*"
+pymongo = {extras = ["srv"], version = "*"}
 
 [dev-packages]
 pytest = "*"
