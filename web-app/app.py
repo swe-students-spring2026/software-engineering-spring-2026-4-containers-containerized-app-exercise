@@ -1,52 +1,73 @@
 """Flask web app for sound-alert uploads and results."""
 
 import os
-import sys
-from flask import Flask, render_template, request, jsonify
-from pymongo import MongoClient
+from datetime import datetime, timezone
+from uuid import uuid4
+
+from flask import Flask, jsonify, render_template, request
 from gridfs import GridFSBucket
-from dotenv import load_dotenv
-
-sys.stdout.reconfigure(line_buffering=True)
-load_dotenv()
-
-# mongodb connection
-# use .env file to connect to atlas
-# MONGO_DB_NAME - name of db collection
-
-client = MongoClient(os.getenv("MONGO_URI"))
-db = client[os.getenv("MONGO_DB_NAME")]
-bucket = GridFSBucket(db, bucket_name="audio_files")
+from pymongo import MongoClient
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
+UPLOAD_FOLDER = "uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
+MONGO_DB_NAME = os.getenv("MONGO_DB_NAME", "sound_alerts")
+
+mongo_client = MongoClient(MONGO_URI)
+db = mongo_client[MONGO_DB_NAME]
+bucket = GridFSBucket(db, bucket_name="audio_files")
+analysis_jobs_collection = db["analysis_jobs"]
 
 
 @app.route("/")
 def index():
-    """Homepage"""
+    """Homepage."""
     return render_template("index.html")
 
 
-@app.route("/analyze", methods=["POST"])
-def analyze():
-    """Send Audio recording to be analyzed"""
-    file = request.files["audiofile"]
+@app.route("/upload", methods=["POST"])
+def upload():
+    """Upload media file and create an analysis job."""
+    uploaded_file = request.files.get("media")
 
-    if not file or file.filename == "":
+    if uploaded_file is None or uploaded_file.filename == "":
         return jsonify({"success": False, "error": "missing file"}), 400
-    print(file)
 
-    # https://www.mongodb.com/docs/languages/python/pymongo-driver/current/crud/gridfs/
-    with bucket.open_upload_stream(
-        filename=file.filename, metadata={"content_type": file.content_type}
-    ) as grid_in:
-        file.save(grid_in)
+    filename = secure_filename(uploaded_file.filename)
+    unique_filename = f"{uuid4()}_{filename}"
+    file_path = os.path.join(UPLOAD_FOLDER, unique_filename)
+    uploaded_file.save(file_path)
 
-    return jsonify({"success": True, "filename": file.filename})
+    with open(file_path, "rb") as media_stream:
+        gridfs_file_id = bucket.upload_from_stream(
+            filename=filename,
+            source=media_stream,
+            metadata={"content_type": uploaded_file.content_type},
+        )
 
-    # except Exception as err:
-    #     print("err:", err)
-    #     return jsonify({"success": False, "error": str(err)}), 400
+    job_document = {
+        "audio_path": file_path,
+        "status": "pending",
+        "created_at": datetime.now(timezone.utc),
+        "media_path": file_path,
+        "media_type": uploaded_file.content_type,
+        "original_filename": filename,
+        "duration_seconds": None,
+        "gridfs_file_id": gridfs_file_id,
+    }
+    inserted_job = analysis_jobs_collection.insert_one(job_document)
+
+    return jsonify(
+        {
+            "success": True,
+            "filename": filename,
+            "job_id": str(inserted_job.inserted_id),
+            "gridfs_file_id": str(gridfs_file_id),
+        }
+    )
 
 
 if __name__ == "__main__":
