@@ -31,8 +31,7 @@ def analyze():
     """Send Audio recording to be analyzed"""
     try:
         file = request.files["audiofile"]
-        print(file)
-        print(file.content_type)
+
 
         return jsonify({"success": True})
 
