@@ -25,11 +25,9 @@ MODEL_PATH = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "hand_landmarker.task"
 )
 
-
 def _dist(a, b):
     """Euclidean distance between two landmarks."""
     return math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2 + (a.z - b.z) ** 2)
-
 
 def straightness_ratio(mcp, pip, dip, tip):
     """Compute the straightness ratio of a finger.
@@ -49,7 +47,6 @@ def straightness_ratio(mcp, pip, dip, tip):
     direct = _dist(mcp, tip)
     return direct / path
 
-
 def get_finger_states(landmarks):
     """Return a dict of {finger_name: bool} indicating extended or curled.
 
@@ -66,7 +63,6 @@ def get_finger_states(landmarks):
         )
         states[name] = ratio >= STRAIGHTNESS_THRESHOLDS[name]
     return states
-
 
 def classify_gesture(finger_states):
     """Given the finger states, return the gesture.
@@ -100,7 +96,6 @@ def classify_gesture(finger_states):
 
     return "unknown"
 
-
 def _create_landmarker(model_path=None):
     """Create a HandLandmarker instance using the Tasks API."""
     path = model_path or MODEL_PATH
@@ -112,7 +107,6 @@ def _create_landmarker(model_path=None):
         min_hand_detection_confidence=0.5,
     )
     return mp.tasks.vision.HandLandmarker.create_from_options(options)
-
 
 def classify_frame(frame, landmarker=None):
     """Classify the gesture in an OpenCV BGR frame.
