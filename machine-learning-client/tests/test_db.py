@@ -24,7 +24,9 @@ def test_save_practice_session():
             },
             "total_filler_count": 1,
             "pace_feedback": "slowwww...",
-            "filler_feedback": ("Good fluency. Only a few filler words were used."),
+            "filler_feedback": (
+                "Good fluency. Only a few filler words were used."
+            ),
         },
     }
 
