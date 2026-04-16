@@ -40,7 +40,6 @@ def get_sessions():
     return jsonify([_serialize_mongo_doc(s) for s in sessions]), 200
 
 
-
 @app.route("/api/sessions/<session_id>", methods=["GET"])
 def get_session_details(session_id):
     """Retrieve details for a specific practice session by its ID."""
@@ -51,15 +50,13 @@ def get_session_details(session_id):
         return jsonify({"error": "Session not found"}), 404
     return jsonify(_serialize_mongo_doc(session)), 200
 
+
 @app.route("/api/commands/<command_id>", methods=["GET"])
 def get_command_status(command_id):
     """Retrieve the status of a queued/processing command."""
     database = get_db()
-    
     oid = ObjectId(command_id)
-    
     command = database.commands.find_one({"_id": oid})
-   
     return jsonify(_serialize_mongo_doc(command)), 200
 
 
