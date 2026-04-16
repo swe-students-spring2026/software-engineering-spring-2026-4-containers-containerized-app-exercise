@@ -140,10 +140,7 @@ def test_successful_login(client):
     client.get("/logout")
     response = client.post(
         "/login",
-        data={
-            "username": "successlogin", 
-            "password": 
-            "password123"},
+        data={"username": "successlogin", "password": "password123"},
         follow_redirects=True,
     )
     assert response.status_code == 200
