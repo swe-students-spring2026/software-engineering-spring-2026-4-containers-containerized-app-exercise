@@ -101,17 +101,23 @@ docker-compose down -v
 
 ## Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `ML_MODEL_URL` | Roboflow inference server URL | `https://serverless.roboflow.com` |
-| `ML_MODEL_API_KEY` | Your Roboflow API key | *(required)* |
-| `ML_MODEL_ID` | Roboflow model ID and version | `garbage-classification-3/2` |
-| `MONGO_URI` | MongoDB connection string | `mongodb://mongodb:27017/` |
-| `DB_NAME` | MongoDB database name | `garbage_classifier` |
+| Variable           | Description                   | Default                           |
+| ------------------ | ----------------------------- | --------------------------------- |
+| `ML_MODEL_URL`     | Roboflow inference server URL | `https://serverless.roboflow.com` |
+| `ML_MODEL_API_KEY` | Your Roboflow API key         | _(required)_                      |
+| `ML_MODEL_ID`      | Roboflow model ID and version | `garbage-classification-3/2`      |
+| `MONGO_URI`        | MongoDB connection string     | `mongodb://mongodb:27017/`        |
+| `DB_NAME`          | MongoDB database name         | `garbage_classifier`              |
 
 Secret files (`.env`) are not included in version control. See `.env.example` for the required format. An example file with dummy values is provided at `.env.example`.
 
 ## Running Tests
+
+### Prerequisites
+
+- Python 3.10, 3.11, or 3.12 (Python 3.13+ is not supported by `inference-sdk`)
+- Docker and Docker Compose
+- A Roboflow API key (set in `.env`)
 
 ### ML Client
 
