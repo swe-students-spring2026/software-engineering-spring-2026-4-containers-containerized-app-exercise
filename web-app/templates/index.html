@@ -1,11 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homepage</title>
-</head>
-<body>
-    <h1>Welcome to the Homepage</h1>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Terminal Titans - AI Movie Recommendations{% endblock %}
+
+{% block content %}
+<div class="hero-container">
+    <div>
+        <span class="hero-badge">AI-Powered Entertainment</span>
+    </div>
+
+    <h1 class="hero-title">
+        Discover Movies <br> Through Your Emotions
+    </h1>
+
+    <p class="hero-description">
+        Experience cinema like never before. Our advanced <strong>Facial Emotion Recognition (FER)</strong>
+        technology analyzes your current mood in real-time to recommend the perfect movie for every moment.
+    </p>
+
+    <div class="btn-group">
+        <a href="{{ url_for('login') }}" class="btn-primary btn-large">Sign In</a>
+        <a href="{{ url_for('signup') }}" class="btn-outline btn-large">Create an Account</a>
+    </div>
+
+    <div class="features-grid">
+        <div class="feature-card">
+            <h3 class="feature-title">Smart Recognition</h3>
+            <p class="feature-text">Instant mood analysis using your camera and advanced machine learning models.</p>
+        </div>
+        <div class="feature-card">
+            <h3 class="feature-title">Curated Library</h3>
+            <p class="feature-text">Access to thousands of movies categorized by emotional impact and genre.</p>
+        </div>
+        <div class="feature-card">
+            <h3 class="feature-title">Personalized Feed</h3>
+            <p class="feature-text">Deep learning algorithms that get better at understanding your taste every day.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
