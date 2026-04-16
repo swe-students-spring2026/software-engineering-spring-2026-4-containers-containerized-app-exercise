@@ -3,7 +3,7 @@
 import os
 from pymongo import MongoClient  # pylint: disable=import-error
 
-MONGO_URI = os.environ.get("MONGO_URI", "mongodb://mongodb:27017/appdb")
+MONGO_URI = os.environ.get("MONGO_URI")
 DB_NAME = "appdb"
 COLLECTION_NAME = "ml_records"
 
