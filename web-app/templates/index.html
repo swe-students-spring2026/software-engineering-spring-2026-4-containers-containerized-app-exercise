@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>CollegeMaxxing</title>
+  </head>
+  <body>
+    <!-- Header -->
+    <div>
+    <span><a href="/">CollegeMaxxing</a></span>
+
+    <span style="float: right;">
+        {% if is_valid %}
+        <a href="/dashboard">Dashboard</a>
+        <a href="/logout">Log out</a>
+        {% else %}
+        <a href="/login">Log in</a>
+        <a href="/signup">Sign up</a>
+        {% endif %}
+    </span>
+    </div>
+
+    <hr>
+    <!-- content -->
+    <main>
+      <h1>Get Ready for Your College Application!</h1>
+
+      <p>
+        Upload your essay, complete a mock interview, and receive AI-powered feedback
+        to improve your chances of getting into your dream school.
+      </p>
+      <ul>
+        <li>Get a personalized application score</li>
+        <li>Practice real interview questions</li>
+        <li>Identify strengths and weaknesses</li>
+      </ul>
+      <!-- signup and login buttons -->
+      <div style="margin-top: 30px;">
+        <button onclick="window.location.href='/login'">Log In</button>
+        <button onclick="window.location.href='/signup'">Sign Up Free</button>
+      </div>
+    </main>
+  </body>
+</html>

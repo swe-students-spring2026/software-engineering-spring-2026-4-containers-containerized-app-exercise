@@ -6,8 +6,12 @@ name = "pypi"
 [packages]
 pylint = "*"
 black = "*"
+flask = "*"
+pytest = "*"
+pytest-flask = "*"
+faster-whisper = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.10"
+python_version = "3"
