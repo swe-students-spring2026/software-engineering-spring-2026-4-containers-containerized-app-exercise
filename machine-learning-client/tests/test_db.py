@@ -1,33 +1,35 @@
 """Tests for app.db."""
+import pytest
+from app import db
 
-from app.db import save_practice_session
 
-
-def test_save_practice_session():
-    """Test that a practice session can be saved."""
+def test_save_practice_session_calls_insert_one(monkeypatch):
     session = {
         "audio_file": "record_outputs/demo.wav",
         "duration_seconds": 6,
-        "transcript": ("Hello everyone um today I want to introduce myself"),
+        "transcript": "Hello everyone um today I want to introduce myself",
         "analysis": {
             "word_count": 8,
             "wpm": 80,
-            "filler_words": {
-                "um": 1,
-                "uh": 0,
-                "like": 0,
-                "you know": 0,
-                "literally": 0,
-                "actually": 0,
-                "basically": 0,
-                "i mean": 0,
-            },
-            "total_filler_count": 1,
-            "pace_feedback": "slowwww...",
-            "filler_feedback": ("Good fluency. Only a few filler words were used."),
         },
     }
 
-    inserted_id = save_practice_session(session)
+    class FakeInsertResult:
+        inserted_id = "fake123"
 
-    assert inserted_id is not None
+    class FakeCollection:
+        def insert_one(self, inserted_session):
+            assert inserted_session == session
+            return FakeInsertResult()
+
+    # 🔥 THIS IS THE KEY LINE
+    monkeypatch.setattr(db, "get_collection", lambda: FakeCollection())
+
+    inserted_id = db.save_practice_session(session)
+
+    assert inserted_id == "fake123"
+
+
+def test_save_practice_session_invalid_input():
+    with pytest.raises(ValueError):
+        db.save_practice_session("not a dictionary")

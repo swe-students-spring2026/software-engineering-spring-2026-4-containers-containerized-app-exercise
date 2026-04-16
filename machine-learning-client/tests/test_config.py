@@ -1,18 +1,26 @@
-"""Tests for app.config."""
+from app.config import (
+    MONGO_URI,
+    MONGO_DB_NAME,
+    MONGO_COLLECTION_NAME,
+    AUDIO_FILE,
+    SAMPLE_RATE,
+    CHANNELS,
+)
 
-from app.config import MONGO_URI, MONGO_DB_NAME, MONGO_COLLECTION_NAME
+def test_mongo_uri_default_loaded():
+    assert MONGO_URI == "mongodb://mongodb:27017"
 
+def test_mongo_db_name_default_loaded():
+    assert MONGO_DB_NAME == "ai_speech_coach"
 
-def test_mongo_uri_loaded():
-    """Test that MONGO_URI is loaded correctly."""
-    assert MONGO_URI == "mongodb://localhost:27017/"
-
-
-def test_mongo_db_name_loaded():
-    """Test that MONGO_DB_NAME is loaded correctly."""
-    assert MONGO_DB_NAME == "sleep_pandas"
-
-
-def test_mongo_collection_name_loaded():
-    """Test that MONGO_COLLECTION_NAME is loaded correctly."""
+def test_mongo_collection_name_default_loaded():
     assert MONGO_COLLECTION_NAME == "practice_sessions"
+
+def test_audio_file_default_loaded():
+    assert AUDIO_FILE == "sample_audio/test.wav"
+
+def test_sample_rate_default():
+    assert SAMPLE_RATE == 44100
+
+def test_channels_default():
+    assert CHANNELS == 1
