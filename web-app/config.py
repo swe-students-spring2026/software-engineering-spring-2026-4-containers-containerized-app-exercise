@@ -14,6 +14,7 @@ class Config:  # pylint: disable=too-few-public-methods
 
     SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key")
     DEBUG = os.getenv("FLASK_DEBUG", "true").lower() == "true"
+    TEMPLATES_AUTO_RELOAD = True
 
     MONGO_URI = os.getenv("MONGO_URI", "mongodb://mongodb:27017/")
     MONGO_DB_NAME = os.getenv("MONGO_DB_NAME", "sign_language_db")

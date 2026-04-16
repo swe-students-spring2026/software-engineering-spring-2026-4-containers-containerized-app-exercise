@@ -1,9 +1,15 @@
-# Sign Language Recognition Dashboard
+# SignBridge - Sign Language Recognition Dashboard + Containerized App
 
 [![CI Subsystems](https://github.com/swe-students-spring2026/4-containers-next_team/actions/workflows/ci.yml/badge.svg)](https://github.com/swe-students-spring2026/4-containers-next_team/actions/workflows/ci.yml)
 [![lint-free](https://github.com/swe-students-spring2026/4-containers-next_team/actions/workflows/lint.yml/badge.svg)](https://github.com/swe-students-spring2026/4-containers-next_team/actions/workflows/lint.yml)
 
-A containerized computer vision application designed to recognize and translate sign language gestures in real-time. The project uses a Machine Learning client (utilizing OpenCV and a Convolutional Neural Network trained on the Sign Language MNIST dataset) to detect American Sign Language (ASL) alphabet gestures from a video feed, and saves the classification results to a MongoDB database. A Flask web dashboard reads this database to show the translated gestures and confidence scores in real-time.
+## App Description:
+Introduction: SignBridge is an educational web platform that helps users understand sign language recognition results through an interactive dashboard.
+
+Product Vision: The app aims to make sign language recognition more useful in educational settings, making sign language technology more understandable, accessible, and meaningful for real users.
+
+## Product Overview
+SignBridge is containerized computer vision application designed to recognize and translate sign language gestures in real-time. The project uses a Machine Learning client (utilizing OpenCV and a Convolutional Neural Network trained on the Sign Language MNIST dataset) to detect American Sign Language (ASL) alphabet gestures from a video feed, and saves the classification results to a MongoDB database. A Flask web dashboard reads this database to show the translated gestures and confidence scores in real-time.
 
 ## Team Members
 - [Hollan Yuan](https://github.com/hwyuanzi)
@@ -14,16 +20,51 @@ A containerized computer vision application designed to recognize and translate 
 
 ## Architecture
 This project is containerized using Docker and is split into three main parts, run together using Docker Compose:
-1. **Machine Learning Client**: A Python script that captures video frames using OpenCV, processes the hand region, and classifies the gesture using a custom CNN model trained on the Sign Language MNIST dataset.
-2. **Web App**: A Python Flask web server showing a UI dashboard that displays the live translation stream and historical gesture data.
-3. **Database**: A MongoDB instance to store the timestamped gesture classification data and confidence scores.
+
+The application consists of three main services:
+
+```text
++---------------------------+      +-----------------------+      +---------------------------+
+| Machine Learning Client   | ---> | MongoDB Database      | ---> | Flask Web Dashboard       |
+| OpenCV + CNN Inference    |      | Stores Predictions    |      | Visualizes Results        |
++---------------------------+      +-----------------------+      +---------------------------+
+```
+
+1. **Machine Learning Client**: The machine learning client is a Python-based service that captures video frames with OpenCV, processes the hand region, and classifies gestures using a custom CNN model trained on the Sign Language MNIST dataset.
+2. **Web App**: The web app is built with Flask and provides an interactive dashboard for viewing live prediction results, confidence scores, and historical gesture data.
+3. **Database**: The database uses MongoDB to store timestamped prediction results, confidence scores, and related metadata, allowing the system to retrieve and display both recent and past predictions.
+
+## Project Structure
+
+```bash
+web-app/
+├── app.py
+├── routes/
+│   ├── api.py
+│   └── pages.py
+├── services/
+│   └── prediction_service.py
+├── templates/
+│   ├── base.html
+│   ├── index.html
+│   └── history.html
+├── static/
+│   ├── css/
+│   └── js/
+├── db/
+│   └── mongo.py
+└── tests/
+```
 
 ## Running the Application
 
 Follow these steps to run the project via Docker Compose.
 
-**1. Prerequisites**
-Make sure you have Git, Docker, and Docker Compose installed. You'll need Docker Desktop running in the background.
+**1. Enviroment Setup**
+Before running the project, make sure you have the following installed:
+  - Git
+  -[Docker](https://www.docker.com/products/docker-desktop/?utm_source=chatgpt.com)
+  - Docker Compose
 
 **2. Clone the repository**
 ```bash
@@ -71,7 +112,7 @@ docker-compose up --build
 *(You can add `-d` at the end to run them in the background).*
 
 **6. View the app and logs**
-- **Web App:** Go to [http://localhost:5000](http://localhost:5000) in your browser to see the dashboard.
+- **Web App:** Go to [http://localhost:5001](http://localhost:5001) in your browser to see the dashboard.
 - **ML Client Logs:** To check if the machine learning client is running and processing the video, open a new terminal and run:
   ```bash
   docker logs ergonomics_ml

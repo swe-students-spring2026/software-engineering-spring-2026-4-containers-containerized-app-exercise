@@ -4,8 +4,9 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-opencv-python = "==4.13.0.92"
-mediapipe = "==0.10.31"
+opencv-python-headless = "*"
+torch = "*"
+torchvision = "*"
 pymongo = "==4.6.2"
 python-dotenv = "*"
 
