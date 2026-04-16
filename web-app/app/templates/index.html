@@ -54,14 +54,13 @@
 
         <section class="container">
             <h2>Performance Visualizations</h2>
-            <p><i>(placeholders for Chart.js/Plotly)</i></p>
             
             <div class="chart-box">
-                [ Line Chart: Words Per Minute Over Time ]
+                <canvas id="wpmChart" aria-label="Words per minute over time" role="img"></canvas>
             </div>
 
             <div class="chart-box">
-                [ Bar Chart: Breakdown of Top Filler Words (um, uh, literally) ]
+                <canvas id="fillerChart" aria-label="Filler word breakdown" role="img"></canvas>
             </div>
         </section>
 
@@ -77,41 +76,12 @@
                         <th>Action</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>SESS-004</td>
-                        <td>2026-04-10 14:30</td>
-                        <td>145</td>
-                        <td>12</td>
-                        <td><a href="#">View Details</a></td>
-                    </tr>
-                    <tr>
-                        <td>SESS-003</td>
-                        <td>2026-04-08 09:15</td>
-                        <td>162 (Rushing)</td>
-                        <td>18</td>
-                        <td><a href="#">View Details</a></td>
-                    </tr>
-                    <tr>
-                        <td>SESS-002</td>
-                        <td>2026-04-05 16:45</td>
-                        <td>138</td>
-                        <td>25</td>
-                        <td><a href="#">View Details</a></td>
-                    </tr>
-                    <tr>
-                        <td>SESS-001</td>
-                        <td>2026-04-01 11:00</td>
-                        <td>130</td>
-                        <td>31</td>
-                        <td><a href="#">View Details</a></td>
-                    </tr>
-                </tbody>
+                <tbody id="sessions-tbody"></tbody
             </table>
         </section>
     </main>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
 </body>
 </html>

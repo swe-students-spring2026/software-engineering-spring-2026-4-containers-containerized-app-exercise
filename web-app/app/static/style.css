@@ -38,12 +38,17 @@ hr {
 
 .chart-box {
     border: 1px dashed #666;
-    height: 250px;
     background-color: #eaeaea;
     text-align: center;
-    line-height: 250px;
     margin-bottom: 15px;
     color: #555;
+    padding: 10px;
+}
+
+.chart-box canvas {
+    width: 100% !important;
+    height: 260px !important;
+    display: block;
 }
 
 table {

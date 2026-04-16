@@ -5,6 +5,7 @@ from flask import Flask, jsonify, request, render_template
 from db import get_db
 from pydub import AudioSegment
 import uuid
+from bson import ObjectId
 
 app = Flask(
     __name__,
@@ -16,6 +17,16 @@ UPLOAD_FOLDER = "/app/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
+def _serialize_mongo_doc(doc: dict) -> dict:
+    """Convert MongoDB document to JSON serializable dict"""
+    if not doc:
+        return doc
+    out = dict(doc)
+    if "_id" in out:
+        out["_id"] = str(out["_id"])
+    return out
+
+
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -25,23 +36,31 @@ def home():
 def get_sessions():
     """Retrieve all practice sessions from the database."""
     database = get_db()
-    sessions = list(
-        database.practice_sessions.find({}, {"_id": 0})
-    )
-    return jsonify(sessions), 200
+    sessions = list(database.practice_sessions.find({}))
+    return jsonify([_serialize_mongo_doc(s) for s in sessions]), 200
+
 
 
 @app.route("/api/sessions/<session_id>", methods=["GET"])
 def get_session_details(session_id):
     """Retrieve details for a specific practice session by its ID."""
     database = get_db()
-    session = database.practice_sessions.find_one(
-        {"session_id": session_id},
-        {"_id": 0},
-    )
+    oid = ObjectId(session_id)
+    session = database.practice_sessions.find_one({"_id": oid})
     if not session:
         return jsonify({"error": "Session not found"}), 404
-    return jsonify(session), 200
+    return jsonify(_serialize_mongo_doc(session)), 200
+
+@app.route("/api/commands/<command_id>", methods=["GET"])
+def get_command_status(command_id):
+    """Retrieve the status of a queued/processing command."""
+    database = get_db()
+    
+    oid = ObjectId(command_id)
+    
+    command = database.commands.find_one({"_id": oid})
+   
+    return jsonify(_serialize_mongo_doc(command)), 200
 
 
 @app.route("/api/trigger-practice", methods=["POST"])
@@ -96,13 +115,14 @@ def upload_audio():
         "status": "pending",
     }
 
-    database.commands.insert_one(command)
+    inserted = database.commands.insert_one(command)
 
     return (
         jsonify(
             {
                 "message": "Audio uploaded, converted, and queued.",
                 "wav_file": wav_path,
+                "command_id": str(inserted.inserted_id),
             }
         ),
         202,
