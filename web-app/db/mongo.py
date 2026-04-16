@@ -1,6 +1,6 @@
+import os
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
-import os
 
 def get_database():
     mongo_uri = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
