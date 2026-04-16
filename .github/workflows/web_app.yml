@@ -30,14 +30,11 @@ jobs:
         working-directory: web-app
         run: black --check .
 
-      #- name: Run tests with coverage
-      #  working-directory: web-app
-      #  env:
-      #    MONGO_URI: mongodb://localhost:27017/
-      #    MONGO_DB_NAME: garbage_classifier
-      #  run: |
-      #    coverage run -m pytest tests/test_app.py -v
-      #    coverage report --fail-under=80
+      - name: Run tests with coverage
+        working-directory: web-app
+        run: |
+          coverage run -m pytest test/test_app.py -v
+          coverage report --fail-under=80
 
   docker:
     runs-on: ubuntu-latest

@@ -137,8 +137,6 @@ pytest test/ -v
 ├── .env.example
 ├── machine-learning-client/
 │   ├── app.py              # Flask inference API
-│   ├── database.py         # MongoDB connection and save logic
-│   ├── ml_client.py        # Legacy capture/inference loop
 │   ├── dockerfile
 │   └── requirements.txt
 ├── web-app/
