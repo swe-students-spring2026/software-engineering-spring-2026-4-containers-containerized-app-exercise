@@ -28,7 +28,11 @@ Project board: [GitHub Project 118](https://github.com/orgs/swe-students-spring2
 
 ## Usability 
 
-Backyard birder's journal/life list tracker. Birdwatches typically maintain 'life lists' of every species they've spotted. Our system would automatically build that over time. The dashboard becomes the user's personal birding log, which is something birders currently maintain manually by hand. The user would be 'I want to know what birds visit my place without standing outside all day with binoculars and simply just using my phone.'
+Backyard birder's journal/life list tracker:
+
+Birdwatchers typically maintain 'life lists' of every species they've spotted. Our system would automatically build that over time. The dashboard becomes the user's personal birding log, which is something birders currently maintain manually by hand. 
+
+A user story could be: "I to know what birds visit my place without standing outside all day with binoculars and I simply just using my phone."
 
 ## Repository Structure
 
