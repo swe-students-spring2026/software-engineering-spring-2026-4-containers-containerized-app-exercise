@@ -1,31 +1,45 @@
 """Main Flask application for the web app."""
 
-import datetime # pylint: disable=import-error
-import os # pylint: disable=import-error
-import pymongo # pylint: disable=import-error
+import datetime  # pylint: disable=import-error
+import os  # pylint: disable=import-error
+import pymongo  # pylint: disable=import-error
 
 from dotenv import load_dotenv
-from bson.objectid import ObjectId # pylint: disable=import-error
+from bson.objectid import ObjectId  # pylint: disable=import-error
 from flask import Flask, flash, redirect, render_template, request, url_for
 from flask_login import (
-    LoginManager, UserMixin, current_user, login_required, login_user, logout_user
+    LoginManager,
+    UserMixin,
+    current_user,
+    login_required,
+    login_user,
+    logout_user,
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 
 try:
     from zoneinfo import ZoneInfo
+
     ZoneInfo("America/New_York")
 except (ImportError, AttributeError):
     try:
         import importlib
+
         importlib.import_module("tzdata")
     except (ImportError, AttributeError):
         from datetime import timezone as _tz
-        class ZoneInfo: # pylint: disable=too-few-public-methods
+
+        class ZoneInfo:  # pylint: disable=too-few-public-methods
             """Fallback ZoneInfo class for environments without zoneinfo/tzdata."""
-            _map = {"America/New_York": _tz(datetime.timedelta(hours=-5)), "UTC": _tz.utc}
+
+            _map = {
+                "America/New_York": _tz(datetime.timedelta(hours=-5)),
+                "UTC": _tz.utc,
+            }
+
             def __init__(self, key):
                 self._offset = self._map.get(key, _tz.utc)
+
 
 # load .env
 load_dotenv()
@@ -36,10 +50,10 @@ app.secret_key = os.getenv("SECRET_KEY", "dev-secret-change-me")
 client = pymongo.MongoClient(os.getenv("MONGO_URI"))
 db = client[os.getenv("MONGO_DBNAME", "titan_terminals")]
 
-users_col       = db["users"]
-datetimes_col   = db["datetimes"]
-quotes_col      = db["quotes"]
-movies_col      = db["movies"]
+users_col = db["users"]
+datetimes_col = db["datetimes"]
+quotes_col = db["quotes"]
+movies_col = db["movies"]
 
 # flask-login set up
 login_manager = LoginManager()
@@ -48,9 +62,11 @@ login_manager.login_view = "login"
 login_manager.login_message = "Please log in to access that page."
 login_manager.login_message_category = "info"
 
+
 # user information
 class User(UserMixin):
     """User class for Flask-Login integration."""
+
     def __init__(self, user_doc):
         """Initializes the User class."""
         self.user_doc = user_doc
@@ -69,14 +85,16 @@ class User(UserMixin):
         """Returns the email of the user."""
         return self.user_doc.get("email", "")
 
+
 @login_manager.user_loader
 def load_user(user_id):
     """Loads a user from the database given their ID."""
     try:
         doc = users_col.find_one({"_id": ObjectId(user_id)})
-    except Exception: # pylint: disable=broad-exception-caught
+    except Exception:  # pylint: disable=broad-exception-caught
         return None
     return User(doc) if doc else None
+
 
 @app.route("/")
 def index():
@@ -88,6 +106,7 @@ def index():
     if current_user.is_authenticated:
         return redirect(url_for("home"))
     return render_template("index.html")
+
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
@@ -125,7 +144,7 @@ def signup():
             "username": username,
             "password_hash": generate_password_hash(password),
             "created_at": datetime.datetime.utcnow(),
-            "role": None
+            "role": None,
         }
         result = users_col.insert_one(new_user)
         new_user["_id"] = result.inserted_id
@@ -136,6 +155,7 @@ def signup():
         return redirect(url_for("home"))
 
     return render_template("signup.html")
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -172,6 +192,7 @@ def login():
 
     return render_template("login.html")
 
+
 @app.route("/logout")
 @login_required
 def logout():
@@ -183,6 +204,7 @@ def logout():
     logout_user()
     flash("You've been logged out.", "info")
     return redirect(url_for("index"))
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
