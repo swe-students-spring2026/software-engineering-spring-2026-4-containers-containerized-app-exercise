@@ -1,58 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+    box-sizing: border-box;
+}
+
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Inter', Arial, sans-serif;
     text-align: center;
-    background: #eee6f3; /* Light Violet */
-    color: #000000;
+    background: #f0e8f8;
+    color: #1a1a1a;
+    margin: 0;
 }
 
 /* HEADER */
 .header {
-    margin-top: 0px;
-    padding: 24px 0;
-    background-color: #57068c; /* NYU Violet */
+    padding: 28px 24px 20px;
+    background: linear-gradient(135deg, #57068c, #7b1fa2);
     color: white;
+    box-shadow: 0 2px 12px rgba(87, 6, 140, 0.3);
 }
 
 .header h1 {
-    margin-bottom: 8px;
+    margin: 0 0 6px;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
 }
 
 .subtitle {
-    color: #eee6f3; /* Light Violet */
+    color: #e0c9f5;
+    margin: 0;
+    font-size: 14px;
 }
 
 /* CONTROL */
 .control {
-    margin: 32px;
+    margin: 36px 0 0;
 }
 
 /* BUTTON */
 button {
-    padding: 16px 32px;     
-    font-size: 20px;    
+    padding: 14px 36px;
+    font-size: 17px;
+    font-family: 'Inter', Arial, sans-serif;
+    font-weight: 600;
     border: none;
-    background-color: #57068c;/* NYU Violet */
+    border-radius: 8px;
+    background-color: #57068c;
     color: white;
-    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+    box-shadow: 0 4px 12px rgba(87, 6, 140, 0.35);
 }
 
 .start {
-    background-color: #57068c;/* NYU Violet */
+    background-color: #57068c;
 }
 
 .stop {
-    background-color: #330662; /* Deep Violet */
+    background-color: #330662;
+    box-shadow: 0 4px 12px rgba(51, 6, 98, 0.35);
 }
 
 button:hover {
-    opacity: 0.9;
+    opacity: 0.92;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(87, 6, 140, 0.4);
+}
+
+button:active {
+    transform: translateY(0);
 }
 
 /* STATUS */
 .status {
-    margin-top: 16px;
-    font-size: 16px;
-    color: #404040;
+    margin-top: 18px;
+    font-size: 15px;
+    color: #555;
+    font-weight: 500;
 }
 
 /* DOT */
@@ -62,35 +87,111 @@ button:hover {
     border-radius: 50%;
     display: inline-block;
     margin-left: 6px;
+    vertical-align: middle;
 }
 
 .idle {
-    background-color: #b8b8b8;
+    background-color: #c0c0c0;
 }
 
 .active {
-    background-color: #8900e1; /* Ultra Violet */
+    background-color: #8900e1;
+    box-shadow: 0 0 6px rgba(137, 0, 225, 0.6);
+    animation: glow 1.4s ease-in-out infinite;
+}
+
+@keyframes glow {
+    0%, 100% { box-shadow: 0 0 4px rgba(137, 0, 225, 0.5); }
+    50%       { box-shadow: 0 0 10px rgba(137, 0, 225, 0.9); }
+}
+
+#timer {
+    margin-top: 10px;
+    font-size: 26px;
+    font-weight: 700;
+    color: #57068c;
+    letter-spacing: 1px;
+}
+
+/* RESULTS SECTION */
+.results-section {
+    margin: 36px auto;
+    width: 60%;
+    text-align: left;
+}
+
+.results-section h2 {
+    margin-bottom: 12px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #2d2d2d;
+}
+
+.current-result {
+    background: white;
+    padding: 20px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    border-left: 4px solid #57068c;
+}
+
+.current-result.empty {
+    border-left-color: #d0c0e0;
+}
+
+.current-bird-name {
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 4px;
+    color: #1a1a1a;
+}
+
+.current-bird-meta {
+    font-size: 14px;
+    color: #777;
+}
+
+.current-result-list {
+    background: white;
+    padding: 16px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+
+.current-result-list:empty {
+    display: none;
+}
+
+.result-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #f0eaf7;
+}
+
+.result-item:last-child {
+    border-bottom: none;
 }
 
 /* DETECTIONS PANEL */
 .detections {
-    margin: 40px auto;
+    margin: 0 auto 48px;
     width: 60%;
     text-align: left;
 }
 
 .detections h2 {
     margin-bottom: 12px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #2d2d2d;
 }
 
-/* LIST CONTAINER */
 .detection-list {
     background: white;
     padding: 16px;
     max-height: 300px;
 }
 
-/* ITEM */
 .detection-item {
     padding: 10px;
     border-bottom: 1px solid #eee;
@@ -100,64 +201,128 @@ button:hover {
     border-bottom: none;
 }
 
-/* TEXT STYLES */
 .bird-name {
-    font-weight: bold;
+    font-weight: 600;
+    color: #1a1a1a;
 }
 
 .meta {
-    font-size: 14px;
-    color: gray;
+    font-size: 13px;
+    color: #888;
+    margin-top: 2px;
 }
 
-#timer {
-    margin-top: 12px;
-    font-size: 24px;
-    font-weight: bold;
-    color: #57068c; /* NYU Violet */
+/* HEADER USER / LOGOUT */
+.header-user {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #ddc8f0;
 }
 
-/*RESULTS SECTION*/
-.results-section {
-    margin: 40px auto;
-    width: 60%;
+.logout-link {
+    color: #ddc8f0;
+    text-decoration: underline;
+}
+
+.logout-link:hover {
+    color: #ffffff;
+}
+
+/* LOGIN PAGE */
+.login-box {
+    margin: 64px auto;
+    width: 380px;
+    background: white;
+    padding: 36px 32px;
     text-align: left;
+    border-radius: 14px;
+    box-shadow: 0 4px 24px rgba(87, 6, 140, 0.12);
 }
 
-.results-section h2 {
-    margin-bottom: 12px;
+.login-box h2 {
+    margin: 0 0 24px;
+    color: #57068c;
+    font-size: 22px;
+    font-weight: 700;
 }
 
-.current-result {
-    background: white;
-    padding: 16px;
+.login-field {
+    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.login-field label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #444;
+}
+
+.login-field input {
+    padding: 10px 12px;
+    font-size: 15px;
+    font-family: 'Inter', Arial, sans-serif;
+    border: 1.5px solid #ddd;
+    border-radius: 7px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.login-field input:focus {
+    border-color: #57068c;
+    box-shadow: 0 0 0 3px rgba(87, 6, 140, 0.1);
+}
+
+.login-btn {
+    width: 100%;
+    margin-top: 6px;
+    cursor: pointer;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 16px;
+}
+
+.login-error {
+    background: #fff0f0;
+    color: #c0392b;
+    font-size: 13px;
     margin-bottom: 16px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border-left: 3px solid #c0392b;
 }
 
-.current-bird-name {
-    font-weight: bold;
-    font-size: 18px;
-    margin-bottom: 6px;
+.auth-switch {
+    margin-top: 18px;
+    font-size: 13px;
+    color: #666;
+    text-align: center;
 }
 
-.current-bird-meta{
-    font-size:14px;
-    color: gray;
+.auth-switch a {
+    color: #57068c;
+    font-weight: 600;
+    text-decoration: none;
 }
 
-.current-result-list{
-    background: white;
-    padding: 16px;
-}
-.current-result-list:empty{
-    display:none;
+.auth-switch a:hover {
+    text-decoration: underline;
 }
 
-.result-item {
-    padding: 10px;
-    border-bottom: 1px solid #eee;
+.field-hint {
+    font-weight: normal;
+    font-size: 12px;
+    color: #999;
 }
 
-.result-item:last-child {
-    border-bottom: none;
+/* ANALYZING STATE */
+.current-result.analyzing .current-bird-name {
+    color: #57068c;
+    animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
 }

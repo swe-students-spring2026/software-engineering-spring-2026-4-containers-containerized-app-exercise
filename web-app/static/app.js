@@ -23,7 +23,7 @@ function updateTimer() {
 }
 
 async function recordChunk() {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true, mimeType: 'audio/ogg' });
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
     const recorder = new MediaRecorder(stream);
     const chunks = [];
