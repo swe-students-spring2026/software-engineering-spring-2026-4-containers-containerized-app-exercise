@@ -29,8 +29,6 @@ jobs:
           
       - name: Test with pytest
         if: ${{ hashFiles(format('{0}/**/*.py', matrix.subdir)) != '' }}
-        env:
-          GEMINI_API_KEY = "YOUR GOOGLE AI API KEY"
         run: |
           cd ${{ matrix.subdir }}
           pipenv run pytest
