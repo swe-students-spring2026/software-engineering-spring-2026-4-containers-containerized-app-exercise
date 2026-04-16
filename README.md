@@ -2,4 +2,4 @@
 
 # Containerized App Exercise
 
-Rock Paper Scissors project, more info to come
+Build a containerized app that uses machine learning. See [instructions](./instructions.md) for details.
