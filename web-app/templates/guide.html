@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Garbage Classification Guide{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>🗑️ Garbage Classification Guide</h1>
+    <p style="text-align:center; font-size:18px; margin-bottom:30px;">
+        Learn how to sort different types of waste correctly
+    </p>
+
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:25px;">
+        
+        <!-- Recyclable -->
+        <div style="background:white; padding:25px; border-radius:15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
+            <h2 style="color:#2196F3;">♻️ Recyclable Waste (Blue Bin)</h2>
+            <p><strong>Examples:</strong></p>
+            <ul>
+                <li>Plastic bottles, containers</li>
+                <li>Paper, cardboard, newspapers</li>
+                <li>Glass bottles and jars</li>
+                <li>Metal cans, aluminum foil</li>
+                <li>Clean clothes and textiles</li>
+            </ul>
+        </div>
+
+        <!-- Hazardous -->
+        <div style="background:white; padding:25px; border-radius:15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
+            <h2 style="color:#f44336;">🔴 Hazardous Waste (Red Bin)</h2>
+            <p><strong>Examples:</strong></p>
+            <ul>
+                <li>Batteries</li>
+                <li>Expired medicines</li>
+                <li>Paint, chemicals, pesticides</li>
+                <li>Fluorescent lamps and bulbs</li>
+                <li>Electronic waste (phones, chargers)</li>
+            </ul>
+        </div>
+
+        <!-- Food/Kitchen Waste -->
+        <div style="background:white; padding:25px; border-radius:15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
+            <h2 style="color:#4caf50;">🟢 Food / Kitchen Waste (Green Bin)</h2>
+            <p><strong>Examples:</strong></p>
+            <ul>
+                <li>Fruit peels, vegetable scraps</li>
+                <li>Rice, leftovers, spoiled food</li>
+                <li>Tea bags, coffee grounds</li>
+                <li>Egg shells, bones</li>
+                <li>Garden waste</li>
+            </ul>
+        </div>
+
+        <!-- Other/General Waste -->
+        <div style="background:white; padding:25px; border-radius:15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
+            <h2 style="color:#795548;">⚫ Other / General Waste (Gray Bin)</h2>
+            <p><strong>Examples:</strong></p>
+            <ul>
+                <li>Tissue paper, napkins</li>
+                <li>Dirty plastic bags</li>
+                <li>Cigarette butts</li>
+                <li>Dust, hair, sweeping waste</li>
+                <li>Contaminated packaging</li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% block title %}Smart Garbage Classifier - Home{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Smart Garbage Classifier</h1>
+    <p style="text-align:center; font-size:18px;">Upload an image and let AI classify your garbage</p>
+
+    <div class="upload-area">
+        <p style="font-size:18px; margin-bottom:20px;">📸 Select Garbage Image</p>
+        <input type="file" id="imageInput" accept="image/*" style="display:none;">
+        <button class="btn" onclick="document.getElementById('imageInput').click()">📁 Choose Image</button>
+        <button class="btn btn-orange" onclick="openCamera()">📷 Open Camera</button>
+
+        <!-- Camera UI (hidden by default) -->
+        <div id="cameraSection" class="camera-section">
+            <video id="video" class="camera-video" autoplay playsinline></video>
+            <canvas id="canvas" style="display:none;"></canvas>
+            <br>
+            <button class="btn btn-capture" onclick="capturePhoto()">📸 Capture</button>
+            <button class="btn btn-cancel" onclick="closeCamera()">✖ Cancel</button>
+        </div>
+    </div>
+
+    <div style="text-align:center; margin:30px 0;">
+        <button class="btn" style="font-size:18px; padding:16px 40px;" onclick="classifyGarbage()">
+            🔍 Start Classification
+        </button>
+    </div>
+
+    {% if stats %}
+    <div style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap; margin:30px 0;">
+        <div class="result-card" style="padding:20px; min-width:180px;">
+            <h3>Total Classifications</h3>
+            <p style="font-size:28px; font-weight:bold;">{{ stats.total_records }}</p>
+        </div>
+
+        <div class="result-card" style="padding:20px; min-width:180px;">
+            <h3>Top Category</h3>
+            <p style="font-size:28px; font-weight:bold;">{{ stats.top_category }}</p>
+        </div>
+
+        <div class="result-card" style="padding:20px; min-width:180px;">
+            <h3>Blue Bin</h3>
+            <p style="font-size:28px; font-weight:bold;">♻️ {{ stats.blue_bin }}</p>
+        </div>
+
+        <div class="result-card" style="padding:20px; min-width:180px;">
+            <h3>Green Bin</h3>
+            <p style="font-size:28px; font-weight:bold;">🌱 {{ stats.green_bin }}</p>
+        </div>
+
+        <div class="result-card" style="padding:20px; min-width:180px;">
+            <h3>Gray Bin</h3>
+            <p style="font-size:28px; font-weight:bold;">🗑️ {{ stats.gray_bin }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if records %}
+    <div style="max-width:900px; margin:30px auto;">
+        <h2 style="text-align:center; margin-bottom:20px;">Recent Classifications</h2>
+        <table>
+            <tr>
+                <th>Time</th>
+                <th>Item</th>
+                <th>Category</th>
+                <th>Bin</th>
+                <th>Confidence</th>
+            </tr>
+            {% for r in records %}
+            <tr>
+                <td>{{ r.get('timestamp', 'N/A') }}</td>
+                <td>{{ r.get('item', 'Unknown') }}</td>
+                <td>{{ r.get('category', 'Unknown') }}</td>
+                <td>
+                    {% if r.get('bin') == 'Blue' %}♻️ Blue Bin
+                    {% elif r.get('bin') == 'Green' %}🌱 Green Bin
+                    {% elif r.get('bin') == 'Gray' %}🗑️ Gray Bin
+                    {% else %}❓ {{ r.get('bin', 'Unknown') }}
+                    {% endif %}
+                </td>
+                <td>{{ r.get('confidence', 0) }}%</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% endif %}
+
+    <div id="preview" style="text-align:center; margin-top:20px;"></div>
+</div>
+
+
+<script>
+    let videoStream = null;
+    let capturedFile = null;
+
+    document.getElementById('imageInput').addEventListener('change', function(e) {
+        const preview = document.getElementById('preview');
+        capturedFile = null;
+        preview.innerHTML = `<img src="${URL.createObjectURL(e.target.files[0])}" 
+                               style="max-width:420px; border-radius:15px; margin-top:15px;">`;
+    });
+
+    function openCamera() {
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(stream) {
+                videoStream = stream;
+                const video = document.getElementById('video');
+                video.srcObject = stream;
+                document.getElementById('cameraSection').style.display = 'block';
+            })
+            .catch(function(err) {
+                alert('Could not access camera: ' + err.message);
+            });
+    }
+
+    function capturePhoto() {
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+
+        canvas.toBlob(function(blob) {
+            capturedFile = blob;
+            const url = URL.createObjectURL(blob);
+            document.getElementById('preview').innerHTML =
+                `<img src="${url}" style="max-width:420px; border-radius:15px; margin-top:15px;">`;
+        }, 'image/jpeg');
+
+        closeCamera();
+    }
+
+    function closeCamera() {
+        if (videoStream) {
+            videoStream.getTracks().forEach(t => t.stop());
+            videoStream = null;
+        }
+        document.getElementById('cameraSection').style.display = 'none';
+    }
+
+    async function classifyGarbage() {
+        const preview = document.getElementById('preview');
+        const fileInput = document.getElementById('imageInput');
+
+        const imageData = capturedFile || (fileInput.files[0] || null);
+        if (!imageData) {
+            alert("Please select or capture an image first.");
+            return;
+        }
+
+        const filename = capturedFile ? 'capture.jpg' : fileInput.files[0].name;
+        const formData = new FormData();
+        formData.append('image', imageData, filename);
+        formData.append('item', filename.split('.')[0].replace(/[-_]/g, ' '));
+
+        preview.innerHTML = '<p>Calling the AI model, please wait...</p>';
+
+        try {
+            const response = await fetch('/classify', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error(`Server returned ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (data.record_id) {
+                window.location.href = `/result/${data.record_id}`;
+                return;
+            }
+
+            preview.innerHTML = `
+                <div class="result-card"
+                     style="max-width:520px; margin:24px auto; padding:24px; background:#fff; border-radius:18px; box-shadow:0 18px 40px rgba(0,0,0,0.08); text-align:left;">
+                    <h2>Classification Result</h2>
+                    <p><strong>Item:</strong> ${data.item}</p>
+                    <p><strong>Category:</strong> ${data.category}</p>
+                    <p><strong>Bin:</strong> ${data.bin}</p>
+                    <p><strong>Confidence:</strong> ${data.confidence}%</p>
+                    <p><strong>Timestamp:</strong> ${data.timestamp}</p>
+                    ${data.model_error ? `<p style="color:red;"><strong>Warning:</strong> ${data.model_error}</p>` : ''}
+                </div>
+            `;
+        } catch (error) {
+            preview.innerHTML = `<p style="color:red;">Failed to classify garbage: ${error.message}</p>`;
+            console.error('Error during classification:', error);
+        }
+    }
+</script>
+{% endblock %}
