@@ -13,7 +13,6 @@ This makes the project especially useful for two types of users:
 - learners who want to better understand how sign language gestures are recognized over time
 
 ## Product User Stories
-```md
 ### User Type 1: People who rely on sign language support
 1. As a user who communicates with sign language, I want the system to recognize my hand gestures so that my signed input can be interpreted on screen.
 2. As a user who communicates with sign language, I want to see live prediction results so that I can know whether the system is recognizing my gesture correctly in real time.
