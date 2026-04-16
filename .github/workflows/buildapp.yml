@@ -11,6 +11,13 @@ jobs:
     defaults:
       run:
         working-directory: web-app
+
+    services:
+      mongodb:
+        image: mongo
+        ports:
+          - 27017:27017
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
