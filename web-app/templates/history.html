@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}History | Sign Language Recognition{% endblock %}
+
+{% block content %}
+{% set next_sort = "asc" if sort_order == "desc" else "desc" %}
+
+<section class="panel history-page-panel">
+  <div class="panel-header">
+    <h2>Prediction History</h2>
+    <a href="{{ url_for('pages.index') }}" class="mini-link">← Back to dashboard</a>
+  </div>
+
+  <form method="GET" action="{{ url_for('pages.history') }}" class="history-search-form">
+    <input
+      type="text"
+      name="search"
+      class="history-search-input"
+      placeholder="Search label..."
+      value="{{ search_query or '' }}"
+    >
+    <input type="hidden" name="sort" value="{{ sort_order }}">
+    <button type="submit">Search</button>
+  </form>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>
+            <a
+              href="{{ url_for('pages.history', search=search_query, sort=next_sort) }}"
+              class="sort-link"
+            >
+              Timestamp
+              {% if sort_order == "asc" %}
+                ↑
+              {% else %}
+                ↓
+              {% endif %}
+            </a>
+          </th>
+          <th>Predicted Label</th>
+          <th>Confidence</th>
+          <th>Current Text</th>
+          <th>Source</th>
+          <th>Frame</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in recent %}
+        <tr>
+          <td>{{ item.timestamp }}</td>
+          <td>{{ item.predicted_label }}</td>
+          <td>{{ item.confidence }}</td>
+          <td>{{ item.current_text or "N/A" }}</td>
+          <td>{{ item.source or "N/A" }}</td>
+          <td>{{ item.frame_number if item.frame_number is not none else "N/A" }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6">No prediction history available yet.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

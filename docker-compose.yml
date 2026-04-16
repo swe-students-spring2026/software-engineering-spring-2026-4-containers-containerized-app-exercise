@@ -1,0 +1,42 @@
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: ergonomics_mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    restart: always
+
+  web-app:
+    build: ./web-app
+    container_name: ergonomics_web
+    ports:
+      - "5001:5000"
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
+      - MONGO_COLLECTION=${MONGO_COLLECTION}
+    volumes:
+      - ./web-app:/app
+
+    depends_on:
+      - mongodb
+    restart: always
+
+  machine-learning-client:
+    build: ./machine-learning-client
+    container_name: ergonomics_ml
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
+      - MONGO_COLLECTION=${MONGO_COLLECTION}
+    # We will mount a sample video to run the detection without a real webcam in Docker
+    volumes:
+      - ./machine-learning-client/data/raw/sample.mp4:/app/data/raw/sample.mp4
+    depends_on:
+      - mongodb
+    restart: always
+
+volumes:
+  mongodb_data:

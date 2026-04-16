@@ -1,0 +1,642 @@
+/* =========================================================
+   Global reset and base typography
+   ========================================================= */
+@import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600");
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  display: block;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  line-height: 1.6;
+  background: #000000;
+  color: rgba(255, 255, 255, 0.78);
+  font-family: "Source Sans Pro", Helvetica, sans-serif;
+  font-size: 16pt;
+  font-weight: 300;
+  letter-spacing: 0.025em;
+  overflow-x: hidden;
+  padding: 4rem 1.5rem 2rem 1.5rem;
+  position: relative;
+}
+
+body.is-preload *,
+body.is-preload *::before,
+body.is-preload *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.78)),
+    radial-gradient(circle at top left, rgba(28, 180, 149, 0.2), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(28, 180, 149, 0.12), transparent 22%);
+  z-index: 0;
+}
+
+#app-shell {
+  position: relative;
+  z-index: 1;
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* =========================================================
+   Links and headings
+   ========================================================= */
+a {
+  color: #1cb495;
+  text-decoration: none;
+  border-bottom: dotted 1px rgba(255, 255, 255, 0.35);
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+a:hover {
+  color: #1de9b6;
+  border-bottom-color: transparent;
+}
+
+strong,
+b {
+  font-weight: 600;
+  color: #ffffff;
+}
+
+em,
+i {
+  font-style: italic;
+}
+
+h1,
+h2,
+h3 {
+  color: #ffffff;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+h2 {
+  font-size: 1.4rem;
+}
+
+h3 {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.72);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+p {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* =========================================================
+   Header and top navigation
+   ========================================================= */
+#header {
+  margin-bottom: 2.5rem;
+}
+
+#header p {
+  font-size: 1.1rem;
+}
+
+.top-nav {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1.2rem;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  border-bottom: none;
+  font-weight: 400;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.nav-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #1cb495;
+  text-decoration: none;
+}
+
+/* =========================================================
+   Generic panel/card styles
+   ========================================================= */
+.panel {
+  background: rgba(255, 255, 255, 0.06);
+  border: solid 1px rgba(255, 255, 255, 0.16);
+  border-radius: 18px;
+  padding: 1.2rem;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.34);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.1rem;
+}
+
+.status-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #1cb495;
+  box-shadow: 0 0 12px rgba(28, 180, 149, 0.55);
+}
+
+/* =========================================================
+   Main page layout
+   ========================================================= */
+.main-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.9fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.live-panel {
+  grid-column: 1 / 2;
+  min-width: 0;
+}
+
+.right-column {
+  grid-column: 2 / 3;
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+  min-width: 0;
+}
+
+.medals-panel,
+.history-panel {
+  grid-column: 1 / 3;
+  min-width: 0;
+}
+
+/* =========================================================
+   Camera section
+   ========================================================= */
+.camera-box {
+  margin-bottom: 1rem;
+}
+
+#camera-preview {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.04);
+  display: block;
+}
+
+/* =========================================================
+   Live prediction block
+   ========================================================= */
+.live-letter-wrap {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  margin: 1rem 0 1.25rem 0;
+}
+
+.live-letter {
+  flex-shrink: 0;
+  width: 140px;
+  height: 140px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  font-size: 5rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: #1cb495;
+  box-shadow: 0 0.5rem 1.2rem rgba(28, 180, 149, 0.28);
+  transition: font-size 0.2s ease, background 0.2s ease;
+}
+
+.live-letter.is-na {
+  font-size: 2rem;
+}
+
+.live-meta p {
+  margin-bottom: 0.5rem;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* =========================================================
+   Challenge / game section
+   ========================================================= */
+.challenge-layout {
+  display: grid;
+  grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: center;
+}
+
+.challenge-image-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.challenge-image {
+  width: 100%;
+  max-width: 220px;
+  max-height: 180px;
+  object-fit: contain;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.5rem;
+}
+
+.challenge-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 0.8rem;
+  letter-spacing: 0.04em;
+}
+
+.challenge-help {
+  margin-top: 0.9rem;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.status-stack {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.status-card {
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0.9rem 1rem;
+}
+
+.status-label {
+  display: block;
+  color: rgba(255, 255, 255, 0.56);
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.status-value {
+  color: #ffffff;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+/* =========================================================
+   Translation box / form controls
+   ========================================================= */
+.translation-box label {
+  display: block;
+  font-weight: 400;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+textarea,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select {
+  width: 100%;
+  border: solid 1px rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  outline: none;
+  padding: 0.75rem 1rem;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+textarea:focus,
+input:focus,
+select:focus {
+  border-color: #1cb495;
+  box-shadow: 0 0 0 1px #1cb495;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* =========================================================
+   Buttons
+   ========================================================= */
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+button,
+.button,
+input[type="submit"],
+input[type="button"],
+input[type="reset"] {
+  appearance: none;
+  border: none;
+  border-radius: 999px;
+  background: #1cb495;
+  color: #ffffff !important;
+  cursor: pointer;
+  font-weight: 600;
+  padding: 0.7rem 1.4rem;
+  letter-spacing: 0.04em;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+  text-decoration: none;
+}
+
+button:hover,
+.button:hover,
+input[type="submit"]:hover {
+  background: #17a589;
+  box-shadow: 0 0.35rem 1rem rgba(28, 180, 149, 0.22);
+}
+
+button:active,
+.button:active,
+input[type="submit"]:active {
+  transform: translateY(1px);
+}
+
+button.secondary {
+  background: transparent;
+  color: #1cb495 !important;
+  border: 1px solid rgba(28, 180, 149, 0.55);
+}
+
+button.secondary:hover {
+  background: rgba(28, 180, 149, 0.12);
+  box-shadow: none;
+}
+
+.active-toggle {
+  background: #17a589 !important;
+}
+
+/* =========================================================
+   Table styles
+   ========================================================= */
+.table-wrap {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead th {
+  text-align: left;
+  color: rgba(255, 255, 255, 0.65);
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+tbody td {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.mini-link {
+  font-size: 0.875rem;
+}
+
+/* =========================================================
+   Footer
+   ========================================================= */
+#footer {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.55);
+}
+
+#footer .copyright {
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+}
+
+#footer .copyright li {
+  font-size: 0.875rem;
+}
+
+/* =========================================================
+   Responsive layout
+   ========================================================= */
+@media screen and (max-width: 1180px) {
+  .main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .live-panel,
+  .right-column,
+  .medals-panel,
+  .history-panel {
+    grid-column: 1 / 2;
+  }
+}
+
+@media screen and (max-width: 760px) {
+  .challenge-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .challenge-image-wrap {
+    justify-content: flex-start;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  body {
+    padding: 4rem 1rem 2rem 1rem;
+    font-size: 14pt;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  .live-letter-wrap {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .button-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .history-page-panel .history-search-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .history-page-panel .history-search-input {
+    max-width: 100%;
+  }
+}

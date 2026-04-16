@@ -1,0 +1,40 @@
+name: CI Subsystems
+
+on: [push, pull_request]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # repeat same job for each subsystem in the following subdirectories
+        subdir: [web-app, machine-learning-client]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        if: ${{ hashFiles(format('{0}/Pipfile', matrix.subdir)) != '' }}
+        run: |
+          cd ${{ matrix.subdir }}
+          python -m pip install --upgrade pip
+          pip install pipenv
+          pipenv sync --dev || pipenv install --dev
+      - name: Lint with pylint
+        if: ${{ hashFiles(format('{0}/Pipfile', matrix.subdir)) != '' }}
+        continue-on-error: true # For scaffolding Phase
+        run: |
+          cd ${{ matrix.subdir }}
+          pipenv run pylint $(git ls-files '*.py') || true
+      - name: Format with black
+        if: ${{ hashFiles(format('{0}/Pipfile', matrix.subdir)) != '' }}
+        run: |
+          cd ${{ matrix.subdir }}
+          pipenv run black --diff --check . || true
+      - name: Test with pytest
+        if: ${{ hashFiles(format('{0}/Pipfile', matrix.subdir)) != '' }}
+        run: |
+          cd ${{ matrix.subdir }}
+          pipenv run pytest --cov=. || true
