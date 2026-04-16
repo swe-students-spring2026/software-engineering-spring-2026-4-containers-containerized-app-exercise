@@ -1,5 +1,8 @@
 import os
+import requests
 import datetime
+import ffmpeg
+from dotenv import load_dotenv
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_login import (
@@ -24,22 +27,24 @@ login_manager = LoginManager(app)
 login_manager.login_view = "login"
 login_manager.login_message = None
 
-from dotenv import load_dotenv
 load_dotenv()
 
 class User(UserMixin):
-
+    """User functions to create and search for users"""
     def __init__(self, doc):
+        """Initialize user from MongDB"""
         self.id = str(doc["_id"])
         self.username = doc.get("username", "")
 
     @staticmethod
     def get_by_username(username):
+        """Finds the user by their username"""
         doc = users_coll.find_one({"username": username.lower().strip()})
         return User(doc) if doc else None
 
     @staticmethod
     def create(username, password):
+        """Creates a new user"""
         username = username.lower().strip()
         if users_coll.find_one({"username": username}):
             return None
@@ -57,6 +62,7 @@ class User(UserMixin):
 
 @login_manager.user_loader
 def load_user(user_id):
+    """Load user by id for login"""
     try:
         doc = users_coll.find_one({"_id": ObjectId(user_id)})
     except Exception:
@@ -66,11 +72,12 @@ def load_user(user_id):
 @app.route("/")
 @login_required
 def index():
+    """Redirects automatically to dashboard."""
     return redirect(url_for("dashboard"))
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    ""
+    """Handles users logging in"""
     if current_user.is_authenticated:
         return redirect(url_for("dashboard"))
 
@@ -94,6 +101,7 @@ def login():
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
+    """Handles new users signing up"""
     if current_user.is_authenticated:
         return redirect(url_for("dashboard"))
 
@@ -124,6 +132,7 @@ def signup():
 
 @app.route("/logout")
 def logout():
+    """Log out of current user"""
     logout_user()
     session.pop("_flashes", None)
     return redirect(url_for("login"))
@@ -162,12 +171,62 @@ def delete(speech_id):
 @app.route("/submit", methods=["POST"])
 @login_required
 def submit():
-    """Send the audio file and the name of the speech to the ML client."""
-    # TODO
+    """Sends the audio file and the name of the speech to the ML client."""
+    title = (request.form.get("title") or "").strip()
+    audio_file = request.files.get("audio")
+
+    if not title:
+        flash("Please enter a title for your speech.")
+        return redirect(url_for("record"))
+
+    if not audio_file:
+        flash("Please record your speech before submitting.")
+        return redirect(url_for("record"))
+
+    # save original webm file
+    webm_path = f"temp_{current_user.id}.webm"
+    wav_path = f"temp_{current_user.id}.wav"
+    audio_file.save(webm_path)
+
+    try:
+        ffmpeg.input(webm_path).output(wav_path).run(overwrite_output=True)
+    except Exception:
+        flash("Could not process audio file. Please try again.")
+        if os.path.exists(webm_path):
+            os.remove(webm_path)
+        return redirect(url_for("record"))
+
+    try:
+        with open(wav_path, "rb") as f:
+            response = requests.post(
+                os.environ.get("ML_CLIENT_URL", "http://localhost:5001/analyze"),
+                files={"audio": f},
+                data={
+                    "title": title,
+                    "user_id": current_user.id,
+                },
+                timeout=60,
+            )
+
+        if response.status_code != 200:
+            flash("Something went wrong analyzing your speech. Please try again.")
+            return redirect(url_for("record"))
+
+    except requests.exceptions.RequestException:
+        flash("Could not reach the analysis service. Please try again.")
+        return redirect(url_for("record"))
+
+    finally:
+        if os.path.exists(webm_path):
+            os.remove(webm_path)
+        if os.path.exists(wav_path):
+            os.remove(wav_path)
+
+    flash("Speech analyzed successfully!")
     return redirect(url_for("dashboard"))
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5002, debug=True)
 
 
 

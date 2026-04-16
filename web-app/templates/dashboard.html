@@ -19,24 +19,28 @@
                 <p class="speech-meta"><strong>Date:</strong> {{ speech.timestamp }}</p>
             {% endif %}
 
-            {% if speech.overall_score is defined %}
-                <p><strong>Overall Score:</strong> {{ speech.overall_score }}</p>
+            {% if speech.wpm %}
+                <p><strong>Words Per Minute:</strong> {{ speech.wpm }}</p>
             {% endif %}
 
-            {% if speech.words_per_minute is defined %}
-                <p><strong>Words Per Minute:</strong> {{ speech.words_per_minute }}</p>
+            {% if speech.pace_rating %}
+                <p><strong>Pace:</strong> {{ speech.pace_rating }}</p>
             {% endif %}
 
-            {% if speech.filler_word_total is defined %}
-                <p><strong>Filler Words:</strong> {{ speech.filler_word_total }}</p>
+            {% if speech.filler_count %}
+                <p><strong>Filler Words:</strong> {{ speech.filler_count }}</p>
             {% endif %}
 
-            {% if speech.pitch_variance is defined %}
-                <p><strong>Pitch Variance:</strong> {{ speech.pitch_variance }}</p>
+            {% if speech.volume_rating %}
+                <p><strong>Volume:</strong> {{ speech.volume_rating }}</p>
             {% endif %}
 
-            {% if speech.avg_volume_db is defined %}
-                <p><strong>Average Volume:</strong> {{ speech.avg_volume_db }} dB</p>
+            {% if speech.pitch_rating %}
+                <p><strong>Pitch:</strong> {{ speech.pitch_rating }}</p>
+            {% endif %}
+
+            {% if speech.transcript %}
+                <p><strong>Transcript:</strong> {{ speech.transcript }}</p>
             {% endif %}
 
             <form method="POST" action="/delete/{{ speech.id }}">
