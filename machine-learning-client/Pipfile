@@ -8,6 +8,10 @@ pylint = "*"
 black = "*"
 pymongo = "*"
 flask = "*"
+numpy = "*"
+soundfile = "*"
+openai-whisper = "*"
+librosa = "*"
 
 
 [dev-packages]
