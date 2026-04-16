@@ -78,49 +78,49 @@ def test_compute_words_per_minute_decimal():
 # rate_volume tests
 def test_rate_volume_too_quiet():
     """Test volume rated as too quiet"""
-    assert rate_volume(-50) == "too quiet"
+    assert rate_volume(-50) == "Too quiet"
 
 
 def test_rate_volume_too_loud():
     """Test volume rated as too loud"""
-    assert rate_volume(-5) == "too loud"
+    assert rate_volume(-5) == "Too loud"
 
 
 def test_rate_volume_good():
     """Test volume rated as good"""
-    assert rate_volume(-20) == "good"
+    assert rate_volume(-20) == "Good"
 
 
 # rate_pitch tests
 def test_rate_pitch_monotone():
     """Test pitch rated as monotone"""
-    assert rate_pitch(10) == "monotone"
+    assert rate_pitch(10) == "Monotone"
 
 
 def test_rate_pitch_too_varied():
     """Test pitch rated as too varied"""
-    assert rate_pitch(3000) == "too varied"
+    assert rate_pitch(3000) == "Too varied"
 
 
 def test_rate_pitch_good():
     """Test pitch rated as good"""
-    assert rate_pitch(500) == "good"
+    assert rate_pitch(500) == "Good"
 
 
 # rate_pace tests
 def test_rate_pace_too_slow():
     """Test pace rated as too slow"""
-    assert rate_pace(80) == "too slow"
+    assert rate_pace(80) == "Too slow"
 
 
 def test_rate_pace_too_fast():
     """Test pace rated as too fast"""
-    assert rate_pace(191) == "too fast"
+    assert rate_pace(191) == "Too fast"
 
 
 def test_rate_pace_good():
     """Test pace rated as good"""
-    assert rate_pace(130) == "good"
+    assert rate_pace(130) == "Good"
 
 
 # transcribe_audio test
@@ -177,10 +177,11 @@ def test_analyze_success(flask_client, mocker):
         return_value={
             "duration_seconds": 30.0,
             "avg_volume_db": -20.0,
-            "pitch_variance": 500.0,
+            "pitch_variance": 400.0,
         },
     )
     mocker.patch("ml_client.speeches_collection.insert_one", return_value=MagicMock())
+    mocker.patch("werkzeug.datastructures.FileStorage.save")
     data = {
         "audio": (io.BytesIO(b"fake audio content"), "audio_test.wav"),
         "title": "Test Speech",

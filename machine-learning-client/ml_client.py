@@ -62,29 +62,29 @@ def analyze_audio(audio_path):
 
 def rate_volume(avg_vol_db):
     """Gives the volume of the speech a rating"""
-    if avg_vol_db < -40:
-        return "too quiet"
-    if avg_vol_db > -10:
-        return "too loud"
-    return "good"
+    if avg_vol_db < -26:
+        return "Too quiet"
+    if avg_vol_db > -15:
+        return "Too loud"
+    return "Good"
 
 
 def rate_pitch(pitch_var):
     """Gives the pitch variance of the speech a rating"""
-    if pitch_var < 50:
-        return "monotone"
-    if pitch_var > 2000:
-        return "too varied"
-    return "good"
+    if pitch_var < 300:
+        return "Monotone"
+    if pitch_var > 500:
+        return "Too varied"
+    return "Good"
 
 
 def rate_pace(pace):
     """Gives the pace of the speech a rating"""
     if pace < 100:
-        return "too slow"
+        return "Too slow"
     if pace > 190:
-        return "too fast"
-    return "good"
+        return "Too fast"
+    return "Good"
 
 
 @app.route("/analyze", methods=["POST"])
@@ -93,7 +93,8 @@ def analyze():
     if "audio" not in request.files:
         return jsonify({"error": "no audio file"}), 400
     audio_file = request.files["audio"]
-    audio_path = f"/tmp/{uuid.uuid4()}_{audio_file.filename}"
+    audio_filename = f"{uuid.uuid4()}.wav"
+    audio_path = f"/audio_files/{audio_filename}"
     audio_file.save(audio_path)
 
     model = whisper.load_model("base")
@@ -116,6 +117,7 @@ def analyze():
         "volume_rating": volume_rating,
         "pitch_rating": pitch_rating,
         "pace_rating": pace_rating,
+        "audio_filename": audio_filename,
     }
     speeches_collection.insert_one(result)
     return jsonify({"status": "success"}), 200

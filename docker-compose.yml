@@ -12,6 +12,8 @@ services:
       - mongodb
     environment:
       MONGO_URI: mongodb://mongodb:27017/
+    volumes:
+      - audio_files:/audio_files
 
   web-app:
     build: ./web-app
@@ -25,3 +27,8 @@ services:
       MONGO_URI: mongodb://mongodb:27017/
       SECRET_KEY: secret-key
       ML_CLIENT_URL: http://machine-learning-client:5001/analyze
+    volumes:
+      - audio_files:/audio_files
+
+volumes:
+  audio_files:

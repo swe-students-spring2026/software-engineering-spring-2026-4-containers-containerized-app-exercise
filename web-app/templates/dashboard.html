@@ -16,7 +16,7 @@
             <h3>{{ speech.title }}</h3>
 
             {% if speech.timestamp %}
-                <p class="speech-meta"><strong>Date:</strong> {{ speech.timestamp }}</p>
+                <p class="speech-meta"><strong>Date:</strong> {{ speech.timestamp.strftime("%B %d, %Y at %I:%M %p") }}</p>
             {% endif %}
 
             {% if speech.wpm %}
@@ -41,6 +41,12 @@
 
             {% if speech.transcript %}
                 <p><strong>Transcript:</strong> {{ speech.transcript }}</p>
+            {% endif %}
+
+            {% if speech.audio_filename %}
+                <audio controls>
+                    <source src="/audio/{{ speech.audio_filename }}" type="audio/wav">
+                </audio>
             {% endif %}
 
             <form method="POST" action="/delete/{{ speech.id }}">

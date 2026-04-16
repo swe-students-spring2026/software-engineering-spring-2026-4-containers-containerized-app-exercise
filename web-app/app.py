@@ -8,7 +8,16 @@ import requests
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
 from dotenv import load_dotenv
-from flask import Flask, flash, redirect, render_template, request, session, url_for
+from flask import (
+    Flask,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+    send_from_directory,
+)
 from flask_login import (
     LoginManager,
     UserMixin,
@@ -157,6 +166,13 @@ def dashboard():
 def record():
     """This will be the page that users record and name their speech."""
     return render_template("record.html")
+
+
+@app.route("/audio/<filename>")
+@login_required
+def serve_audio(filename):
+    """Serve audio file for playback."""
+    return send_from_directory("/audio_files", filename)
 
 
 @app.route("/delete/<speech_id>", methods=["POST"])

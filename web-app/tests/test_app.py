@@ -24,6 +24,13 @@ def test_login_page(client):
     assert response.status_code == 200
 
 
+def test_serve_audio_not_logged_in(client):
+    """Test audio route redirects if not logged in."""
+    response = client.get("/audio/test.wav")
+    assert response.status_code == 302
+    assert "/login" in response.location
+
+
 def test_index_redirects_not_loggedin(client):
     """Test that index redirects if not logged in."""
     response = client.get("/")
