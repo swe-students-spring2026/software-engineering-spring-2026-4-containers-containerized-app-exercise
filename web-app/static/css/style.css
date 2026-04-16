@@ -363,71 +363,9 @@ p {
   color: #5a4e44;
 }
 
-.challenge-layout {
-  display: grid;
-  grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
-  gap: 1rem;
-  align-items: center;
-}
-
-.challenge-image-wrap {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
-.challenge-image {
-  width: 100%;
-  max-width: 220px;
-  max-height: 180px;
-  object-fit: contain;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  background: rgba(255, 255, 255, 0.4);
-  padding: 0.5rem;
-}
-
-.challenge-title {
-  font-size: 1.8rem;
-  font-weight: 600;
-  color: #2a2421;
-  margin-bottom: 0.8rem;
-  letter-spacing: 0.04em;
-}
-
-.challenge-help {
-  margin-top: 0.9rem;
-  font-size: 0.95rem;
-  color: #5a4e44;
-}
-
-.status-stack {
-  display: grid;
-  gap: 0.8rem;
-}
-
-.status-card {
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  padding: 0.9rem 1rem;
-}
-
-.status-label {
-  display: block;
-  color: #5a4e44;
-  font-size: 0.85rem;
-  margin-bottom: 0.25rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.status-value {
-  color: #2a2421;
-  font-size: 1.15rem;
-  font-weight: 600;
-}
-
+/* =========================================================
+   Translation box / form controls
+   ========================================================= */
 .translation-box label {
   display: block;
   font-weight: 400;
@@ -589,16 +527,6 @@ tbody tr:hover {
   .medals-panel,
   .history-panel {
     grid-column: 1 / 2;
-  }
-}
-
-@media screen and (max-width: 760px) {
-  .challenge-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .challenge-image-wrap {
-    justify-content: flex-start;
   }
 }
 

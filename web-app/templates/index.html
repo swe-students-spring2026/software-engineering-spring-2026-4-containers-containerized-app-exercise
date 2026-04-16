@@ -4,7 +4,6 @@
 
 {% block content %}
 <section class="main-grid">
-  <!-- Left column: live recognition / camera / speech -->
   <article class="panel live-panel">
     <div class="panel-header">
       <div style="display: flex; align-items: center; justify-content: flex-start; gap: 0.75rem;">
@@ -25,7 +24,6 @@
       <button id="game-restart-btn" type="button" class="secondary">Restart</button>
     </div>
 
-    <!-- Realtime prediction display -->
     <div class="live-letter-wrap">
       <div class="live-letter" id="latest-label">N/A</div>
 
@@ -52,12 +50,10 @@
       <div class="button-row">
         <button id="speak-btn" type="button">Speak</button>
         <button id="auto-speak-btn" type="button" class="secondary">Auto Speak: Off</button>
-        <button id="stop-speaker-btn" type="button" class="secondary">Stop Speaker</button>
       </div>
     </div>
   </article>
 
-  <!-- Right column: challenge first, game status second -->
   <div class="right-column">
     <article class="panel challenge-panel">
       <div class="panel-header">
@@ -78,9 +74,10 @@
           <p class="challenge-title" id="challenge-display-text">CAT</p>
           <div id="challenge-slots" class="challenge-slots"></div>
           <p class="challenge-help">
-            Hold the same correct letter for about 3 seconds to lock it in.
+            Hold the same correct letter for about 2 seconds to lock it in.
             A wrong stable letter resets the current challenge.
           </p>
+          <div id="game-feedback" class="game-feedback" aria-live="polite"></div>
         </div>
       </div>
     </article>
@@ -114,15 +111,16 @@
     </article>
   </div>
 
-  <!-- Bottom row: medal wall -->
   <article class="panel medals-panel">
     <div class="panel-header">
       <h2>Medal Wall</h2>
     </div>
+    <p class="medal-help">
+      Complete a word challenge to unlock its matching medal. Each completed word earns one medal.
+    </p>
     <div id="medal-wall" class="medal-wall"></div>
   </article>
 
-  <!-- Bottom row: recent predictions -->
   <article class="panel history-panel">
     <div class="panel-header">
       <h2>Recent Predictions</h2>

@@ -31,7 +31,9 @@
 
 .challenge-layout {
   display: grid;
-  gap: 1rem;
+  gap: 1.1rem;
+  grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
+  align-items: center;
 }
 
 .challenge-image-wrap {
@@ -54,38 +56,44 @@
 }
 
 .challenge-title {
-  color: #2a2421;
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 0.75rem;
+  color: #fff;
+  font-size: 2.45rem;
+  font-weight: 800;
+  margin-bottom: 0.95rem;
+  letter-spacing: 0.06em;
+  line-height: 1.1;
 }
 
 .challenge-help {
-  color: #5a4e44;
-  line-height: 1.6;
-  margin-top: 0.85rem;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.85;
+  margin-top: 1rem;
+  font-size: 1.22rem;
+  font-weight: 700;
+  max-width: 26rem;
 }
 
 .challenge-slots {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.55rem;
+  gap: 0.8rem;
   align-items: center;
 }
 
 .challenge-slot {
-  min-width: 44px;
-  height: 52px;
-  padding: 0 0.5rem;
+  min-width: 72px;
+  height: 76px;
+  padding: 0 0.8rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
-  border: 2px solid rgba(255, 255, 255, 0.8);
-  background: rgba(255, 255, 255, 0.5);
-  color: #2a2421;
-  font-weight: 700;
-  font-size: 1.1rem;
+  border-radius: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  font-weight: 800;
+  font-size: 2rem;
+  line-height: 1;
 }
 
 .challenge-slot.matched {
@@ -96,7 +104,38 @@
 }
 
 .challenge-gap {
-  width: 20px;
+  width: 24px;
+}
+
+/* =========================================================
+   Feedback message
+   ========================================================= */
+.game-feedback {
+  display: none;
+  margin-top: 1rem;
+  padding: 1rem 1.15rem;
+  border-radius: 14px;
+  border: 1px solid rgba(28, 180, 149, 0.45);
+  background: rgba(28, 180, 149, 0.14);
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.65;
+}
+
+.game-feedback.is-visible {
+  display: block;
+}
+
+/* =========================================================
+   Medal wall
+   ========================================================= */
+.medal-help {
+  margin-bottom: 1rem;
+  color: rgba(255, 255, 255, 0.78);
+  line-height: 1.7;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 .medal-wall {
@@ -121,6 +160,7 @@
 .medal-card.unlocked {
   filter: grayscale(0);
   opacity: 1;
+  box-shadow: 0 0 1rem rgba(28, 180, 149, 0.16);
 }
 
 .medal-image {
@@ -136,6 +176,55 @@
   color: #2a2421;
   font-size: 0.88rem;
   line-height: 1.3;
+  font-weight: 700;
+}
+
+/* =========================================================
+   Responsive layout
+   ========================================================= */
+@media screen and (max-width: 980px) {
+  .challenge-layout {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .challenge-image-wrap {
+    justify-content: flex-start;
+  }
+
+  .challenge-help {
+    max-width: none;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .challenge-title {
+    font-size: 2rem;
+  }
+
+  .challenge-help {
+    font-size: 1.05rem;
+    line-height: 1.7;
+  }
+
+  .challenge-slot {
+    min-width: 58px;
+    height: 62px;
+    font-size: 1.55rem;
+  }
+
+  .status-value {
+    font-size: 1.5rem;
+  }
+
+  .medal-wall {
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  }
+
+  .medal-image {
+    width: 80px;
+    height: 80px;
+  }
 }
 
 .medal-card {

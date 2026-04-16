@@ -1,7 +1,8 @@
 (function () {
   "use strict";
 
-  const STABLE_MS = 3000;
+  const STABLE_MS = 2000;
+  const FEEDBACK_MS = 2000;
 
   let challenges = [];
   let progress = {
@@ -16,6 +17,7 @@
   let stableCandidate = "";
   let stableSince = 0;
   let acceptedStableCandidate = false;
+  let feedbackTimeoutId = null;
 
   function $(id) {
     return document.getElementById(id);
@@ -23,6 +25,17 @@
 
   function currentChallenge() {
     return challenges[progress.current_level] || null;
+  }
+
+  function normalizedTargetCharacters(challenge) {
+    if (!challenge || !challenge.target_text) {
+      return [];
+    }
+
+    return challenge.target_text
+      .toUpperCase()
+      .split("")
+      .filter((character) => character !== " ");
   }
 
   async function saveProgress() {
@@ -55,7 +68,30 @@
 
   function updateGameStatus(statusText) {
     progress.game_status = statusText.toLowerCase();
-    $("game-status-text").textContent = statusText;
+    const statusEl = $("game-status-text");
+    if (statusEl) {
+      statusEl.textContent = statusText;
+    }
+  }
+
+  function showFeedback(message) {
+    const feedback = $("game-feedback");
+    if (!feedback) {
+      return;
+    }
+
+    feedback.textContent = message;
+    feedback.classList.add("is-visible");
+
+    if (feedbackTimeoutId) {
+      window.clearTimeout(feedbackTimeoutId);
+    }
+
+    feedbackTimeoutId = window.setTimeout(() => {
+      feedback.classList.remove("is-visible");
+      feedback.textContent = "";
+      feedbackTimeoutId = null;
+    }, FEEDBACK_MS);
   }
 
   function renderCurrentLevelCard() {
@@ -63,11 +99,18 @@
       progress.current_level < challenges.length
         ? String(progress.current_level + 1)
         : String(challenges.length);
-    $("game-current-level").textContent = levelText;
+
+    const levelEl = $("game-current-level");
+    if (levelEl) {
+      levelEl.textContent = levelText;
+    }
   }
 
   function renderStableLetter(letter) {
-    $("game-stable-letter").textContent = letter || "-";
+    const stableEl = $("game-stable-letter");
+    if (stableEl) {
+      stableEl.textContent = letter || "-";
+    }
   }
 
   function renderChallengeSlots() {
@@ -78,7 +121,7 @@
       return;
     }
 
-    const displayText = challenge.display_text;
+    const displayText = challenge.display_text || "";
     let letterIndex = 0;
 
     container.innerHTML = "";
@@ -134,7 +177,10 @@
       const card = document.createElement("div");
       card.className = "medal-card";
 
-      const unlocked = progress.earned_medals.includes(challenge.image);
+      const unlocked =
+        progress.earned_medals.includes(challenge.image) ||
+        progress.completed_words.includes(challenge.display_text);
+
       if (unlocked) {
         card.classList.add("unlocked");
       }
@@ -163,18 +209,26 @@
     if (!progress.game_status) {
       updateGameStatus("Idle");
     } else {
-      $("game-status-text").textContent =
+      const statusText =
         progress.game_status.charAt(0).toUpperCase() +
         progress.game_status.slice(1);
+      const statusEl = $("game-status-text");
+      if (statusEl) {
+        statusEl.textContent = statusText;
+      }
     }
   }
 
-  function resetCurrentChallengeState() {
-    matchedCount = 0;
+  function resetStableTracking() {
     stableCandidate = "";
     stableSince = 0;
     acceptedStableCandidate = false;
     renderStableLetter("-");
+  }
+
+  function resetCurrentChallengeState() {
+    matchedCount = 0;
+    resetStableTracking();
     renderChallengeSlots();
   }
 
@@ -192,28 +246,32 @@
       progress.earned_medals.push(challenge.image);
     }
 
+    updateGameStatus("Completed");
+    showFeedback(
+      `Match success! You earned the ${challenge.display_text} medal.`
+    );
+
     progress.current_level += 1;
     matchedCount = 0;
-    stableCandidate = "";
-    stableSince = 0;
-    acceptedStableCandidate = false;
+    resetStableTracking();
 
     if (progress.current_level >= challenges.length) {
-      progress.current_level = challenges.length - 1;
       updateGameStatus("Completed");
       gameRunning = false;
-    } else {
-      updateGameStatus("Completed");
-      window.setTimeout(() => {
-        if (gameRunning) {
-          updateGameStatus("Running");
-        }
-        renderAll();
-      }, 900);
+      renderAll();
+      saveProgress().catch(console.error);
+      return;
     }
 
     renderAll();
     saveProgress().catch(console.error);
+
+    window.setTimeout(() => {
+      if (gameRunning) {
+        updateGameStatus("Running");
+      }
+      renderAll();
+    }, FEEDBACK_MS);
   }
 
   function applyStableLetter(letter) {
@@ -222,22 +280,38 @@
       return;
     }
 
-    const targetCharacters = challenge.target_text.split("");
+    const targetCharacters = normalizedTargetCharacters(challenge);
     const expected = targetCharacters[matchedCount];
+
+    if (!expected) {
+      return;
+    }
 
     if (letter === expected) {
       matchedCount += 1;
+      updateGameStatus("Matched");
       renderChallengeSlots();
+
+      resetStableTracking();
 
       if (matchedCount === targetCharacters.length) {
         completeCurrentChallenge();
+        return;
       }
+
+      window.setTimeout(() => {
+        if (gameRunning) {
+          updateGameStatus("Running");
+        }
+      }, 350);
+
       return;
     }
 
     matchedCount = 0;
     renderChallengeSlots();
     updateGameStatus("Failed");
+    resetStableTracking();
 
     window.setTimeout(() => {
       if (gameRunning) {
@@ -273,9 +347,13 @@
     progress = data.progress;
     gameRunning = false;
     matchedCount = 0;
-    stableCandidate = "";
-    stableSince = 0;
-    acceptedStableCandidate = false;
+    resetStableTracking();
+
+    const feedback = $("game-feedback");
+    if (feedback) {
+      feedback.textContent = "";
+      feedback.classList.remove("is-visible");
+    }
 
     updateGameStatus("Idle");
     renderAll();
