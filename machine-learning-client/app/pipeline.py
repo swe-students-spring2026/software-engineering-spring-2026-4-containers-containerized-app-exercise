@@ -87,7 +87,7 @@ def process_commands():
                     },
                 )
 
-            except Exception as error:
+            except (ValueError, FileNotFoundError, OSError, wave.Error) as error:
                 database.commands.update_one(
                     {"_id": command["_id"]},
                     {"$set": {"status": "error", "error": str(error)}},
