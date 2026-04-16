@@ -3,8 +3,8 @@
     --primary-color: black;
     --primary-dark: grey;
     --primary-light: #dbeafe;
-    --stop-color: grey;
-    --stop-dark: darkgrey;
+    --stop-color: #000000;   
+    --stop-dark: #333333;
     --secondary-color: rgb(20, 141, 172);
     --success-color: #10b981;
     --text-dark: #1f2937;
