@@ -61,7 +61,7 @@ def upload():
             "gridfs_file_id": gridfs_file_id,
         }
         inserted_job = analysis_jobs_collection.insert_one(job_document)
-        return redirect(url_for('analysis_page', job_id= str(inserted_job.inserted_id)))
+        return redirect(url_for("analysis_page", job_id=str(inserted_job.inserted_id)))
 
     except PyMongoError as e:
         print(f"database error: {e}")
@@ -70,16 +70,19 @@ def upload():
     except IOError as e:
         print(f"io error: {e}")
         return jsonify({"success": False, "error": "file io error"}), 500
-    
+
+
 @app.route("/analysis/<job_id>")
 def analysis_page(job_id):
     audio = analysis_jobs_collection.find_one({"_id": ObjectId(job_id)})
 
-    return render_template("analysis.html", 
-        filename = audio["original_filename"],
-        gridfs_id = str(audio["gridfs_file_id"]),
-        content_type = audio['media_type']
+    return render_template(
+        "analysis.html",
+        filename=audio["original_filename"],
+        gridfs_id=str(audio["gridfs_file_id"]),
+        content_type=audio["media_type"],
     )
+
 
 @app.route("/playback/<gridfs_id>", methods=["GET"])
 def playback(gridfs_id):
@@ -88,11 +91,9 @@ def playback(gridfs_id):
     return send_file(
         file,
         mimetype=file.metadata.get("content_type", "application/octet-stream"),
-        as_attachment=False, 
-        download_name=file.filename
+        as_attachment=False,
+        download_name=file.filename,
     )
-    
-
 
 
 if __name__ == "__main__":
