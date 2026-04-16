@@ -15,6 +15,18 @@ _gaze_lock = threading.Lock()
 _latest_gaze = {"x": 0.5, "y": 0.5, "ts": 0.0}
 
 
+def reset_gaze_cache_for_tests() -> None:
+    """Reset in-memory gaze; used by automated tests."""
+    with _gaze_lock:
+        _latest_gaze.update({"x": 0.5, "y": 0.5, "ts": 0.0})
+
+
+def get_gaze_snapshot_for_tests() -> dict[str, float]:
+    """Return a copy of the latest gaze position (for tests)."""
+    with _gaze_lock:
+        return dict(_latest_gaze)
+
+
 @app.route("/")
 def index():
     """Displays the page"""
@@ -74,7 +86,7 @@ def calibrate_frame():
         return jsonify({"error": "ML Service unavailable"}), 500
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     host = os.getenv("FLASK_HOST", "0.0.0.0")
     port = int(os.getenv("FLASK_PORT", "5000"))
     debug = os.getenv("FLASK_DEBUG", "false").lower() == "true"

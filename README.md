@@ -99,12 +99,12 @@ Standup reports (full reports are posted to the team channel; below matches that
 - **blockers**: None.
 
 ## Angelina Wu @TangelinaWu
-- **did**: EyeWrite scope, reviews, ML + web coordination.
+- **did**: EyeWrite scope, reviews, ML + web coordination. 
 - **doing**: Refine ML client and web app behavior.
 - **blockers**: None.
 
 ## Han Xiao @vick12333
-- **did**: ML accuracy experiments, `gaze_math` and tracker work.
+- **did**: ML accuracy experiments, `gaze_math` and tracker work Add web-app pytest.
 - **doing**: Continue calibration / smoothing improvements.
 - **blockers**: None.
 
