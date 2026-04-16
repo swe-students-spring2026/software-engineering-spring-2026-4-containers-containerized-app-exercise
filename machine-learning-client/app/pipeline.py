@@ -92,10 +92,10 @@ def process_commands():
                 )
 
             except (
-                    ValueError,
-                    FileNotFoundError,
-                    OSError,
-                    wave.Error,
+                ValueError,
+                FileNotFoundError,
+                OSError,
+                wave.Error,
             ) as error:
                 database.commands.update_one(
                     {"_id": command["_id"]},
