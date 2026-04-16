@@ -13,6 +13,10 @@ pymongo = "*"
 requests = "*"
 python-dotenv = "*"
 ffmpeg-python = "*"
+coverage = "*"
+pytest = "*"
+pytest-flask = "*"
+tomli = "*"
 
 [dev-packages]
 

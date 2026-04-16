@@ -1,4 +1,5 @@
 """Database connection module for the web app."""
+
 import os
 from pymongo import MongoClient
 
