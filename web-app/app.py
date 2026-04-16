@@ -1,11 +1,12 @@
 """Flask web app for sound-alert uploads and results."""
 
 import os
+import sys
 from datetime import datetime, timezone
 
 # from uuid import uuid4
 
-from flask import Flask, jsonify, render_template, request, redirect, url_for
+from flask import Flask, jsonify, render_template, request, redirect, url_for, send_file
 from gridfs import GridFSBucket
 from pymongo import MongoClient
 from bson import ObjectId
@@ -13,6 +14,7 @@ from pymongo.errors import PyMongoError
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 
+sys.stdout.reconfigure(line_buffering=True)
 load_dotenv()
 app = Flask(__name__)
 
@@ -72,11 +74,25 @@ def upload():
 @app.route("/analysis/<job_id>")
 def analysis_page(job_id):
     audio = analysis_jobs_collection.find_one({"_id": ObjectId(job_id)})
-    file = bucket.open_download_stream(audio["gridfs_file_id"])
 
     return render_template("analysis.html", 
-        filename = audio["original_filename"]
+        filename = audio["original_filename"],
+        gridfs_id = str(audio["gridfs_file_id"]),
+        content_type = audio['media_type']
     )
+
+@app.route("/playback/<gridfs_id>", methods=["GET"])
+def playback(gridfs_id):
+    file = bucket.open_download_stream(ObjectId(gridfs_id))
+    print(file)
+    return send_file(
+        file,
+        mimetype=file.metadata.get("content_type", "application/octet-stream"),
+        as_attachment=False, 
+        download_name=file.filename
+    )
+    
+
 
 
 if __name__ == "__main__":

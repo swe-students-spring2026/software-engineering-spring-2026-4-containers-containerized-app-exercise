@@ -8,6 +8,9 @@
 
 <div class="container">
     <h1>{{ filename }}</h1>
+    <audio controls>
+        <source src="{{ url_for('playback', gridfs_id=gridfs_id) }}" type="{{ content_type }}">
+    </audio>
 </div>
 
 </body>
