@@ -7,8 +7,8 @@ from datetime import datetime
 import librosa
 import numpy as np
 import whisper
-from db import speeches_collection
 from flask import Flask, request, jsonify
+from db import speeches_collection
 
 app = Flask(__name__)
 FILLER_WORDS = {"um", "uh", "like"}

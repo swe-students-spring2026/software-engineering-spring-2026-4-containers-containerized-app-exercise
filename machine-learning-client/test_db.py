@@ -1,13 +1,18 @@
+"""Tests for database connection."""
 from db import speeches_collection
+# pylint: disable=import-error
+# pylint: disable=redefined-outer-name
 
 
 def test_db_connection():
+    """Test that database connection works."""
     result = speeches_collection.insert_one({"test": "connection"})
     assert result.inserted_id is not None
     speeches_collection.delete_one({"_id": result.inserted_id})
 
 
 def test_insert_speech():
+    """Test inserting a speech document into the database."""
     speech = {
         "user_id": "test_user_1",
         "title": "test speech",

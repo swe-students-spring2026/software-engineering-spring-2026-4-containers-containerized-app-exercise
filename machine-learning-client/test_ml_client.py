@@ -1,13 +1,16 @@
 """Tests for the ML Client"""
+# pylint: disable=redefined-outer-name
 # pylint: disable=import-error
 # pylint: disable=wrong-import-position
+import io
 import sys
 from unittest.mock import MagicMock
 import pytest
-sys.modules['whisper'] = MagicMock()
-sys.modules['librosa'] = MagicMock()
-sys.modules['numpy'] = MagicMock()
-sys.modules['db'] = MagicMock()
+
+sys.modules["whisper"] = MagicMock()
+sys.modules["librosa"] = MagicMock()
+sys.modules["numpy"] = MagicMock()
+sys.modules["db"] = MagicMock()
 
 from ml_client import (
     count_filler_words,
@@ -21,9 +24,8 @@ from ml_client import (
 )
 
 
-
 @pytest.fixture
-def client():
+def flask_client():
     """Create a test client for the Flask app."""
     app.config["TESTING"] = True
     with app.test_client() as test_client:
@@ -118,7 +120,10 @@ def test_rate_pace_too_fast():
 def test_rate_pace_good():
     """Test pace rated as good"""
     assert rate_pace(130) == "good"
-#transcribe_audio test
+
+
+# transcribe_audio test
+
 
 def test_transcribe_audio_returns_text():
     """Test that transcribe_audio returns stripped transcript"""
@@ -134,7 +139,10 @@ def test_transcribe_audio_empty():
     mock_model.transcribe.return_value = {"text": "   "}
     result = transcribe_audio("fake.wav", mock_model)
     assert result == ""
-#anaylze_audio tests
+
+
+# anaylze_audio tests
+
 
 def test_analyze_audio_duration(mocker):
     """Test that analyze_audio returns correct duration"""
@@ -150,15 +158,16 @@ def test_analyze_audio_duration(mocker):
     result = analyze_audio("fake.wav")
     assert result["duration_seconds"] == 45.0
 
-#flask route tests
-def test_analyze_no_audio(client):
+
+# flask route tests
+def test_analyze_no_audio(flask_client):
     """Test analyze endpoint returns 400 when no audio file provided"""
-    response = client.post("/analyze")
+    response = flask_client.post("/analyze")
     assert response.status_code == 400
     assert response.json["error"] == "no audio file"
 
 
-def test_analyze_success(client, mocker):
+def test_analyze_success(flask_client, mocker):
     """Test analyze endpoint returns 200 on success"""
     mocker.patch("ml_client.whisper.load_model", return_value=MagicMock())
     mocker.patch("ml_client.transcribe_audio", return_value="um hello world")
@@ -168,12 +177,11 @@ def test_analyze_success(client, mocker):
         "pitch_variance": 500.0,
     })
     mocker.patch("ml_client.speeches_collection.insert_one", return_value=MagicMock())
-
     data = {
-        "audio": (open("audio_test.wav", "rb"), "audio_test.wav"),
+        "audio": (io.BytesIO(b"fake audio content"), "audio_test.wav"),
         "title": "Test Speech",
         "user_id": "123",
     }
-    response = client.post("/analyze", data=data, content_type="multipart/form-data")
+    response = flask_client.post("/analyze", data=data, content_type="multipart/form-data")
     assert response.status_code == 200
     assert response.json["status"] == "success"
