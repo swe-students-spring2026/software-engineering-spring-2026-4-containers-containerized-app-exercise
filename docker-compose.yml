@@ -11,14 +11,17 @@ services:
     depends_on:
       - mongodb
     environment:
-      - MONGO_URI=mongodb://mongodb:27017/
+      MONGO_URI: mongodb://mongodb:27017/
 
   web-app:
     build: ./web-app
     container_name: web-app
-    ports:
-      - "5001:5000"
     depends_on:
       - mongodb
+      - machine-learning-client
+    ports:
+      - "5002:5002"
     environment:
-      - MONGO_URI=mongodb://mongodb:27017/
+      MONGO_URI: mongodb://mongodb:27017/
+      SECRET_KEY: secret-key
+      ML_CLIENT_URL: http://machine-learning-client:5001/analyze
