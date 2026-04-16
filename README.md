@@ -36,7 +36,6 @@ This makes the project especially useful for two types of users:
 8. As a learner, I want the project to show how sign language recognition works end-to-end so that I can better understand the relationship between image input, prediction, and displayed output.
 9. As a learner, I want a history view of recognized gestures so that I can identify repeated mistakes in my practice.
 10. As a learner, I want an accessible educational tool rather than just a model demo so that I can engage with sign language recognition in a more practical way.
-```
 
 ## Product Overview
 SignBridge is containerized computer vision application designed to recognize and translate sign language gestures in real-time. The project uses a Machine Learning client (utilizing OpenCV and a Convolutional Neural Network trained on the Sign Language MNIST dataset) to detect American Sign Language (ASL) alphabet gestures from a video feed, and saves the classification results to a MongoDB database. A Flask web dashboard reads this database to show the translated gestures and confidence scores in real-time.
@@ -53,12 +52,10 @@ This project is containerized using Docker and is split into three main parts, r
 
 The application consists of three main services:
 
-```text
 +---------------------------+      +-----------------------+      +---------------------------+
 | Machine Learning Client   | ---> | MongoDB Database      | ---> | Flask Web Dashboard       |
 | OpenCV + CNN Inference    |      | Stores Predictions    |      | Visualizes Results        |
 +---------------------------+      +-----------------------+      +---------------------------+
-```
 
 1. **Machine Learning Client**: The machine learning client is a Python-based service that captures video frames with OpenCV, processes the hand region, and classifies gestures using a custom CNN model trained on the Sign Language MNIST dataset.
 2. **Web App**: The web app is built with Flask and provides an interactive dashboard for viewing live prediction results, confidence scores, and historical gesture data.
