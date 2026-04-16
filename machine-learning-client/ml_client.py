@@ -1,12 +1,14 @@
 """Machine learning client for audio speech analysis."""
+
+# pylint: disable=import-error
 import re
 import uuid
 from datetime import datetime
 import librosa
 import numpy as np
 import whisper
-from db import speeches_collection
 from flask import Flask, request, jsonify
+from db import speeches_collection
 
 app = Flask(__name__)
 FILLER_WORDS = {"um", "uh", "like"}
@@ -56,29 +58,34 @@ def analyze_audio(audio_path):
         "avg_volume_db": avg_volume_db,
         "pitch_variance": pitch_variance,
     }
+
+
 def rate_volume(avg_vol_db):
     """Gives the volume of the speech a rating"""
     if avg_vol_db < -40:
         return "too quiet"
-    if avg_vol_db > -10: 
+    if avg_vol_db > -10:
         return "too loud"
     return "good"
+
 
 def rate_pitch(pitch_var):
     """Gives the pitch variance of the speech a rating"""
     if pitch_var < 50:
         return "monotone"
-    if pitch_var > 2000: 
+    if pitch_var > 2000:
         return "too varied"
     return "good"
+
 
 def rate_pace(pace):
     """Gives the pace of the speech a rating"""
     if pace < 100:
         return "too slow"
-    if pace > 190: 
+    if pace > 190:
         return "too fast"
     return "good"
+
 
 @app.route("/analyze", methods=["POST"])
 def analyze():
@@ -112,6 +119,7 @@ def analyze():
     }
     speeches_collection.insert_one(result)
     return jsonify({"status": "success"}), 200
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5001)

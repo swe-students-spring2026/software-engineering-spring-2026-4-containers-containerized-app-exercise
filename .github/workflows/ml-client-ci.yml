@@ -1,0 +1,22 @@
+name: ML Client CI
+
+on:
+  pull_request:
+
+jobs:
+  test-machine-learning-client:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: machine-learning-client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov pytest-mock flask pymongo
+      - name: Run tests
+        run: python -m pytest test_ml_client.py -v --cov=ml_client
