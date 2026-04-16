@@ -1,0 +1,10 @@
+flask
+pymongo
+python-dotenv
+inference-sdk
+pytest
+pytest-flask
+pytest-cov
+coverage
+pylint
+black

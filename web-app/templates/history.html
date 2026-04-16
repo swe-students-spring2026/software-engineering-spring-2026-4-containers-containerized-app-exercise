@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Recognition History{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>📋 Recognition History</h1>
+
+    {% if records %}
+    <table>
+        <tr>
+            <th>Time</th>
+            <th>Item</th>
+            <th>Category</th>
+            <th>Bin</th>
+            <th>Confidence</th>
+            <th>Details</th>
+        </tr>
+        {% for r in records %}
+        <tr>
+            <td>{{ r.get('timestamp', 'N/A') }}</td>
+            <td>{{ r.get('item', 'Unknown') }}</td>
+            <td>{{ r.get('category', 'Unknown') }}</td>
+            <td>
+                {% if r.get('bin') == 'Blue' %}♻️ Blue Bin
+                {% elif r.get('bin') == 'Green' %}🌱 Green Bin
+                {% elif r.get('bin') == 'Gray' %}🗑️ Gray Bin
+                {% else %}❓ {{ r.get('bin', 'Unknown') }}
+                {% endif %}
+            </td>
+            <td>{{ r.get('confidence', 0) }}%</td>
+            <td>
+                <a href="/result/{{ r.get('_id') }}">
+                    <button class="btn btn-secondary">View</button>
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p style="text-align:center; color:#999; margin-top:40px;">
+        No classification history yet. Try classifying some garbage first!
+    </p>
+    {% endif %}
+</div>
+{% endblock %}

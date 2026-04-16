@@ -1,0 +1,10 @@
+roboflow
+pymongo
+python-dotenv
+black
+pylint
+pytest
+pytest-cov
+coverage
+flask
+inference-sdk
