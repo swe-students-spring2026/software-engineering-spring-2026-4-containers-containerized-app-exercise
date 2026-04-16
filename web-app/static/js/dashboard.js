@@ -145,6 +145,12 @@
       if (button) {
         button.textContent = "📷 Start Camera";
       }
+
+      const dot = document.getElementById("recording-dot");
+      const text = document.getElementById("recording-text");
+      if (dot) dot.classList.remove("is-recording");
+      if (text) text.classList.remove("is-recording");
+
       return;
     }
 
@@ -160,6 +166,11 @@
       if (button) {
         button.textContent = "⏹ Stop Camera";
       }
+
+      const dot = document.getElementById("recording-dot");
+      const text = document.getElementById("recording-text");
+      if (dot) dot.classList.add("is-recording");
+      if (text) text.classList.add("is-recording");
     } catch (error) {
       console.error("Camera access denied or unavailable:", error);
       alert("Unable to access the camera. Please allow camera permission in your browser.");
