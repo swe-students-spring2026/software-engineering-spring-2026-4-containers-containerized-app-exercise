@@ -113,28 +113,7 @@ Secret files (`.env`) are not included in version control. See `.env.example` fo
 
 ## Running Tests
 
-### Prerequisites
-
-- Python 3.10, 3.11, or 3.12 (Python 3.13+ is not supported by `inference-sdk`)
-- Docker and Docker Compose
-- A Roboflow API key (set in `.env`)
-
-### ML Client
-
-```bash
-cd machine-learning-client
-pip install -r requirements.txt
-coverage run -m pytest ../test/ -v
-coverage report
-```
-
-### Web App
-
-```bash
-cd web-app
-pip install -r requirements.txt
-pytest test/ -v
-```
+Unit tests for both subsystems are run automatically via GitHub Actions CI on every pull request and push to `main`. Coverage reports are generated as part of the CI workflow. See the badge status at the top of this file for the latest results.
 
 ## Project Structure
 
@@ -150,7 +129,7 @@ pytest test/ -v
 │   ├── templates/          # Jinja2 HTML templates
 │   ├── static/             # CSS
 │   ├── Dockerfile
-│   └── requirement.txt
+│   └── requirements.txt
 ├── test/
 │   └── test_ml.py          # ML client unit tests
 └── web-app/test/
