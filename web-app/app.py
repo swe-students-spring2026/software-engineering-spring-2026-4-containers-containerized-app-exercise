@@ -59,19 +59,16 @@ def map_bin(category_value):
 
     normalized = str(category_value).lower()
 
-    if any(k in normalized for k in (
-        "recycl", "plastic", "paper", "glass", "metal", "cardboard"
-    )):
+    if any(
+        k in normalized
+        for k in ("recycl", "plastic", "paper", "glass", "metal", "cardboard")
+    ):
         return "Blue"
 
-    if any(k in normalized for k in (
-        "compost", "food", "organic", "biodegradable"
-    )):
+    if any(k in normalized for k in ("compost", "food", "organic", "biodegradable")):
         return "Green"
 
-    if any(k in normalized for k in (
-        "trash", "landfill", "other", "cloth"
-    )):
+    if any(k in normalized for k in ("trash", "landfill", "other", "cloth")):
         return "Gray"
 
     return "Unknown"

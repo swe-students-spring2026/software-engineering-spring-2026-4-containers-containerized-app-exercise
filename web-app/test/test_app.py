@@ -6,6 +6,7 @@ from app import app as flask_app
 from bson import ObjectId
 import app as web_app
 
+
 @pytest.fixture(name="client")
 def fixture_client():
     """Create a test client for the Flask app."""
@@ -36,6 +37,7 @@ def test_unknown_route_returns_404(client):
     """Test that an unknown route correctly returns a 404 status."""
     res = client.get("/nonexistent")
     assert res.status_code == 404
+
 
 def test_normalize_confidence_decimal():
     """Confidence decimal values should become integer percentages."""
@@ -198,6 +200,7 @@ def test_history_route_status(client, monkeypatch):
 
 def test_result_detail_not_found(client, monkeypatch):
     """Unknown result ids should return 404."""
+
     class FakeCollection:
         def find_one(self, *args, **kwargs):
             return None
@@ -231,6 +234,7 @@ def test_result_detail_found(client, monkeypatch):
     assert b"Classification Result" in res.data
     assert b"PLASTIC" in res.data
 
+
 def test_build_result_defaults():
     """build_result should create the expected default result structure."""
     result = web_app.build_result("banana peel")
@@ -262,11 +266,7 @@ def test_normalize_json_objectid():
 def test_extract_prediction_with_predictions():
     """extract_prediction should use the first prediction from the model response."""
     result = web_app.build_result("bottle")
-    response_data = {
-        "predictions": [
-            {"class": "PLASTIC", "confidence": 0.87}
-        ]
-    }
+    response_data = {"predictions": [{"class": "PLASTIC", "confidence": 0.87}]}
 
     web_app.extract_prediction(response_data, result)
 
@@ -278,10 +278,7 @@ def test_extract_prediction_with_predictions():
 def test_extract_prediction_without_predictions():
     """extract_prediction should fall back to top-level category/confidence fields."""
     result = web_app.build_result("scrap")
-    response_data = {
-        "category": "METAL",
-        "confidence": "91%"
-    }
+    response_data = {"category": "METAL", "confidence": "91%"}
 
     web_app.extract_prediction(response_data, result)
 
