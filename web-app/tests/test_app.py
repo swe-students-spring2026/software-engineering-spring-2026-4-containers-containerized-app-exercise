@@ -143,7 +143,7 @@ def test_emptysignup_username(tester):
        "password2": "password123"
    })
    assert response.status_code == 200
-   assert b"Please enter a username." in response.data
+   assert b"Please enter a username and password." in response.data
 
 def test_emptysignup_password(tester):
    """Test signup with empty password shows error."""
@@ -153,7 +153,7 @@ def test_emptysignup_password(tester):
        "password2": ""
    })
    assert response.status_code == 200
-   assert b"Please enter a password." in response.data
+   assert b"Please enter a username and password." in response.data
 
 def test_signup_passmatch(tester):
    """Test signup with non matching passwords shows error message."""

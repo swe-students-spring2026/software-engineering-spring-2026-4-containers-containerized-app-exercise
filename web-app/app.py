@@ -1,23 +1,26 @@
-import os
-import requests
+"""Flask web application for SpeechCoach."""
 import datetime
+import os
+
 import ffmpeg
+import requests
+from bson.objectid import ObjectId
+from bson.errors import InvalidId
 from dotenv import load_dotenv
-
-load_dotenv()
-
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, flash, redirect, render_template, request, session, url_for
 from flask_login import (
     LoginManager,
+    UserMixin,
+    current_user,
     login_required,
     login_user,
     logout_user,
-    current_user,
-    UserMixin,
 )
-from werkzeug.security import generate_password_hash, check_password_hash
-from bson.objectid import ObjectId
+from werkzeug.security import check_password_hash, generate_password_hash
+
 from db import users_collection, speeches_collection
+
+load_dotenv()
 
 users_coll = users_collection
 speeches_coll = speeches_collection
@@ -66,7 +69,7 @@ def load_user(user_id):
     """Load user by id for login"""
     try:
         doc = users_coll.find_one({"_id": ObjectId(user_id)})
-    except Exception:
+    except InvalidId:
         return None
     return User(doc) if doc else None
 
@@ -111,11 +114,8 @@ def signup():
         password = request.form.get("password") or ""
         password_check = request.form.get("password2") or ""
 
-        if not username:
-            flash("Please enter a username.")
-            return render_template("signup.html")
-        if not password:
-            flash("Please enter a password.")
+        if not username or not password:
+            flash("Please enter a username and password.")
             return render_template("signup.html")
         if password != password_check:
             flash("Passwords do not match.")
@@ -128,7 +128,6 @@ def signup():
 
         login_user(user)
         return redirect(url_for("dashboard"))
-
     return render_template("signup.html")
 
 @app.route("/logout")
@@ -159,7 +158,7 @@ def delete(speech_id):
     """This will allow users to delete a speech they have made."""
     try:
         oid = ObjectId(speech_id)
-    except Exception:
+    except InvalidId:
         flash("Invalid speech id.")
         return redirect(url_for("dashboard"))
     speeches_coll.delete_one({
@@ -190,7 +189,7 @@ def submit():
 
     try:
         ffmpeg.input(webm_path).output(wav_path).run(overwrite_output=True)
-    except Exception:
+    except ffmpeg.Error:
         flash("Could not process audio file. Please try again.")
         if os.path.exists(webm_path):
             os.remove(webm_path)
@@ -224,9 +223,3 @@ def submit():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5002, debug=True)
-
-
-
-
-
-
