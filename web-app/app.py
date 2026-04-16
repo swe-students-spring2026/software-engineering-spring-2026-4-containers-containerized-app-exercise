@@ -66,7 +66,7 @@ def upload():
                 "gridfs_file_id": str(gridfs_file_id),
             }
         )
-    
+
     except PyMongoError as e:
         print(f"database error: {e}")
         return jsonify({"success": False, "error": "database error"}), 500
