@@ -1,7 +1,7 @@
 """Flask web app for sound-alert uploads and results."""
 
 import os
-import sys
+# import sys
 from datetime import datetime, timezone
 
 # from uuid import uuid4
@@ -9,16 +9,16 @@ from datetime import datetime, timezone
 from flask import Flask, jsonify, render_template, request, redirect, url_for, send_file
 from gridfs import GridFSBucket
 from pymongo import MongoClient
-from bson import ObjectId
 from pymongo.errors import PyMongoError
+from bson import ObjectId
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 
-sys.stdout.reconfigure(line_buffering=True)
+# sys.stdout.reconfigure(line_buffering=True)
 load_dotenv()
 app = Flask(__name__)
 
-""" please use .env file for db connection """
+"""Please use .env file for db connection."""
 # MONGO_URI = mongodb+srv://{username}:{password}@cluster.m91q1zi.mongodb.net/?appName=Cluster
 # MONGO_DB_NAME = audio_description
 
@@ -74,6 +74,7 @@ def upload():
 
 @app.route("/analysis/<job_id>")
 def analysis_page(job_id):
+    """Render the analysis page for a given job ID with audio playback and analysis under."""
     audio = analysis_jobs_collection.find_one({"_id": ObjectId(job_id)})
 
     return render_template(
@@ -86,6 +87,7 @@ def analysis_page(job_id):
 
 @app.route("/playback/<gridfs_id>", methods=["GET"])
 def playback(gridfs_id):
+    """Route with no static file, just a url to play an audio file from gridfs."""
     file = bucket.open_download_stream(ObjectId(gridfs_id))
     print(file)
     return send_file(
