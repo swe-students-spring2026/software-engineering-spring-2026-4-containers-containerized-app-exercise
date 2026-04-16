@@ -16,6 +16,21 @@ let committedOnCurrent = false;
 
 const CALIBRATION_ORDER = ["center", "top_left", "top_right", "bottom_left", "bottom_right"];
 
+function renderKeyboard() {
+  keys.forEach((key) => {
+    const button = document.createElement("button");
+    button.className = "key";
+    button.dataset.key = key;
+    button.textContent = key;
+
+    if (key === "SPACE") {
+      button.classList.add("wide");
+    }
+
+    keyboardRoot.appendChild(button);
+  });
+}
+
 const TARGETS = {
     "center": { left: "50%", top: "50%" },
     "top_left": { left: "8%", top: "10%" },
