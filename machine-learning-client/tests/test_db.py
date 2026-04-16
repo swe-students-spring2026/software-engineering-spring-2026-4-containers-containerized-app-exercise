@@ -8,9 +8,7 @@ def test_save_practice_session():
     session = {
         "audio_file": "record_outputs/demo.wav",
         "duration_seconds": 6,
-        "transcript": (
-            "Hello everyone um today I want to introduce myself"
-        ),
+        "transcript": ("Hello everyone um today I want to introduce myself"),
         "analysis": {
             "word_count": 8,
             "wpm": 80,
@@ -26,9 +24,7 @@ def test_save_practice_session():
             },
             "total_filler_count": 1,
             "pace_feedback": "slowwww...",
-            "filler_feedback": (
-                "Good fluency. Only a few filler words were used."
-            ),
+            "filler_feedback": ("Good fluency. Only a few filler words were used."),
         },
     }
 

@@ -69,12 +69,8 @@ def test_analyze_transcript_basic():
     assert result["total_filler_count"] == 1
     assert result["wpm"] == 8
     assert result["pace_feedback"] == "slowwww..."
-    assert (
-        result["filler_feedback"]
-        == (
-            "Good fluency. "
-            "Only a few filler words were used."
-        )
+    assert result["filler_feedback"] == (
+        "Good fluency. " "Only a few filler words were used."
     )
 
 
@@ -85,9 +81,7 @@ def test_analyze_transcript_no_filler_words():
 
     assert result["word_count"] == 6
     assert result["total_filler_count"] == 0
-    assert (
-        result["filler_feedback"] == "Very fluent. No filler words detected."
-    )
+    assert result["filler_feedback"] == "Very fluent. No filler words detected."
 
 
 def test_analyze_transcript_moderate_filler_words():
@@ -97,8 +91,7 @@ def test_analyze_transcript_moderate_filler_words():
 
     assert result["total_filler_count"] == 6
     assert result["filler_feedback"] == (
-        "Moderate filler word usage. "
-        "Try to pause instead of using filler words."
+        "Moderate filler word usage. " "Try to pause instead of using filler words."
     )
 
 
@@ -109,8 +102,7 @@ def test_analyze_transcript_high_filler_words():
 
     assert result["total_filler_count"] == 10
     assert result["filler_feedback"] == (
-        "Moderate filler word usage. "
-        "Try to pause instead of using filler words."
+        "Moderate filler word usage. " "Try to pause instead of using filler words."
     )
 
 
