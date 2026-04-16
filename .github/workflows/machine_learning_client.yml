@@ -1,0 +1,39 @@
+name: ML Client CI
+
+on:
+  push:
+    paths:
+      - "machine-learning-client/**"
+      - ".github/workflows/machine_learning_client.yml"
+  pull_request:
+    paths:
+      - "machine-learning-client/**"
+      - ".github/workflows/machine_learning_client.yml"
+
+jobs:
+  lint-and-format:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: machine-learning-client
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pipenv
+          pipenv sync --dev --python $(which python)
+
+      - name: Lint with pylint
+        run: |
+          pipenv run pylint **/*.py
+
+      - name: Format with black
+        run: |
+          pipenv run black --diff --check .
