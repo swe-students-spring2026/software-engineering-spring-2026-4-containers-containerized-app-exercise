@@ -1,4 +1,5 @@
 """Database connection module for the machine learning client."""
+
 import os
 from pymongo import MongoClient
 

@@ -1,4 +1,5 @@
 """Tests for the ML Client"""
+
 # pylint: disable=redefined-outer-name
 # pylint: disable=import-error
 # pylint: disable=wrong-import-position
@@ -171,17 +172,22 @@ def test_analyze_success(flask_client, mocker):
     """Test analyze endpoint returns 200 on success"""
     mocker.patch("ml_client.whisper.load_model", return_value=MagicMock())
     mocker.patch("ml_client.transcribe_audio", return_value="um hello world")
-    mocker.patch("ml_client.analyze_audio", return_value={
-        "duration_seconds": 30.0,
-        "avg_volume_db": -20.0,
-        "pitch_variance": 500.0,
-    })
+    mocker.patch(
+        "ml_client.analyze_audio",
+        return_value={
+            "duration_seconds": 30.0,
+            "avg_volume_db": -20.0,
+            "pitch_variance": 500.0,
+        },
+    )
     mocker.patch("ml_client.speeches_collection.insert_one", return_value=MagicMock())
     data = {
         "audio": (io.BytesIO(b"fake audio content"), "audio_test.wav"),
         "title": "Test Speech",
         "user_id": "123",
     }
-    response = flask_client.post("/analyze", data=data, content_type="multipart/form-data")
+    response = flask_client.post(
+        "/analyze", data=data, content_type="multipart/form-data"
+    )
     assert response.status_code == 200
     assert response.json["status"] == "success"
