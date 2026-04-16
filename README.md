@@ -117,3 +117,57 @@ Standup reports (full reports are posted to the team channel; below matches that
 - **did**: Web app UI work.
 - **doing**: Refine typing and dwell UX.
 - **blockers**: None.
+
+# Standup Report - 15 April 2026 Evening Meeting
+
+## Adam Shin @aus2005
+- **did**: Polished UI and env.
+- **doing**: Handle Linting Errors and github reversion issues.
+- **blockers**: None.
+
+## Angelina Wu @TangelinaWu
+- **did**: Refined web app behavior.
+- **doing**: Refine task boards.
+- **blockers**: None.
+
+## Han Xiao @vick12333
+- **did**: Continued calibration / smoothing
+- **doing**: Still working on calibration / smoothing improvements.
+- **blockers**: None.
+
+## Alejandro
+- **did**: Worked more on the Container
+- **doing**: Docs Alignment
+- **blockers**: None.
+
+## Wonden
+- **did**: Refined Typing
+- **doing**: Continue to work on UX. 
+- **blockers**: None.
+
+# Standup Report - 16 April 2026
+
+## Adam Shin @aus2005
+- **did**: Handled Linting Errors and github.
+- **doing**: Updating ReadMe.
+- **blockers**: None.
+
+## Angelina Wu @TangelinaWu
+- **did**: Finalized Task Boards.
+- **doing**: Review Code.
+- **blockers**: None.
+
+## Han Xiao @vick12333
+- **did**: Finished Calibration and smoothing improvements
+- **doing**: Final code review.
+- **blockers**: None.
+
+## Alejandro
+- **did**: Finished container and Docs Alignment.
+- **doing**: Working through app to find bugs. 
+- **blockers**: None.
+
+## Wonden
+- **did**: Refined UX.
+- **doing**: Final checkover of project.
+- **blockers**: None.
