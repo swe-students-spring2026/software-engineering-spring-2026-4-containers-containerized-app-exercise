@@ -2,10 +2,9 @@
 
 [![Unit test](https://github.com/swe-students-spring2026/4-containers-lime_llamas/actions/workflows/lint.yml/badge.svg)](https://github.com/swe-students-spring2026/4-containers-lime_llamas/actions/workflows/lint.yml)
 
-[![Web App CI](https://github.com/swe-students-spring2026/4-containers-lime_llamas/actions/workflows/web-app.yml/badge.svg)](https://github.com/swe-students-spring2026/4-containers-lime_llamas/actions/workflows/web_app.yml)
+[![Web App CI](https://github.com/swe-students-spring2026/4-containers-lime_llamas/actions/workflows/web_app.yml/badge.svg)](https://github.com/swe-students-spring2026/4-containers-lime_llamas/actions/workflows/web_app.yml)
 
-[![ML Client CI](https://github.com/swe-students-spring2026/4-containers-lime_llamas/actions/workflows/machine-learning-client.yml/badge.svg)](https://github.com/swe-students-spring2026/4-containers-lime_llamas/actions/workflows/machine_learning_client.yml)
-
+[![ML Client CI](https://github.com/swe-students-spring2026/4-containers-lime_llamas/actions/workflows/machine_learning_client.yml/badge.svg)](https://github.com/swe-students-spring2026/4-containers-lime_llamas/actions/workflows/machine_learning_client.yml)
 
 A containerized bird sound monitoring system built with Flask, MongoDB, Docker Compose, and BirdNET. The system records and processes bird audio data, identifies bird species through machine learning, stores results in MongoDB, and displays recent detections in a web dashboard.
 
