@@ -51,11 +51,12 @@ SignBridge is containerized computer vision application designed to recognize an
 This project is containerized using Docker and is split into three main parts, run together using Docker Compose:
 
 The application consists of three main services:
-
+```text
 +---------------------------+      +-----------------------+      +---------------------------+
 | Machine Learning Client   | ---> | MongoDB Database      | ---> | Flask Web Dashboard       |
 | OpenCV + CNN Inference    |      | Stores Predictions    |      | Visualizes Results        |
 +---------------------------+      +-----------------------+      +---------------------------+
+```
 
 1. **Machine Learning Client**: The machine learning client is a Python-based service that captures video frames with OpenCV, processes the hand region, and classifies gestures using a custom CNN model trained on the Sign Language MNIST dataset.
 2. **Web App**: The web app is built with Flask and provides an interactive dashboard for viewing live prediction results, confidence scores, and historical gesture data.
