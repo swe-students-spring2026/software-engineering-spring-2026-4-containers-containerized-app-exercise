@@ -21,7 +21,7 @@ app = Flask(__name__)
 # MONGO_DB_NAME = audio_description
 
 mongo_client = MongoClient(os.getenv("MONGO_URI"))
-db = mongo_client[os.getenv("MONGO_URI")]
+db = mongo_client[os.getenv("MONGO_DB_NAME")]
 bucket = GridFSBucket(db, bucket_name="audio_files")
 analysis_jobs_collection = db["analysis_jobs"]
 
@@ -59,7 +59,7 @@ def upload():
             "gridfs_file_id": gridfs_file_id,
         }
         inserted_job = analysis_jobs_collection.insert_one(job_document)
-        return redirect(url_for('analysis', job_id= str(inserted_job.inserted_id)))
+        return redirect(url_for('analysis_page', job_id= str(inserted_job.inserted_id)))
 
     except PyMongoError as e:
         print(f"database error: {e}")
@@ -71,9 +71,8 @@ def upload():
     
 @app.route("/analysis/<job_id>", methods=["GET"])
 def analysis_page(job_id):
-    audio = analysis_jobs_collection.find({"_id": ObjectId(job_id)})
-
-    render_template("analysis.html", 
+    audio = analysis_jobs_collection.find_one({"_id": ObjectId(job_id)})
+    return render_template("analysis.html", 
         filename = audio["original_filename"]
     )
 
