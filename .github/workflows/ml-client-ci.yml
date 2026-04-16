@@ -19,4 +19,4 @@ jobs:
           python -m pip install --upgrade pip
           pip install pytest pytest-cov pytest-mock flask pymongo
       - name: Run tests
-        run: pytest tests/test_ml_client.py -v --cov=ml_client
+        run: pytest test_ml_client.py -v --cov=ml_client --import-mode=importlib
