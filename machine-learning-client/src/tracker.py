@@ -8,7 +8,7 @@ import time
 from collections import deque
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Deque, Tuple
+from typing import Any, Deque, Optional, Tuple
 from urllib.request import urlopen
 
 import cv2
@@ -20,7 +20,12 @@ from mediapipe.tasks.python.core.base_options import BaseOptions
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 
-from gaze_math import SimpleCalibrator, extract_feature_point
+from gaze_math import (
+    ScreenPoint,
+    SimpleCalibrator,
+    extract_feature_point,
+    smooth_gaze_deque,
+)
 
 MODEL_PATH = Path(__file__).resolve().parents[1] / "models" / "face_landmarker.task"
 
@@ -33,6 +38,7 @@ MODEL_URL = (
 app = Flask(__name__)
 
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://127.0.0.1:27017/")
+gaze_collection: Optional[Any] = None
 try:
     mongo_client = MongoClient(MONGO_URI)
     db = mongo_client["eyewrite_db"]
@@ -77,23 +83,20 @@ def create_face_landmarker(path: Path):
     return vision.FaceLandmarker.create_from_options(options)
 
 
-def decode_image(img_string: str) -> np.ndarray:
-    """Decodes base64 image into an OpenCV BGR image"""
+def decode_image(img_string: str) -> Optional[np.ndarray]:
+    """Decodes base64 image into an OpenCV BGR image (or None if bytes are invalid)."""
     img_data = base64.b64decode(img_string)
     nparr = np.frombuffer(img_data, np.uint8)
     return cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
 
-def _smooth_gaze(smoothing: Deque, estimated) -> Tuple[float, float]:
+def _smooth_gaze(smoothing: Deque, estimated: ScreenPoint) -> Tuple[float, float]:
     """Append estimate to smoothing buffer and return clamped average."""
-    smoothing.append((estimated.x, estimated.y))
-    avg_x = float(np.clip(np.mean([p[0] for p in smoothing]), 0.0, 1.0))
-    avg_y = float(np.clip(np.mean([p[1] for p in smoothing]), 0.0, 1.0))
-    return avg_x, avg_y
+    return smooth_gaze_deque(smoothing, estimated)
 
 
 @app.route("/process", methods=["POST"])
-def process():
+def process():  # pylint: disable=too-many-return-statements
     """Process a single frame and return the estimated gaze point."""
     data = request.json
     if not data or "image" not in data:
@@ -101,6 +104,8 @@ def process():
 
     try:
         frame = decode_image(data["image"])
+        if frame is None:
+            return jsonify({"error": "invalid image"}), 400
         mp_image = mp.Image(
             image_format=mp.ImageFormat.SRGB,
             data=cv2.cvtColor(frame, cv2.COLOR_BGR2RGB),
@@ -120,13 +125,13 @@ def process():
         if estimated:
             avg_x, avg_y = _smooth_gaze(state.smoothing, estimated)
 
-            try:
-                gaze_collection.insert_one(
-                    {"x": avg_x, "y": avg_y, "timestamp": time.time()}
-                )
-
-            except PyMongoError as db_err:
-                print(f"error connecting to the database: {db_err}")
+            if gaze_collection is not None:
+                try:
+                    gaze_collection.insert_one(
+                        {"x": avg_x, "y": avg_y, "timestamp": time.time()}
+                    )
+                except PyMongoError as db_err:
+                    print(f"error connecting to the database: {db_err}")
 
             return jsonify({"x": avg_x, "y": avg_y}), 200
 
@@ -144,6 +149,8 @@ def calibrate():
         return jsonify({"error": "invalid data"}), 400
     try:
         frame = decode_image(data["image"])
+        if frame is None:
+            return jsonify({"error": "invalid image"}), 400
         mp_image = mp.Image(
             image_format=mp.ImageFormat.SRGB,
             data=cv2.cvtColor(frame, cv2.COLOR_BGR2RGB),
