@@ -6,19 +6,21 @@ name = "pypi"
 [packages]
 pylint = "*"
 black = "*"
-pymongo = "*"
-flask = "*"
 inference-sdk = "*"
-python-dotenv = "*"
 pytest = "*"
 pytest-flask = "*"
 coverage = "*"
+flask = "*"
+requests = "*"
+pymongo = "*"
+python-dotenv = "*"
 
 [dev-packages]
 black = "*"
 pylint = "*"
 pytest = "*"
 pytest-flask = "*"
+pytest-cov = "*"
 
 [requires]
 python_version = "3.10"
