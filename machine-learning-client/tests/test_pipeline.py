@@ -74,15 +74,26 @@ def test_run_pipeline_happy_path(monkeypatch, pipeline_module):
             "total_filler_count": 1,
             "wpm": 18,
             "pace_feedback": "slowwww...",
-            "filler_feedback": "Good fluency. Only a few filler words were used.",
+            "filler_feedback": (
+                "Good fluency. Only a few filler words were used.",
+            )
         }
 
     def fake_save_practice_session(_session):
         """Return fake inserted id."""
         return "abc123"
 
-    monkeypatch.setattr(pipeline_module, "get_wav_duration", fake_get_wav_duration)
-    monkeypatch.setattr(pipeline_module, "transcribe_audio", fake_transcribe_audio)
+    monkeypatch.setattr(
+        pipeline_module,
+        "get_wav_duration",
+        fake_get_wav_duration,
+    )
+
+    monkeypatch.setattr(
+        pipeline_module,
+        "transcribe_audio",
+        fake_transcribe_audio,
+    )
     monkeypatch.setattr(
         pipeline_module,
         "analyze_transcript",
@@ -104,7 +115,9 @@ def test_run_pipeline_happy_path(monkeypatch, pipeline_module):
     assert result["inserted_id"] == "abc123"
 
 
-def test_run_pipeline_raises_for_empty_transcript(monkeypatch, pipeline_module):
+def test_run_pipeline_raises_for_empty_transcript(
+    monkeypatch, pipeline_module
+):
     """Test empty transcript raises ValueError."""
 
     def fake_get_wav_duration(_path):
@@ -115,8 +128,12 @@ def test_run_pipeline_raises_for_empty_transcript(monkeypatch, pipeline_module):
         """Return blank transcript."""
         return "   "
 
-    monkeypatch.setattr(pipeline_module, "get_wav_duration", fake_get_wav_duration)
-    monkeypatch.setattr(pipeline_module, "transcribe_audio", fake_transcribe_audio)
+    monkeypatch.setattr(
+        pipeline_module, "get_wav_duration", fake_get_wav_duration
+        )
+    monkeypatch.setattr(
+        pipeline_module, "transcribe_audio", fake_transcribe_audio
+        )
 
     with pytest.raises(ValueError, match="No speech was detected"):
         pipeline_module.run_pipeline("sample_audio/test.wav")
