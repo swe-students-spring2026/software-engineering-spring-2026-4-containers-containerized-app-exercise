@@ -2,11 +2,9 @@
 
 import uuid
 import os
-from pydub import AudioSegment
 from flask import Flask, jsonify, request, render_template
 from db import get_db
 from pydub import AudioSegment
-import uuid
 from bson import ObjectId
 
 app = Flask(
@@ -15,7 +13,7 @@ app = Flask(
     static_folder="app/static",
 )
 
-UPLOAD_FOLDER = os.environ.get("UPLOAD_FOLDER", "uploads")
+UPLOAD_FOLDER = os.environ.get("UPLOAD_FOLDER", "/app/uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
