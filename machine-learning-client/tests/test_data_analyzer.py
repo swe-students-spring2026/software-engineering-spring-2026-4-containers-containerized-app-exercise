@@ -2,7 +2,11 @@
 
 import pytest
 
-from app.data_analyzer import count_words, count_filler_words, analyze_transcript
+from app.data_analyzer import (
+    count_words,
+    count_filler_words,
+    analyze_transcript,
+)
 
 
 def test_count_words_basic():
@@ -65,8 +69,8 @@ def test_analyze_transcript_basic():
     assert result["total_filler_count"] == 1
     assert result["wpm"] == 8
     assert result["pace_feedback"] == "slowwww..."
-    assert (
-        result["filler_feedback"] == "Good fluency. Only a few filler words were used."
+    assert result["filler_feedback"] == (
+        "Good fluency. " "Only a few filler words were used."
     )
 
 
@@ -87,7 +91,7 @@ def test_analyze_transcript_moderate_filler_words():
 
     assert result["total_filler_count"] == 6
     assert result["filler_feedback"] == (
-        "Moderate filler word usage. Try to pause instead of using filler words."
+        "Moderate filler word usage. " "Try to pause instead of using filler words."
     )
 
 
@@ -98,7 +102,7 @@ def test_analyze_transcript_high_filler_words():
 
     assert result["total_filler_count"] == 10
     assert result["filler_feedback"] == (
-        "Moderate filler word usage. Try to pause instead of using filler words."
+        "Moderate filler word usage. " "Try to pause instead of using filler words."
     )
 
 
