@@ -251,10 +251,10 @@ We use a basic Agile workflow for this project:
 - **Task Board**: We track tasks using the GitHub Projects board linked to this repo.
 - **Dependencies**: Each subsystem (`web-app` and `machine-learning-client`) manages its own dependencies using Pipenv to keep things separated.
 - **CI / CD Pipeline**: We use Github Actions for CI. Any pull request has to pass Pytest (with >80% coverage) and linting checks (Pylint & Black) before we can merge it into the main branch.
-```md
+
 
 ## Product User Stories
-
+```md
 ### User Type 1: People who rely on sign language support
 
 1. As a user who communicates with sign language, I want the system to recognize my hand gestures so that my signed input can be interpreted on screen.
