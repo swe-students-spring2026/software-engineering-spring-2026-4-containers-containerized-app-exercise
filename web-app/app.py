@@ -1,3 +1,5 @@
+"""Web app for recording and displaying class notes."""
+
 from flask import Flask, render_template, redirect, url_for, request, flash, jsonify
 from flask_login import (
     LoginManager,
@@ -48,6 +50,7 @@ def load_user(user_id):
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    """Handle user login."""
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
@@ -65,6 +68,7 @@ def login():
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
+    """Handle new user registration."""
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
@@ -85,6 +89,7 @@ def register():
 
 @app.route("/logout")
 def logout():
+    """Log out the current user."""
     logout_user()
     return redirect(url_for("login"))
 
@@ -114,12 +119,14 @@ def index():
 
             ml_data = ml_response.json()
 
-            result = class_notes.insert_one({
-                "user_id": current_user.id,
-                "transcript": ml_data.get("transcript", ""),
-                "summary": None,
-                "timestamp": datetime.utcnow(),
-            })
+            result = class_notes.insert_one(
+                {
+                    "user_id": current_user.id,
+                    "transcript": ml_data.get("transcript", ""),
+                    "summary": None,
+                    "timestamp": datetime.utcnow(),
+                }
+            )
 
             ml_data["note_id"] = str(result.inserted_id)
 
@@ -134,28 +141,23 @@ def index():
     notes = list(class_notes.find({"user_id": current_user.id}).sort("timestamp", -1))
     return render_template("index.html", notes=notes)
 
-#Generate AI summary
+
+# Generate AI summary
 @app.route("/summarize/<note_id>", methods=["POST"])
 @login_required
 def summarize(note_id):
 
-    note = class_notes.find_one({
-        "_id": ObjectId(note_id),
-        "user_id": current_user.id
-    })
+    note = class_notes.find_one({"_id": ObjectId(note_id), "user_id": current_user.id})
 
     if not note:
         return jsonify({"error": "Note not found"}), 404
 
-    #this transcript will be sent to summarization API
-    transcript = note.get("transcript", "")
+    # this transcript will be sent to summarization API
+    _transcript = note.get("transcript", "")
 
     # TODO:need to be implemented after AI summary tool is implemented
     summary = " placeholder"
 
-    class_notes.update_one(
-        {"_id": ObjectId(note_id)},
-        {"$set": {"summary": summary}}
-    )
+    class_notes.update_one({"_id": ObjectId(note_id)}, {"$set": {"summary": summary}})
 
     return jsonify({"summary": summary})
