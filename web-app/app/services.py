@@ -35,6 +35,11 @@ def transcribe_audio(file):
     data = response.json()
 
     return data.get("transcript", "")
+    # return {
+    #     "transcript": data.get("transcript"),
+    #     "segments": data.get("segments"),
+    #     "language": data.get("language"),
+    # }
 
 def analyze_text(transcript):
     """
