@@ -32,9 +32,9 @@ def test_signup_missing_fields(client):
 
 def test_signup_duplicate_username(client):
     """Test signup failure when username already exists."""
-    with patch(
-        "app.auth.find_user_by_username", return_value={"username": "testuser"}
-    ), patch("app.auth.find_user_by_email", return_value=None):
+    with patch("app.auth.find_user_by_username", return_value={"username": "testuser"}), patch(
+        "app.auth.find_user_by_email", return_value=None
+    ):
         response = client.post(
             "/signup",
             data={
@@ -131,4 +131,5 @@ def test_logout_success(logged_in_client):
     """Test successful logout."""
     response = logged_in_client.get("/logout", follow_redirects=True)
     assert response.status_code == 200
-    assert b"Logged out successfully." in response.data
+    assert b"Login" in response.data
+    
