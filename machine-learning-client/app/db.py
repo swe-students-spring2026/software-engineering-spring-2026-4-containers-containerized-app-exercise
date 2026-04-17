@@ -1,36 +1,28 @@
-"""Database module for MongoDB operations."""
+"""Database helpers for the machine-learning client."""
 
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 
 from app.config import Config
 
-_client = None  # pylint: disable=invalid-name
-
 
 def get_client():
-    """Get MongoDB client instance (cached singleton)."""
-    global _client  # pylint: disable=global-statement
-    if _client is None:
-        _client = MongoClient(Config.MONGO_URI)
-    return _client
+    """Create and return a MongoDB client."""
+    return MongoClient(Config.MONGO_URI)
 
 
 def get_collection():
-    """Get MongoDB collection for predictions."""
+    """Return the MongoDB collection for face-shape predictions."""
     client = get_client()
-    database = client[Config.MONGO_DB_NAME]
-    return database[Config.MONGO_COLLECTION]
+    db = client[Config.MONGO_DB_NAME]
+    return db[Config.MONGO_COLLECTION]
 
 
 def ping_db():
-    """Ping the database to verify connection."""
-    try:
-        client = get_client()
-        client.admin.command("ping")
-        return True
-    except PyMongoError as exc:
-        raise RuntimeError("Failed to ping MongoDB") from exc
+    """Check that the database connection is alive."""
+    client = get_client()
+    client.admin.command("ping")
+    return True
 
 
 def insert_prediction(document):
@@ -41,3 +33,4 @@ def insert_prediction(document):
         return str(result.inserted_id)
     except PyMongoError as exc:
         raise RuntimeError("Failed to insert prediction into MongoDB") from exc
+
