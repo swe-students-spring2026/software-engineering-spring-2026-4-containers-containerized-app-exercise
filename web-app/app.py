@@ -10,6 +10,7 @@ from flask_login import (
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 import requests
 
 app = Flask(__name__)
@@ -18,7 +19,7 @@ app.config["SECRET_KEY"] = "your-secure-key"
 # db setup
 # has to be changed after we put this inside a container
 client = MongoClient("mongodb://localhost:27017/")
-db = client["project4"]
+db = client["fantastic4"]
 # stores users and passwords
 users = db["users"]
 # stores results of ml processing
@@ -92,6 +93,7 @@ def logout():
 @app.route("/", methods=["GET", "POST"])
 @login_required
 def index():
+    """Home Page"""
     if request.method == "POST":
         file = request.files.get("audio_file")
         if not file:
@@ -110,7 +112,18 @@ def index():
                 timeout=120,
             )
 
-            return jsonify(ml_response.json()), ml_response.status_code
+            ml_data = ml_response.json()
+
+            result = class_notes.insert_one({
+                "user_id": current_user.id,
+                "transcript": ml_data.get("transcript", ""),
+                "summary": None,
+                "timestamp": datetime.utcnow(),
+            })
+
+            ml_data["note_id"] = str(result.inserted_id)
+
+            return jsonify(ml_data), ml_response.status_code
 
         except Exception as e:
             return (
@@ -120,3 +133,29 @@ def index():
     # send all past ml results
     notes = list(class_notes.find({"user_id": current_user.id}).sort("timestamp", -1))
     return render_template("index.html", notes=notes)
+
+#Generate AI summary
+@app.route("/summarize/<note_id>", methods=["POST"])
+@login_required
+def summarize(note_id):
+
+    note = class_notes.find_one({
+        "_id": ObjectId(note_id),
+        "user_id": current_user.id
+    })
+
+    if not note:
+        return jsonify({"error": "Note not found"}), 404
+
+    #this transcript will be sent to summarization API
+    transcript = note.get("transcript", "")
+
+    # TODO:need to be implemented after AI summary tool is implemented
+    summary = " placeholder"
+
+    class_notes.update_one(
+        {"_id": ObjectId(note_id)},
+        {"$set": {"summary": summary}}
+    )
+
+    return jsonify({"summary": summary})
