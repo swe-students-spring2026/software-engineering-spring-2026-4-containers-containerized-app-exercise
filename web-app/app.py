@@ -166,3 +166,6 @@ def summarize(note_id):
     class_notes.update_one({"_id": ObjectId(note_id)}, {"$set": {"summary": summary}})
 
     return jsonify({"summary": summary})
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)
