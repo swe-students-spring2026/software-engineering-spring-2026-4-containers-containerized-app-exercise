@@ -7,6 +7,7 @@ from unittest.mock import MagicMock, patch
 import requests
 
 import app as app_module
+from pymongo.errors import PyMongoError
 
 
 def test_index_returns_ok(client):
@@ -120,7 +121,6 @@ def test_dashboard_renders_with_gaze_data(client):
 
 def test_dashboard_handles_db_error(client):
     """Dashboard returns 200 with empty table when MongoDB raises an error."""
-    from pymongo.errors import PyMongoError
 
     mock_collection = MagicMock()
     mock_collection.find.side_effect = PyMongoError("connection refused")
