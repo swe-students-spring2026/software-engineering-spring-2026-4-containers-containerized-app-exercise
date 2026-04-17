@@ -157,10 +157,7 @@ def summarize(note_id):
     if not note:
         return jsonify({"error": "Note not found"}), 404
 
-    # this transcript will be sent to summarization API
     _transcript = note.get("transcript", "")
-
-    # TODO:need to be implemented after AI summary tool is implemented
     summary = " placeholder"
 
     class_notes.update_one({"_id": ObjectId(note_id)}, {"$set": {"summary": summary}})
