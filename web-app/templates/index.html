@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LectureNotes - Speech to Text Note Taking</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
 </head>
 <body>
     <div class="container">
@@ -37,7 +37,7 @@
                             <span class="btn-icon">⏹</span>
                             Stop Recording
                         </button>
-                        <button class="btn btn-secondary" id="clearBtn" onclick="clearTranscription()">
+                        <button class="btn btn-secondary" id="clearBtn" onclick="clearTranscription()" disabled>
                             Clear
                         </button>
                     </div>
@@ -122,8 +122,6 @@
             </section>
         </main>
     </div>
-
-    <!-- script? later maybe would be: -->
-    <!-- <script src="js/app.js"></script> -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
