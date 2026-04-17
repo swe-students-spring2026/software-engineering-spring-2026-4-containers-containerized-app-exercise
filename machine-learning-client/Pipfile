@@ -6,8 +6,17 @@ name = "pypi"
 [packages]
 pylint = "*"
 black = "*"
+opencv-python = "*"
+mediapipe = "==0.10.18"
+numpy = ">=1.26.0,<2.0.0"
+requests = "*"
+pymongo = "*"
+dill = "*"
+flask = "*"
 
 [dev-packages]
+pytest = "*"
+pytest-cov = "*"
 
 [requires]
-python_version = "3.10"
+python_version = "3.11"
