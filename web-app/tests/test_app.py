@@ -96,12 +96,14 @@ def test_calibrate_request_exception_returns_500(mock_post, client):
     assert response.status_code == 500
     assert response.get_json()["error"] == "ML Service unavailable"
 
+
 def test_dashboard_renders_ok(client):
     """Dashboard page loads when no DB connection exists."""
     with patch("app.gaze_collection", None):
         response = client.get("/dashboard")
     assert response.status_code == 200
     assert b"Gaze Data Dashboard" in response.data
+
 
 def test_dashboard_renders_with_gaze_data(client):
     """Dashboard renders data rows when MongoDB returns gaze points."""
@@ -118,6 +120,7 @@ def test_dashboard_renders_with_gaze_data(client):
     assert response.status_code == 200
     assert b"0.1" in response.data
     assert b"0.5" in response.data
+
 
 def test_dashboard_handles_db_error(client):
     """Dashboard returns 200 with empty table when MongoDB raises an error."""
