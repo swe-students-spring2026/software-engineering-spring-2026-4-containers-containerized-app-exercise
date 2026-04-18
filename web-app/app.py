@@ -113,8 +113,73 @@ def index():
         rendered template (str): The rendered HTML template.
     """
     if current_user.is_authenticated:
-        return redirect(url_for("home"))
+        return redirect(url_for("dashboard"))
     return render_template("index.html")
+
+@app.route("/dashboard")
+@login_required
+def dashboard():
+    """
+    Dashboard for displaying session stats and controls.
+    """
+    user_id = current_user.get_id()
+    active_session = sessions_col.find_one({"user_id": user_id, "is_active": True})
+    
+    # Fetch up to 2 past sessions
+    past_sessions_cursor = sessions_col.find({"user_id": user_id, "is_active": False}).sort("start_time", -1).limit(2)
+    past_sessions = list(past_sessions_cursor)
+    
+    # Calculate stats for all fetched sessions
+    def calculate_stats(session_id):
+        fc = snapshots_col.count_documents({"session_id": session_id, "classification": "focused"})
+        dc = snapshots_col.count_documents({"session_id": session_id, "classification": "distracted"})
+        ac = snapshots_col.count_documents({"session_id": session_id, "classification": "absent"})
+        tt = (fc + dc + ac) * 10
+        ft = fc * 10
+        dt = dc * 10
+        at = ac * 10
+        rate = (ft / tt * 100) if tt > 0 else 0
+        return {"focused_time": ft, "distracted_time": dt, "absent_time": at, "total_time": tt, "focus_rate": rate}
+
+    stats = None
+    if active_session:
+        stats = calculate_stats(active_session["_id"])
+    elif past_sessions:
+        stats = calculate_stats(past_sessions[0]["_id"])
+        
+    for ps in past_sessions:
+        ps["stats"] = calculate_stats(ps["_id"])
+
+    return render_template("session_detail.html", active_session=active_session, stats=stats, past_sessions=past_sessions)
+
+@app.route("/session/start", methods=["POST"])
+@login_required
+def start_session():
+    """Starts a new focus session."""
+    existing = sessions_col.find_one({"user_id": current_user.get_id(), "is_active": True})
+    if existing:
+        flash("A session is already active.", "error")
+        return redirect(url_for("dashboard"))
+
+    new_session = {
+        "user_id": current_user.get_id(),
+        "start_time": datetime.datetime.utcnow(),
+        "is_active": True
+    }
+    sessions_col.insert_one(new_session)
+    flash("Study session started!", "success")
+    return redirect(url_for("dashboard"))
+
+@app.route("/session/stop", methods=["POST"])
+@login_required
+def stop_session():
+    """Stops the current focus session."""
+    sessions_col.update_one(
+        {"user_id": current_user.get_id(), "is_active": True},
+        {"$set": {"is_active": False, "end_time": datetime.datetime.utcnow()}}
+    )
+    flash("Study session stopped.", "info")
+    return redirect(url_for("dashboard"))
 
 
 @app.route("/signup", methods=["GET", "POST"])
@@ -125,7 +190,7 @@ def signup():
         rendered template (str): The rendered HTML template.
     """
     if current_user.is_authenticated:
-        return redirect(url_for("home"))
+        return redirect(url_for("dashboard"))
 
     if request.method == "POST":
         username = request.form.get("username", "").strip()
@@ -161,7 +226,7 @@ def signup():
         # log in after signing up
         login_user(User(new_user))
         flash(f"Welcome to Terminal Titans, {username}!", "success")
-        return redirect(url_for("home"))
+        return redirect(url_for("dashboard"))
 
     return render_template("signup.html")
 
@@ -174,7 +239,7 @@ def login():
         rendered template (str): The rendered HTML template.
     """
     if current_user.is_authenticated:
-        return redirect(url_for("home"))
+        return redirect(url_for("dashboard"))
 
     if request.method == "POST":
         username = request.form.get("username", "").strip()
@@ -197,7 +262,7 @@ def login():
 
         login_user(User(user_doc))
         flash(f"Welcome back, {username}!", "success")
-        return redirect(url_for("home"))
+        return redirect(url_for("dashboard"))
 
     return render_template("login.html")
 
@@ -214,6 +279,14 @@ def logout():
     flash("You've been logged out.", "info")
     return redirect(url_for("index"))
 
+
+@app.route("/history")
+@login_required
+def history():
+    """
+    Placeholder route for history.
+    """
+    return render_template("history.html")
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

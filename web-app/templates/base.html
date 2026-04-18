@@ -10,6 +10,13 @@
 <body>
     <header class="site-header">
         <h1 class="logo">TERMINAL TITANS</h1>
+        {% if current_user.is_authenticated %}
+        <nav class="main-nav">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('history') }}">History</a>
+            <a href="{{ url_for('logout') }}" class="logout-link">Logout</a>
+        </nav>
+        {% endif %}
     </header>
 
     {% with messages = get_flashed_messages(with_categories=true) %}

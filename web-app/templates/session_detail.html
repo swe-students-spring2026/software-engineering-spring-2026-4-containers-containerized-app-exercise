@@ -1,9 +1,95 @@
 {% extends "base.html" %}
 
-{% block title %}Session Detail - Terminal Titans{% endblock %}
+{% block title %}Dashboard - Terminal Titans{% endblock %}
 
 {% block content %}
-<div class="auth-card">
-    <h2 class="auth-title">Session Detail</h2>
+{% if active_session %}
+<!-- Auto-refresh the page every 10 seconds while session is active so stats update -->
+<meta http-equiv="refresh" content="10">
+{% endif %}
+
+<div class="auth-card dashboard-card">
+    <h2 class="auth-title">Welcome back, {{ current_user.username }}!</h2>
+
+    {% if active_session %}
+    <div class="status-panel active">
+        <span class="badge badge-success">
+            🟢 Session Active
+        </span>
+        <p class="text-muted mt-1">
+            Started at: {{ active_session.start_time.strftime('%Y-%m-%d %H:%M:%S') }} UTC
+        </p>
+        
+        <div class="stats-grid">
+            <div>
+                <h3>{{ stats.focused_time if stats else 0 }}s</h3>
+                <p class="stat-label">Focused</p>
+            </div>
+            <div>
+                <h3>{{ stats.distracted_time if stats else 0 }}s</h3>
+                <p class="stat-label">Distracted</p>
+            </div>
+            <div>
+                <h3>{{ stats.absent_time if stats else 0 }}s</h3>
+                <p class="stat-label">Absent</p>
+            </div>
+        </div>
+
+        <form action="{{ url_for('stop_session') }}" method="POST">
+            <button type="submit" class="btn-primary btn-danger">
+                Stop Study Session
+            </button>
+        </form>
+    </div>
+    {% else %}
+    <div class="status-panel inactive">
+        <h3 class="mb-2">Ready for your next session?</h3>
+        <form action="{{ url_for('start_session') }}" method="POST">
+            <button type="submit" class="btn-primary">
+                Start Study Session
+            </button>
+        </form>
+    </div>
+
+    {% if stats %}
+    <h3 class="mt-3">Latest Session Stats</h3>
+    <div class="stats-grid boxed">
+        <div>
+            <h3>{{ stats.focused_time }}s</h3>
+            <p class="stat-label">Focused Time</p>
+        </div>
+        <div>
+            <h3>{{ stats.distracted_time }}s</h3>
+            <p class="stat-label">Distracted Time</p>
+        </div>
+        <div>
+            <h3>{{ "%.1f"|format(stats.focus_rate) }}%</h3>
+            <p class="stat-label">Focus Rate</p>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if past_sessions %}
+    <h3 class="mt-3">Recent Sessions</h3>
+    <div class="mt-1">
+        {% for s in past_sessions %}
+        <div class="history-item">
+            <div>
+                <strong>Started:</strong> {{ s.start_time.strftime('%Y-%m-%d %H:%M') }}<br>
+                <strong>Ended:</strong> {{ s.end_time.strftime('%Y-%m-%d %H:%M') if s.end_time else 'Unknown' }}
+            </div>
+            <div class="text-right">
+                <span class="stat-highlight">
+                    {{ "%.1f"|format(s.stats.focus_rate) }}%
+                </span><br>
+                <span class="stat-label">Focus Rate</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted text-center mt-2">No past sessions yet.</p>
+    {% endif %}
+    {% endif %}
 </div>
 {% endblock %}
