@@ -1,6 +1,7 @@
 """
 This file is for testing app/services.py.
 """
+# pylint: disable=too-few-public-methods
 import pytest
 import requests
 from app.services import transcribe_audio
