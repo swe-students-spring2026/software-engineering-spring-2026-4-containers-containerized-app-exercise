@@ -13,6 +13,7 @@ gunicorn = "*"
 pytest = "*"
 pytest-flask = "*"
 pytest-cov = "*"
+tomli = "*"
 
 [dev-packages]
 
