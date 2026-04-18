@@ -1,3 +1,4 @@
+# pylint: disable=too-few-public-methods
 """Tests for the database helper module."""
 
 from app import db as db_module
