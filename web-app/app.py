@@ -1,7 +1,11 @@
 import os
 import pymongo
+import base64
+from datetime import datetime
+from pathlib import Path
 from flask import Flask, render_template, request, jsonify
 from dotenv import load_dotenv
+from bson import ObjectId
 
 load_dotenv()
 
@@ -16,8 +20,8 @@ def create_app(test_config=None):
         app.config.update(test_config)
 
     mongo_uri = os.getenv("MONGO_URI")
-    db_name = os.getenv("DB_NAME", "emotion_db")
-    collection_name = os.getenv("MONGO_COLLECTION", "scans")
+    db_name = os.getenv("DB_NAME", "emotion_db") 
+    collection_name = os.getenv('COLLECTION_NAME', 'scans')
 
     app.db = None
     app.collection_name = collection_name
@@ -49,77 +53,39 @@ def create_app(test_config=None):
         """
         emotion_filter = request.args.get("emotion", "all")
 
-        emotions = [
-            "happy",
-            "sad",
-            "angry",
-            "surprised",
-            "neutral",
-            "disgusted",
-            "fearful",
-            "depressed",
-        ]
+        emotions = ["happy", "sad", "angry", "surprise", "neutral", "disgust", "fear"]
+
+        activities = []
+        emotion_counts = {e: 0 for e in emotions}
+        db_connected = app.db is not None
 
         if app.db is not None:
-            query = {}
+            query = {"status": "done"}
             if emotion_filter != "all":
-                query["emotion"] = emotion_filter
-            activities = list(app.db.analysis.find(query).limit(50))
-            all_scans = list(app.db.analysis.find())
-            emotion_counts = {e: 0 for e in emotions}
-            for scan in all_scans:
-                e = scan.get("emotion", "").lower()
-                if e in emotion_counts:
-                    emotion_counts[e] += 1
-        else:
-            activities = [
-                {
-                    "emotion": "happy",
-                    "confidence": 0.92,
-                    "timestamp": "2026-04-14 10:00",
-                },
-                {"emotion": "sad", "confidence": 0.78, "timestamp": "2026-04-14 10:05"},
-                {
-                    "emotion": "angry",
-                    "confidence": 0.85,
-                    "timestamp": "2026-04-14 10:10",
-                },
-                {
-                    "emotion": "neutral",
-                    "confidence": 0.60,
-                    "timestamp": "2026-04-14 10:15",
-                },
-                {
-                    "emotion": "happy",
-                    "confidence": 0.88,
-                    "timestamp": "2026-04-14 10:20",
-                },
-                {
-                    "emotion": "surprised",
-                    "confidence": 0.73,
-                    "timestamp": "2026-04-13 10:25",
-                },
-                {
-                    "emotion": "depressed",
-                    "confidence": 0.40,
-                    "timestamp": "2026-04-13 10:25",
-                },
-            ]
-            if emotion_filter != "all":
-                activities = [a for a in activities if a["emotion"] == emotion_filter]
-            emotion_counts = {e: 0 for e in emotions}
-            all_dummy = [
-                "happy",
-                "sad",
-                "angry",
-                "neutral",
-                "happy",
-                "surprised",
-                "depressed",
-            ]
-            for e in all_dummy:
-                if e in emotion_counts:
-                    emotion_counts[e] += 1
+                query["predicted_emotion"] = emotion_filter
+
+            scans = list(
+                app.db[app.collection_name]
+                .find(query)
+                .sort("created_at", -1)
+                .limit(20)
+            )
+            all_done_scans = list(
+                app.db[app.collection_name]
+                .find({"status": "done"})
+            )
+            for scan in scans:
+                activities.append({
+                    "timestamp": scan.get("processed_at") or scan.get("created_at"),
+                    "target_emotion": scan.get("target_emotion", ""),
+                    "predicted_emotion": scan.get("predicted_emotion", ""),
+                    "match_score": scan.get("match_score", 0),
+                    "passed": scan.get("passed", False),
+                })
+            for scan in all_done_scans:
+                predicted = (scan.get("predicted_emotion") or "").lower()
+                if predicted in emotion_counts:
+                    emotion_counts[predicted] += 1
 
         return render_template(
             "index.html",
@@ -127,17 +93,94 @@ def create_app(test_config=None):
             emotions=emotions,
             emotion_filter=emotion_filter,
             emotion_counts=emotion_counts,
+            db_connected=db_connected
         )
 
     @app.route("/practice")
     def practiceScreen():
         return render_template("practice.html")
 
-    return app
+    @app.route("/practice/submit", methods=["POST"])
+    def practice_submit():
+        data = request.get_json()
 
+        image_data = data.get("image_data")
+        target_emotion = data.get("target_emotion")
+
+        if not image_data or not target_emotion:
+            return jsonify({"error": "Missing image data or target emotion"}), 400
+
+        try:
+            header, encoded = image_data.split(",", 1)
+            image_bytes = base64.b64decode(encoded)
+
+            output_dir = Path("practice_captures")
+            output_dir.mkdir(exist_ok=True)
+
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"{target_emotion.lower()}_{timestamp}.jpg"
+            image_path = output_dir / filename
+
+            with open(image_path, "wb") as image_file:
+                image_file.write(image_bytes)
+
+            scan_doc = {
+                "actor_name": "anonymous",
+                "image_path": str(image_path.resolve()),
+                "target_emotion": target_emotion.lower(),
+                "status": "pending",
+                "created_at": datetime.now(),
+                "started_at": None,
+                "processed_at": None,
+                "predicted_emotion": None,
+                "emotion_scores": None,
+                "match_score": None,
+                "passed": None,
+                "face_detected": None,
+                "processing_time_ms": None,
+                "error_message": None,
+            }
+
+            inserted = app.db[app.collection_name].insert_one(scan_doc)
+
+            return jsonify({
+                "message": f"Capture submitted for {target_emotion}",
+                "image_path": str(image_path),
+                "scan_id": str(inserted.inserted_id)
+            })
+
+        except Exception as exc:
+            return jsonify({"error": str(exc)}), 500
+    
+    @app.route("/practice/result/<scan_id>")
+    def practice_result(scan_id):
+        if app.db is None:
+            return jsonify({"error": "No database connection"}), 500
+
+        try:
+            scan = app.db[app.collection_name].find_one({"_id": ObjectId(scan_id)})
+
+            if not scan:
+                return jsonify({"error": "Scan not found"}), 404
+
+            scan["_id"] = str(scan["_id"])
+
+            return jsonify({
+                "_id": scan["_id"],
+                "status": scan.get("status"),
+                "target_emotion": scan.get("target_emotion"),
+                "predicted_emotion": scan.get("predicted_emotion"),
+                "match_score": scan.get("match_score"),
+                "passed": scan.get("passed"),
+                "error_message": scan.get("error_message"),
+            })
+        except Exception as exc:
+            return jsonify({"error": str(exc)}), 500
+
+    return app
 
 app = create_app()
 
 if __name__ == "__main__":
     flask_port = int(os.getenv("FLASK_PORT", "5001"))
-    app.run(host="0.0.0.0", port=flask_port)
+    app.run(host="localhost", port=flask_port)

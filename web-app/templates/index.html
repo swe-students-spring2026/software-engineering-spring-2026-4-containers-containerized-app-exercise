@@ -24,7 +24,11 @@
         <div class="col-md-4">
             <div class="card shadow-sm text-center p-3">
                 <h6 class="text-muted">Mode</h6>
-                <h4 class="fw-bold text-warning">Offline (No DB)</h4>
+                {% if db_connected %}
+                    <h4 class="fw-bold text-success">Live DB</h4>
+                {% else %}
+                    <h4 class="fw-bold text-warning">Offline (No DB)</h4>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -32,7 +36,7 @@
     <!-- Filter Dropdown -->
     <div class="card shadow-sm mb-4 p-3">
         <form method="GET" action="/" class="d-flex align-items-center gap-3">
-            <label class="fw-bold mb-0">Filter by Emotion:</label>
+            <label class="fw-bold mb-0">Filter by Predicted Emotion:</label>
             <select name="emotion" class="form-select w-auto" onchange="this.form.submit()">
                 <option value="all" {% if emotion_filter == 'all' %}selected{% endif %}>All</option>
                 {% for e in emotions %}
@@ -46,7 +50,7 @@
 
     <div class="row g-4 mb-4">
         <!-- Scans Table -->
-        <div class="col-md-7">
+        <div class="col-md-8">
             <div class="card shadow-sm h-100">
                 <div class="card-header fw-bold">Recent Scans</div>
                 <div class="card-body p-0">
@@ -54,18 +58,36 @@
                         <thead class="table-dark">
                             <tr>
                                 <th>Timestamp</th>
-                                <th>Emotion</th>
-                                <th>Confidence</th>
+                                <th>Target</th>
+                                <th>Predicted</th>
+                                <th>Match Score</th>
+                                <th>Result</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for item in activities %}
-                            <tr>
-                                <td>{{ item.timestamp }}</td>
-                                <td>{{ item.emotion | capitalize }}</td>
-                                <td>{{ (item.confidence * 100) | round(1) }}%</td>
-                            </tr>
-                            {% endfor %}
+                            {% if activities %}
+                                {% for item in activities %}
+                                <tr>
+                                    <td>{{ item.timestamp }}</td>
+                                    <td>{{ item.target_emotion | capitalize }}</td>
+                                    <td>{{ item.predicted_emotion | capitalize }}</td>
+                                    <td>{{ item.match_score | round(1) }}%</td>
+                                    <td>
+                                        {% if item.passed %}
+                                            <span class="badge bg-success">Pass</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Fail</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-muted">
+                                        No completed scans found.
+                                    </td>
+                                </tr>
+                            {% endif %}
                         </tbody>
                     </table>
                 </div>
@@ -73,9 +95,9 @@
         </div>
 
         <!-- Chart -->
-        <div class="col-md-5">
+        <div class="col-md-4">
             <div class="card shadow-sm h-100 p-3">
-                <h6 class="fw-bold mb-3">Emotion Distribution</h6>
+                <h6 class="fw-bold mb-3">Predicted Emotion Distribution</h6>
                 <canvas id="emotionChart"></canvas>
             </div>
         </div>
@@ -84,8 +106,8 @@
 </div>
 
 <script>
-    const emotionCounts = {{ emotion_counts | tojson }};
-    const labels = {{ emotions | tojson }};
+    const emotionCounts = JSON.parse('{{ emotion_counts | tojson | safe }}');
+    const labels = JSON.parse('{{ emotions | tojson | safe }}');
     const data = labels.map(e => emotionCounts[e] || 0);
 
     const ctx = document.getElementById('emotionChart').getContext('2d');
