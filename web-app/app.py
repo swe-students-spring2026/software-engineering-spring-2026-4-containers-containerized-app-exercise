@@ -20,8 +20,8 @@ def create_app(test_config=None):
         app.config.update(test_config)
 
     mongo_uri = os.getenv("MONGO_URI")
-    db_name = os.getenv("DB_NAME", "emotion_db") 
-    collection_name = os.getenv('COLLECTION_NAME', 'scans')
+    db_name = os.getenv("DB_NAME", "emotion_db")
+    collection_name = os.getenv("COLLECTION_NAME", "scans")
 
     app.db = None
     app.collection_name = collection_name
@@ -65,23 +65,19 @@ def create_app(test_config=None):
                 query["predicted_emotion"] = emotion_filter
 
             scans = list(
-                app.db[app.collection_name]
-                .find(query)
-                .sort("created_at", -1)
-                .limit(20)
+                app.db[app.collection_name].find(query).sort("created_at", -1).limit(20)
             )
-            all_done_scans = list(
-                app.db[app.collection_name]
-                .find({"status": "done"})
-            )
+            all_done_scans = list(app.db[app.collection_name].find({"status": "done"}))
             for scan in scans:
-                activities.append({
-                    "timestamp": scan.get("processed_at") or scan.get("created_at"),
-                    "target_emotion": scan.get("target_emotion", ""),
-                    "predicted_emotion": scan.get("predicted_emotion", ""),
-                    "match_score": scan.get("match_score", 0),
-                    "passed": scan.get("passed", False),
-                })
+                activities.append(
+                    {
+                        "timestamp": scan.get("processed_at") or scan.get("created_at"),
+                        "target_emotion": scan.get("target_emotion", ""),
+                        "predicted_emotion": scan.get("predicted_emotion", ""),
+                        "match_score": scan.get("match_score", 0),
+                        "passed": scan.get("passed", False),
+                    }
+                )
             for scan in all_done_scans:
                 predicted = (scan.get("predicted_emotion") or "").lower()
                 if predicted in emotion_counts:
@@ -93,7 +89,7 @@ def create_app(test_config=None):
             emotions=emotions,
             emotion_filter=emotion_filter,
             emotion_counts=emotion_counts,
-            db_connected=db_connected
+            db_connected=db_connected,
         )
 
     @app.route("/practice")
@@ -143,15 +139,17 @@ def create_app(test_config=None):
 
             inserted = app.db[app.collection_name].insert_one(scan_doc)
 
-            return jsonify({
-                "message": f"Capture submitted for {target_emotion}",
-                "image_path": str(image_path),
-                "scan_id": str(inserted.inserted_id)
-            })
+            return jsonify(
+                {
+                    "message": f"Capture submitted for {target_emotion}",
+                    "image_path": str(image_path),
+                    "scan_id": str(inserted.inserted_id),
+                }
+            )
 
         except Exception as exc:
             return jsonify({"error": str(exc)}), 500
-    
+
     @app.route("/practice/result/<scan_id>")
     def practice_result(scan_id):
         if app.db is None:
@@ -165,19 +163,22 @@ def create_app(test_config=None):
 
             scan["_id"] = str(scan["_id"])
 
-            return jsonify({
-                "_id": scan["_id"],
-                "status": scan.get("status"),
-                "target_emotion": scan.get("target_emotion"),
-                "predicted_emotion": scan.get("predicted_emotion"),
-                "match_score": scan.get("match_score"),
-                "passed": scan.get("passed"),
-                "error_message": scan.get("error_message"),
-            })
+            return jsonify(
+                {
+                    "_id": scan["_id"],
+                    "status": scan.get("status"),
+                    "target_emotion": scan.get("target_emotion"),
+                    "predicted_emotion": scan.get("predicted_emotion"),
+                    "match_score": scan.get("match_score"),
+                    "passed": scan.get("passed"),
+                    "error_message": scan.get("error_message"),
+                }
+            )
         except Exception as exc:
             return jsonify({"error": str(exc)}), 500
 
     return app
+
 
 app = create_app()
 
