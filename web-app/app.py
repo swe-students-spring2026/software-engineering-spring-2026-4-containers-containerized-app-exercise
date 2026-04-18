@@ -1,6 +1,6 @@
 import os
 import pymongo
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -22,7 +22,8 @@ def create_app(test_config=None):
     app.collection_name = collection_name
     ''''change to app.db = connection[actual name] '''
     try:
-        connection = pymongo.MongoClient(mongo_uri)
+        connection = pymongo.MongoClient(mongo_uri, serverSelectionTimeoutMS=2000)
+        connection.server_info()  # Force connection check immediately
         app.db = connection[db_name]
     except Exception as exc:
         print(f"Failed to connect to MongoDB: {exc}")
@@ -87,8 +88,16 @@ def create_app(test_config=None):
             emotion_filter=emotion_filter,
             emotion_counts=emotion_counts,
         )
+    
+    @app.route("/practice")
+    def practiceScreen():
+        return render_template("practice.html")
+
+
 
     return app
+
+
 
 
 app = create_app()
