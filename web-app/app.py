@@ -123,18 +123,7 @@ def index():
 
             ml_data = ml_response.json()
 
-            result = class_notes.insert_one(
-                {
-                    "user_id": current_user.id,
-                    "transcript": ml_data.get("transcript", ""),
-                    "summary": None,
-                    "timestamp": datetime.utcnow(),
-                }
-            )
-
-            ml_data["note_id"] = str(result.inserted_id)
-
-            return jsonify(ml_data), ml_response.status_code
+            return jsonify(ml_response.json()), ml_response.status_code
 
         except requests.exceptions.RequestException as e:
             return (
@@ -144,25 +133,3 @@ def index():
     # send all past ml results
     notes = list(class_notes.find({"user_id": current_user.id}).sort("timestamp", -1))
     return render_template("index.html", notes=notes)
-
-
-# Generate AI summary
-@app.route("/summarize/<note_id>", methods=["POST"])
-@login_required
-def summarize(note_id):
-    """Generate an AI summary for an existing note."""
-
-    note = class_notes.find_one({"_id": ObjectId(note_id), "user_id": current_user.id})
-
-    if not note:
-        return jsonify({"error": "Note not found"}), 404
-
-    summary = "placeholder"
-
-    class_notes.update_one({"_id": ObjectId(note_id)}, {"$set": {"summary": summary}})
-
-    return jsonify({"summary": summary})
-
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
