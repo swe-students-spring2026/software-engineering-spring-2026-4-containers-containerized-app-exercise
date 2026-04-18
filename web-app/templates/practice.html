@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Emotion Practice{% endblock %}
+
+{% block content %}
+
+
+<h2 class="mb-4 fw-bold">Emotion Practice</h2>
+
+<!-- Emotion Selector -->
+<div class="card shadow-sm mb-4 p-3">
+    <h6 class="text-muted mb-3">Please select an emotion to practice:</h6>
+    <div class="d-flex flex-wrap gap-2">
+        {% for emotion in ['Happy', 'Sad', 'Disgust', 'Neutral', 'Angry', 'Fear', 'Surprise'] %}
+        <button class="btn btn-outline-primary emotion-btn" data-emotion="{{ emotion }}">
+            {{ emotion }}
+        </button>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="mb-4">
+    <h1>Actor Camera</h1>
+    <div class="bg-secondary d-flex align-items-center justify-content-center"
+         style="width: 100%; height: 300px; border-radius: 8px;">
+        <span class="text-white">Camera Feed</span>
+    </div>
+</div>
+
+<div class="d-flex gap-4">
+
+    <div class="flex-fill">  <!-- flex-fill makes it take equal space -->
+        <h1>Timer</h1>
+        <div class="bg-secondary d-flex align-items-center justify-content-center"
+             style="height: 100px; border-radius: 8px;">  <!-- no fixed width, let flex handle it -->
+            <span class="text-white">Timer</span>
+        </div>
+    </div>
+
+    <div class="flex-fill">  
+        <h1>Convincing Acting Rate %</h1>
+        <div class="bg-secondary d-flex align-items-center justify-content-center"
+             style="height: 100px; border-radius: 8px;">  <!-- no fixed width, let flex handle it -->
+            <span class="text-white">Convincing Acting Rate %</span>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
