@@ -15,6 +15,7 @@ def utc_now():
     """Return the current UTC time."""
     return datetime.now(timezone.utc)
 
+
 def create_pending_scan(image_path, target_emotion, actor_name="anonymous"):
     """Insert a new acting attempt waiting to be processed."""
     if not image_path:
