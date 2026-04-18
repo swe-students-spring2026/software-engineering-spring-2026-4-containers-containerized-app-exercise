@@ -44,3 +44,4 @@ def update_session_notification(session_id, notification_type, message):
             }
         },
     )
+    
