@@ -65,33 +65,3 @@ async function uploadAudio(blob) {
     }
 }
 
-async function generateSummary() {
-    const summaryDisplay = document.getElementById('summaryDisplay');
-    const summaryLoading = document.getElementById('summaryLoading');
-    const summaryActions = document.getElementById('summaryActions');
-
-    const noteId = localStorage.getItem('currentNoteId');
-    if (!noteId) {
-        alert('Record something first!');
-        return;
-    }
-
-    summaryLoading.style.display = 'block';
-    summaryDisplay.style.display = 'none';
-
-    try {
-        const response = await fetch(`/summarize/${noteId}`, {
-            method: 'POST'
-        });
-        const data = await response.json();
-
-        summaryDisplay.innerHTML = `<p>${data.summary}</p>`;
-        summaryDisplay.style.display = 'block';
-        summaryLoading.style.display = 'none';
-        summaryActions.style.display = 'flex';
-    } catch (error) {
-        summaryDisplay.innerHTML = '<p>Error generating summary</p>';
-        summaryDisplay.style.display = 'block';
-        summaryLoading.style.display = 'none';
-    }
-}
