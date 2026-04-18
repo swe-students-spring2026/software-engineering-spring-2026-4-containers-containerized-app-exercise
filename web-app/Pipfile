@@ -14,6 +14,7 @@ pytest = "*"
 pytest-flask = "*"
 pytest-cov = "*"
 tomli = "*"
+typing-extensions = "*"
 
 [dev-packages]
 
