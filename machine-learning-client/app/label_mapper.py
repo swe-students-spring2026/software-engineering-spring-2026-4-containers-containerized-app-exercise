@@ -1,6 +1,5 @@
 """Helpers for mapping detected face shapes to hairstyle recommendations."""
 
-
 FACE_SHAPE_RECOMMENDATIONS = {
     "Oval": [
         "Textured quiff",

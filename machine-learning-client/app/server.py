@@ -4,7 +4,7 @@ from flask import Flask, jsonify, request
 
 from app.config import Config
 from app.db import insert_prediction, ping_db
-from app.emotion_service import detect_face_shape
+from app.face_shape_service import detect_face_shape
 from app.image_utils import decode_base64_image
 from app.schemas import build_prediction_document
 
