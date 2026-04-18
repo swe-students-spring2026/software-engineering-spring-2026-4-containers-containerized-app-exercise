@@ -32,3 +32,33 @@ def test_filter_no_results(client):
     """GET /?emotion=fearful returns 200 even with no matching scans"""
     response = client.get("/?emotion=fearful")
     assert response.status_code == 200
+
+
+def test_home_page_dummy_data(client):
+    """Force the app to use dummy data by setting the DB connection to None"""
+    client.application.db = None
+    response = client.get("/")
+    assert response.status_code == 200
+    assert b"surprised" in response.data.lower()
+
+
+def test_practice_page_loads(client):
+    """GET /practice returns 200"""
+    response = client.get("/practice")
+    assert response.status_code == 200
+
+
+def test_dummy_data_with_filter(client):
+    """Test that the dummy data block correctly filters by emotion"""
+    client.application.db = None
+    response = client.get("/?emotion=sad")
+    assert response.status_code == 200
+    assert b"sad" in response.data.lower()
+
+
+def test_debug_route_no_db(client):
+    """GET /debug returns an error JSON when the DB is not connected"""
+    client.application.db = None
+    response = client.get("/debug")
+    assert response.status_code == 200
+    assert b"error" in response.data.lower()
