@@ -271,14 +271,47 @@ def start_session():
     flash("Study session started!", "success")
     return redirect(url_for("dashboard"))
 
+def _compute_session_totals(session_id):
+    interval = int(os.getenv("CAPTURE_INTERVAL_SECONDS", "10"))
+    pipeline = [
+        {"$match": {"session_id": session_id}},
+        {"$group": {"_id": "$classification", "count": {"$sum": 1}}},
+    ]
+    counts = {
+        doc["_id"]: doc["count"]
+        for doc in snapshots_col.aggregate(pipeline)
+    }
+    total = sum(counts.values())
+    return {
+        "total_focused_seconds": counts.get("focused", 0) * interval,
+        "total_distracted_seconds": counts.get("distracted", 0) * interval,
+        "total_absent_seconds": counts.get("absent", 0) * interval,
+        "snapshot_count": total,
+    }
 
 @app.route("/session/stop", methods=["POST"])
 @login_required
 def stop_session():
-    """Stops the current focus session."""
+    """Stops the current focus session and writes aggregated totals."""
+    active = sessions_col.find_one(
+        {"user_id": current_user.get_id(), "status": "active"}
+    )
+    if not active:
+        flash("No active session to stop.", "info")
+        return redirect(url_for("dashboard"))
+
+    totals = _compute_session_totals(active["_id"])
+
     sessions_col.update_one(
-        {"user_id": current_user.get_id(), "status": "active"},
-        {"$set": {"status": "completed", "end_time": datetime.datetime.utcnow()}},
+        {"_id": active["_id"]},
+        {
+            "$set": {
+                "status": "completed",
+                "end_time": datetime.datetime.utcnow(),
+                "notification": None,  # clear any stale banner
+                **totals,
+            }
+        },
     )
     flash("Study session stopped.", "info")
     return redirect(url_for("dashboard"))
