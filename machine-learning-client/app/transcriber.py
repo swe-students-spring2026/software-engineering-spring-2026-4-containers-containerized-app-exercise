@@ -50,10 +50,10 @@ def validate_audio_file(audio_path: str) -> bool:
 
 
 def transcribe_audio(
-        model: whisper.Whisper,
-        audio_path: str,
-        initial_prompt: str = "Um, uh, like, you know, so, actually, basically, right,",
-    ) -> dict:
+    model: whisper.Whisper,
+    audio_path: str,
+    initial_prompt: str = "Um, uh, like, you know, so, actually, basically, right,",
+) -> dict:
     """
     Transcribe a (validated) audio file using a loaded Whisper model.
     Returns a dictionary with "text" (full transcript), "segments" (timed segment dictionary with
@@ -94,6 +94,7 @@ def extract_words_per_minute(segments: list) -> float:
 
     duration_minutes = duration_seconds / 60.0
     return round(total_words / duration_minutes, 2)
+
 
 # perhaps another function that gives qualitative value to pauses / splitting of a sentence with
 # segments
