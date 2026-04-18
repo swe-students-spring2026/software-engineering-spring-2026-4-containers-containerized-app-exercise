@@ -6,7 +6,7 @@ Defines all HTTP API endpoints for the web application:
 The main interface between the frontend and backend services.
 """
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify #, request
 
 main = Blueprint("main", __name__)
 

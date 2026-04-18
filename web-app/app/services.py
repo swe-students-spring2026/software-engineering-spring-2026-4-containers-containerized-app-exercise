@@ -30,7 +30,7 @@ def transcribe_audio(file):
     try:
         response = requests.post(url, files=files, timeout=10)
     except requests.exceptions.RequestException as e:
-        raise requests.exceptions.RequestException("Failed to connect to ML service:", e)
+        raise requests.exceptions.RequestException(f"Failed to connect to ML service: {e}")
 
     data = response.json()
 
@@ -41,18 +41,18 @@ def transcribe_audio(file):
     #     "language": data.get("language"),
     # }
 
-def analyze_text(transcript):
-    """
-    STUB code right now.
-    Simulates LLM-based speech analysis.
+# def analyze_text(transcript):
+#     """
+#     STUB code right now.
+#     Simulates LLM-based speech analysis.
 
-    Args:
-        transcript (str): Raw transcription
+#     Args:
+#         transcript (str): Raw transcription
 
-    Returns:
-        dict: Analysis results including cleaned text and feedback
-    """
-    return {
-        "cleaned_text": "This is a stub transcription.",
-        "feedback": "stub response."
-    }
+#     Returns:
+#         dict: Analysis results including cleaned text and feedback
+#     """
+#     return {
+#         "cleaned_text": "This is a stub transcription.",
+#         "feedback": "stub response."
+#     }
