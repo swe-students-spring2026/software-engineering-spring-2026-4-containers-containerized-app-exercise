@@ -5,30 +5,31 @@ from pymongo.errors import PyMongoError
 
 from app.config import Config
 
-_CLIENT = None
-_CLIENT_SOURCE = None
+
+_cached_client = None
+_cached_client_source = None
 
 
 def get_client():
     """Create and cache a MongoDB client."""
-    global _CLIENT, _CLIENT_SOURCE  # pylint: disable=global-statement
+    global _cached_client, _cached_client_source  # pylint: disable=global-statement
 
-    if _CLIENT is None or _CLIENT_SOURCE is not MongoClient:
-        _CLIENT = MongoClient(Config.MONGO_URI)
-        _CLIENT_SOURCE = MongoClient
+    if _cached_client is None or _cached_client_source is not MongoClient:
+        _cached_client = MongoClient(Config.MONGO_URI)
+        _cached_client_source = MongoClient
 
-    return _CLIENT
+    return _cached_client
 
 
 def get_collection():
-    """Return the MongoDB collection for face-shape predictions."""
+    """Return the predictions collection."""
     client = get_client()
     db = client[Config.MONGO_DB_NAME]
     return db[Config.MONGO_COLLECTION]
 
 
 def ping_db():
-    """Check that the database connection is alive."""
+    """Ping MongoDB."""
     try:
         client = get_client()
         client.admin.command("ping")
@@ -38,10 +39,11 @@ def ping_db():
 
 
 def insert_prediction(document):
-    """Insert a prediction document into MongoDB."""
+    """Insert a prediction document."""
     try:
         collection = get_collection()
         result = collection.insert_one(document)
         return str(result.inserted_id)
     except PyMongoError as exc:
         raise RuntimeError("Failed to insert prediction") from exc
+    
