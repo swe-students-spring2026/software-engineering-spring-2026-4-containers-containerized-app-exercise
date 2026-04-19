@@ -198,7 +198,6 @@ def dashboard():
         ps["stats"] = calculate_stats(ps["_id"])
     return render_template(
         "index.html",
-
     )
 
 
@@ -267,8 +266,8 @@ def signup():
             error = "Password is required."
         elif len(password) < 6:
             error = "Password must be at least 6 characters."
-        elif password!=confirm_password:
-            error="Passwords do not match"
+        elif password != confirm_password:
+            error = "Passwords do not match"
         elif users_col.find_one({"email": email}):
             error = "An account with that email already exists."
         elif users_col.find_one({"username": username}):
@@ -280,7 +279,7 @@ def signup():
         # hash password
         new_user = {
             "username": username,
-            "email":email,
+            "email": email,
             "password_hash": generate_password_hash(password),
             "created_at": datetime.datetime.utcnow(),
             "role": None,
