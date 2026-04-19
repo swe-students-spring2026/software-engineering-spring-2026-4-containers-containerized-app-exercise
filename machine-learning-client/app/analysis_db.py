@@ -7,7 +7,7 @@ CLAUSE_LENGTH_THRESHOLD: Thresholds to determine the rating of a clause's length
 STOP_WORDS: A list of stop words to exclude when counting top N appearing words/phrases.
 """
 
-FILLER_WORDS = ["uh", "oh", "like", "other", "you know"]
+FILLER_WORDS = ["uh", "um", "oh", "like", "basically", "you know"]
 
 # Intervals: Too slow, slow, average, fast, too fast
 WORDS_PER_MINUTE_THRESHOLD = [100, 120, 170, 240]

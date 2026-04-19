@@ -4,7 +4,7 @@ A library for transcript analysis.
 
 import re
 from collections import Counter
-import analysis_db
+from . import analysis_db
 
 
 def count_filler_words(speech: str):
@@ -14,32 +14,9 @@ def count_filler_words(speech: str):
     """
     count = 0
     for filler_word in analysis_db.FILLER_WORDS:
-        count += speech.lower().count(filler_word)
+        pattern = rf'\b{re.escape(filler_word)}\b'
+        count += len(re.findall(pattern, speech.lower()))
     return count
-
-
-def speech_speed_rating(speech: str, time_sec: int):
-    """
-    Rate the speed of a speech.
-    Outputs a string, and can be "Too slow", "Slow", "Average", "Fast" or "Too fast".
-    """
-    word_count = len(speech.split(" ")) - count_filler_words(
-        speech
-    )  # Excludes filler words
-    speed = word_count / time_sec * 60
-    rating = ""
-    match speed:
-        case num if num < analysis_db.WORDS_PER_MINUTE_THRESHOLD[0]:
-            rating = "Too slow"
-        case num if num < analysis_db.WORDS_PER_MINUTE_THRESHOLD[1]:
-            rating = "Slow"
-        case num if num < analysis_db.WORDS_PER_MINUTE_THRESHOLD[2]:
-            rating = "Average"
-        case num if num < analysis_db.WORDS_PER_MINUTE_THRESHOLD[3]:
-            rating = "Fast"
-        case _:
-            rating = "Too fast"
-    return rating
 
 
 def sentence_length_rating(speech: str):
@@ -49,7 +26,7 @@ def sentence_length_rating(speech: str):
     Outputs a string, and can be "Short", "Average" or "Long".
     """
     word_count = len(speech.split(" "))
-    sentence_count = len(re.split(r"[.?!]", speech))
+    sentence_count = len([s for s in re.split(r"[.?!]", speech) if s.strip()])
     speed = word_count / sentence_count
     rating = ""
     match speed:
@@ -69,7 +46,7 @@ def clause_length_rating(speech: str):
     Outputs a string, and can be "Short", "Average" or "Long".
     """
     word_count = len(speech.split(" "))
-    clause_count = len(re.split(r"[,.;?!]", speech))
+    clause_count = len([s for s in re.split(r"[.?!,;:\"]", speech) if s.strip()])
     speed = word_count / clause_count
     rating = ""
     match speed:
