@@ -1,4 +1,4 @@
-"""Module for emotion detection using FER and capturing data autonomously."""
+"""ML client for FocusFrame study monitoring."""
 
 import datetime
 import os
@@ -17,15 +17,22 @@ def get_face_emotion():
     """Gets face emotion."""
     detector = FER(mtcnn=False)
 
-    cap = cv2.VideoCapture(0)  # pylint: disable=no-member
 
+def ensure_image_dir():
+    """Create image directory if it does not exist."""
+    if not os.path.exists(IMAGE_DIR):
+        os.makedirs(IMAGE_DIR)
+
+
+def capture_image():
+    """Capture one frame from webcam or fall back to img.png."""
+    cap = cv2.VideoCapture(0)  # pylint: disable=no-member
     img_data = None
 
     if cap.isOpened():
         time.sleep(3)
         ret, cap_frame = cap.read()
         cap.release()
-
         if ret:
             img_data = cap_frame
     else:
