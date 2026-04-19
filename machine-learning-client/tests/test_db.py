@@ -1,77 +1,45 @@
 """Unit tests for ML client database helpers."""
 
-# pylint: disable=missing-function-docstring,missing-class-docstring
-# pylint: disable=too-few-public-methods,unused-argument
+import mongomock
+import pytest
 
-import datetime
 import db  # pylint: disable=import-error
 
 
-class FakeSessionsCollection:
-    def __init__(self):
-        self.find_one_query = None
-        self.update_one_filter = None
-        self.update_one_update = None
-
-    def find_one(self, query):
-        self.find_one_query = query
-        return {"_id": "session123", "status": "active"}
-
-    def update_one(self, filter_query, update_query):
-        self.update_one_filter = filter_query
-        self.update_one_update = update_query
+@pytest.fixture(autouse=True)
+def mock_mongo_client(monkeypatch):
+    """Mock the MongoClient in db module using mongomock."""
+    client = mongomock.MongoClient()
+    monkeypatch.setattr(db, "MongoClient", lambda *args, **kwargs: client)
+    return client
 
 
-class FakeSnapshotsCollection:
-    def __init__(self):
-        self.inserted = None
-
-    def insert_one(self, snapshot):
-        self.inserted = snapshot
-
-
-class FakeDatabase:
-    def __init__(self):
-        self.sessions = FakeSessionsCollection()
-        self.snapshots = FakeSnapshotsCollection()
-
-    def __getitem__(self, key):
-        if key == "sessions":
-            return self.sessions
-        if key == "snapshots":
-            return self.snapshots
-        raise KeyError(key)
+def test_get_collection():
+    """Test get_collection function."""
+    collection = db.get_collection("test_col")
+    assert collection.name == "test_col"
+    assert collection.database.name == db.DB_NAME
 
 
-def test_get_active_session(monkeypatch):
-    fake_db = FakeDatabase()
-    monkeypatch.setattr(db, "get_database", lambda: fake_db)
+def test_save_snapshot():
+    """Test save_snapshot function inserts into snapshots collection."""
+    snapshot_data = {"emotion": "happy", "confidence": 0.9}
 
-    result = db.get_active_session()
+    db.save_snapshot(snapshot_data)
 
-    assert result == {"_id": "session123", "status": "active"}
-    assert fake_db.sessions.find_one_query == {"status": "active"}
-
-
-def test_save_snapshot(monkeypatch):
-    fake_db = FakeDatabase()
-    monkeypatch.setattr(db, "get_database", lambda: fake_db)
-
-    snapshot = {"session_id": "s1", "classification": "focused"}
-    db.save_snapshot(snapshot)
-
-    assert fake_db.snapshots.inserted == snapshot
+    collection = db.get_collection(db.SNAPSHOTS_COLLECTION)
+    inserted = collection.find_one({"emotion": "happy"})
+    assert inserted is not None
+    assert inserted["confidence"] == 0.9
 
 
-def test_update_session_notification(monkeypatch):
-    fake_db = FakeDatabase()
-    monkeypatch.setattr(db, "get_database", lambda: fake_db)
+def test_save_record():
+    """Test save_record alias function inserts into snapshots collection."""
+    record_data = {"emotion": "sad", "confidence": 0.8}
 
-    db.update_session_notification("session123", "distracted", "Focus please")
+    db.save_record(record_data)
 
-    assert fake_db.sessions.update_one_filter == {"_id": "session123"}
-
-    notification = fake_db.sessions.update_one_update["$set"]["notification"]
-    assert notification["type"] == "distracted"
-    assert notification["message"] == "Focus please"
-    assert isinstance(notification["timestamp"], datetime.datetime)
+    collection = db.get_collection(db.SNAPSHOTS_COLLECTION)
+    inserted = collection.find_one({"emotion": "sad"})
+    assert inserted is not None
+    assert inserted["confidence"] == 0.8

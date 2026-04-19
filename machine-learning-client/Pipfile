@@ -5,8 +5,9 @@ name = "pypi"
 
 [packages]
 fer = "*"
-setuptools = "*"
+setuptools = "<70.0.0"
 pymongo = {extras = ["srv"], version = "*"}
+python-dotenv = "*"
 
 [dev-packages]
 pylint = "*"
