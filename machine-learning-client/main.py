@@ -14,18 +14,8 @@ load_dotenv()
 
 
 def get_face_emotion():
-    """Gets face emotion."""
+    """Capture a frame and return image data with top emotion."""
     detector = FER(mtcnn=False)
-
-
-def ensure_image_dir():
-    """Create image directory if it does not exist."""
-    if not os.path.exists(IMAGE_DIR):
-        os.makedirs(IMAGE_DIR)
-
-
-def capture_image():
-    """Capture one frame from webcam or fall back to img.png."""
     cap = cv2.VideoCapture(0)  # pylint: disable=no-member
     img_data = None
 

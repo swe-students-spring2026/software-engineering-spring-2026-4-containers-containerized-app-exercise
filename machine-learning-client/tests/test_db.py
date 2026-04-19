@@ -6,6 +6,7 @@
 import datetime
 import db  # pylint: disable=import-error
 
+
 class FakeSessionsCollection:
     def __init__(self):
         self.find_one_query = None
