@@ -3,7 +3,8 @@
 from unittest.mock import patch, MagicMock
 from io import BytesIO
 import mongomock
-from app import app
+with patch("pymongo.MongoClient", mongomock.MongoClient):
+    from app import app
 
 
 def get_test_context():
