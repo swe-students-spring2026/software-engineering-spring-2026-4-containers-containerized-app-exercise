@@ -54,7 +54,7 @@ def index():
 
     if request.method == "POST":
         # TODO: use this, store in db along with image bytes
-        draw_instruction = request.headers.get('Draw-Instruction')
+        draw_instruction = request.headers.get('Draw-Instruction', 'unknown')
         image_bytes = request.get_data()
         if not image_bytes:
             return "no image bytes provided", 400
@@ -62,7 +62,7 @@ def index():
         try:
             response = requests.post(
                 ML_CLIENT_PREDICT_URL,
-                params={"source": "web-app"},
+                params={"source": "web-app", "instruction": draw_instruction},
                 data=image_bytes,
                 headers={"Content-Type": "application/octet-stream"},
                 timeout=ML_CLIENT_TIMEOUT_SECONDS,
