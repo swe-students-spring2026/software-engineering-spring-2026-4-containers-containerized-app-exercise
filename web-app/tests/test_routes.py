@@ -12,6 +12,7 @@ def test_upload_audio_route(monkeypatch):
     """
 
     app = create_app()
+    app.config["LOGIN_DISABLED"] = True
     client = app.test_client()
 
     # mock transcribe_audio

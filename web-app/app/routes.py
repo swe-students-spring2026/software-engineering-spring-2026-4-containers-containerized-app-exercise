@@ -8,7 +8,7 @@ The main interface between the frontend and backend services.
 
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
-from requests.exceptions import RequestException
+import requests
 
 from app.services import get_user_by_username, create_user, transcribe_audio
 
@@ -96,8 +96,11 @@ def upload_audio():
 
     try:
         transcript = transcribe_audio(file)
-    except RequestException as e:
-        return jsonify({"error": str(e)}), 500
+    except requests.exceptions.RequestException as e:
+        return jsonify({
+            "error": "Failed to reach ML service",
+            "details": str(e)
+        }), 502
 
     return (
         jsonify(
