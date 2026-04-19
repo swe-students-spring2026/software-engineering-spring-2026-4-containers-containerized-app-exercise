@@ -117,11 +117,12 @@ def getRandomThing():
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "GET":
-        return render_template("index.html")
+        thing = getRandomThing()
+        return render_template("index.html", thing=thing)
     if request.method == "POST":
         image_bytes = request.get_data()
         # TODO: do ai image recognition
-        image_description = "a cool doodle"
+        image_description = "[temp description of doodle]"
         return image_description, 200
 
 if __name__ == "__main__":
