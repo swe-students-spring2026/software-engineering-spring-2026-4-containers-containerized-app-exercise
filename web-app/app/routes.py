@@ -97,10 +97,7 @@ def upload_audio():
     try:
         transcript = transcribe_audio(file)
     except requests.exceptions.RequestException as e:
-        return jsonify({
-            "error": "Failed to reach ML service",
-            "details": str(e)
-        }), 502
+        return jsonify({"error": "Failed to reach ML service", "details": str(e)}), 502
 
     return (
         jsonify(
