@@ -30,6 +30,7 @@ def save_record(record):
     """Alias for save_snapshot."""
     return save_snapshot(record)
 
+
 def set_session_notification(session_id, classification):
     import datetime 
 
