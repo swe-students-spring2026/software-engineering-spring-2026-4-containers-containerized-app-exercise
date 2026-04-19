@@ -1,12 +1,11 @@
 """Main Flask application for the web app."""
 
-import datetime  # pylint: disable=import-error
-import os  # pylint: disable=import-error
+import datetime
+import os
 from collections import Counter
-from charts import generate_focus_chart
 
 from dotenv import load_dotenv
-from bson.objectid import ObjectId  # pylint: disable=import-error
+from bson.objectid import ObjectId
 from flask import Flask, flash, redirect, render_template, request, url_for
 from flask_login import (
     LoginManager,
@@ -18,6 +17,7 @@ from flask_login import (
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 
+from charts import generate_focus_chart
 from db import (
     get_database,
     USERS_COLLECTION,

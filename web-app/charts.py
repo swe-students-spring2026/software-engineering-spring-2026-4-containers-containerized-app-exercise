@@ -1,3 +1,5 @@
+"""Chart generation for the dashboard."""
+
 import base64
 import io
 import matplotlib
@@ -20,6 +22,7 @@ _TEXT_COLOR = "#f8fafc"
 
 
 def generate_focus_chart(totals):
+    """function to generate matplotlib charts"""
     values = [int(totals.get(k, 0)) for k in _SLICE_ORDER]
     if sum(values) == 0:
         return None
