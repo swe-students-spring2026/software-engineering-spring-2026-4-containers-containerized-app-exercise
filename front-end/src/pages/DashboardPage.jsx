@@ -32,6 +32,9 @@ export default function DashboardPage() {
                     <div key={r.id}>
                         <p>{r.transcript}</p>
                         <p>Pace: {r.speech_speed}</p>
+                        <p>Filler Words: {r.filler_word_count}</p>
+                        <p>Sentence Length: {r.sentence_length}</p>
+                        <p>Overused Words: {r.overused_words.map(([w, n]) => `${w} (${n})`).join(', ') || 'None'}</p>
                     </div>
                 ))
             }
