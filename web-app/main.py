@@ -53,6 +53,8 @@ def index():
         return render_template("index.html", thing=thing)
 
     if request.method == "POST":
+        # TODO: use this, store in db along with image bytes
+        draw_instruction = request.headers.get('Draw-Instruction')
         image_bytes = request.get_data()
         if not image_bytes:
             return "no image bytes provided", 400
