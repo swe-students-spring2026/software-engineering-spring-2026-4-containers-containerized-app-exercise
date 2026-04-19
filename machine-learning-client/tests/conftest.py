@@ -1,3 +1,5 @@
+"""Pytest configuration for ML client tests."""
+
 import os
 import sys
 

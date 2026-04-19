@@ -1,6 +1,10 @@
-import datetime
-import db
+"""Unit tests for ML client database helpers."""
 
+# pylint: disable=missing-function-docstring,missing-class-docstring
+# pylint: disable=too-few-public-methods,unused-argument
+
+import datetime
+import db  # pylint: disable=import-error
 
 class FakeSessionsCollection:
     def __init__(self):
@@ -70,4 +74,3 @@ def test_update_session_notification(monkeypatch):
     assert notification["type"] == "distracted"
     assert notification["message"] == "Focus please"
     assert isinstance(notification["timestamp"], datetime.datetime)
-    

@@ -1,6 +1,11 @@
+"""Unit tests for ML client main logic."""
+
+# pylint: disable=missing-function-docstring,missing-class-docstring
+# pylint: disable=too-few-public-methods,unused-argument
+
 import datetime
 import pytest
-import main
+import main  # pylint: disable=import-error
 
 
 class FakeDetectorNoFace:
@@ -103,7 +108,7 @@ def test_process_active_session_saves_focused_snapshot(monkeypatch):
     assert snapshot["classification"] == "focused"
     assert snapshot["face_detected"] is True
     assert isinstance(snapshot["timestamp"], datetime.datetime)
-    assert notifications == []
+    assert not notifications
 
 
 def test_process_active_session_sets_distracted_notification(monkeypatch):
@@ -239,4 +244,3 @@ def test_main_skips_process_when_no_active_session(monkeypatch):
 
     assert calls["processed"] == 0
     assert calls["slept"] == 1
-    
