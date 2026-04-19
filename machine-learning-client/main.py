@@ -63,7 +63,7 @@ def store_data(img_frame, emotion, score, classification):
         return
 
     # 2. Encode image to JPG binary
-    success, buffer = cv2.imencode(".jpg", img_frame)
+    success, buffer = cv2.imencode(".jpg", img_frame)  # pylint: disable=no-member
     if not success:
         print("Failed to encode image. Skipping storage.")
         return
