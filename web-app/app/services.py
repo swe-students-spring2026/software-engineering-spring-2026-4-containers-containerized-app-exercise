@@ -50,12 +50,16 @@ def apply_preferences_to_recommendations(recommendations, preferences):
 
     for category in ("male", "female"):
         options = recommendations.get(category, [])
-        matches = [style for style in options if _matches_preferences(style, preferences)]
+        matches = [
+            style for style in options if _matches_preferences(style, preferences)
+        ]
 
         if len(matches) >= 2:
             filtered[category] = matches[:3]
         elif len(matches) == 1:
-            remainder = [style for style in options if style["name"] != matches[0]["name"]]
+            remainder = [
+                style for style in options if style["name"] != matches[0]["name"]
+            ]
             filtered[category] = (matches + remainder)[:3]
         else:
             filtered[category] = options[:3]
@@ -64,10 +68,7 @@ def apply_preferences_to_recommendations(recommendations, preferences):
 
 
 def _favorite_keys(favorites):
-    return {
-        f"{item.get('category', '')}:{item.get('name', '')}"
-        for item in favorites
-    }
+    return {f"{item.get('category', '')}:{item.get('name', '')}" for item in favorites}
 
 
 def annotate_favorites(recommendations, favorites):

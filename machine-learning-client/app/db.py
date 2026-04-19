@@ -5,20 +5,19 @@ from pymongo.errors import PyMongoError
 
 from app.config import Config
 
-
-_cached_client = None
-_cached_client_source = None
+_CLIENT = None
+_CLIENT_SOURCE = None
 
 
 def get_client():
     """Create and cache a MongoDB client."""
-    global _cached_client, _cached_client_source  # pylint: disable=global-statement
+    global _CLIENT, _CLIENT_SOURCE  # pylint: disable=global-statement
 
-    if _cached_client is None or _cached_client_source is not MongoClient:
-        _cached_client = MongoClient(Config.MONGO_URI)
-        _cached_client_source = MongoClient
+    if _CLIENT is None or _CLIENT_SOURCE is not MongoClient:
+        _CLIENT = MongoClient(Config.MONGO_URI)
+        _CLIENT_SOURCE = MongoClient
 
-    return _cached_client
+    return _CLIENT
 
 
 def get_collection():
@@ -46,4 +45,3 @@ def insert_prediction(document):
         return str(result.inserted_id)
     except PyMongoError as exc:
         raise RuntimeError("Failed to insert prediction") from exc
-    

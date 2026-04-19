@@ -1,6 +1,7 @@
 """Face-shape analysis service."""
 
 # pylint: disable=no-member
+# pylint: disable=too-many-locals
 
 from collections import Counter, defaultdict, deque
 from math import atan2, degrees, hypot
@@ -9,7 +10,6 @@ import cv2
 import mediapipe as mp
 
 from app.label_mapper import get_hairstyle_recommendations, normalize_face_shape
-
 
 mp_face_mesh = mp.solutions.face_mesh
 _face_mesh = mp_face_mesh.FaceMesh(
@@ -40,141 +40,96 @@ _CHIN_RIGHT_CLUSTER = [365, 364, 394]
 
 
 def _pt(landmarks, idx, width, height):
-    """Return one landmark point."""
-    landmark = landmarks[idx]
-    return landmark.x * width, landmark.y * height
+    return landmarks[idx].x * width, landmarks[idx].y * height
 
 
-def _dist(point_a, point_b):
-    """Return Euclidean distance."""
-    return hypot(point_a[0] - point_b[0], point_a[1] - point_b[1])
+def _dist(a, b):
+    return hypot(a[0] - b[0], a[1] - b[1])
 
 
 def _avg_pt(landmarks, indices, width, height):
-    """Return a centroid."""
-    xs = [landmarks[idx].x * width for idx in indices]
-    ys = [landmarks[idx].y * height for idx in indices]
+    xs = [landmarks[i].x * width for i in indices]
+    ys = [landmarks[i].y * height for i in indices]
     return sum(xs) / len(xs), sum(ys) / len(ys)
 
 
 def _roll_degrees(landmarks, width, height):
-    """Return face roll in degrees."""
-    eye_left = _pt(landmarks, _EYE_L, width, height)
-    eye_right = _pt(landmarks, _EYE_R, width, height)
-    return degrees(atan2(eye_right[1] - eye_left[1], eye_right[0] - eye_left[0]))
+    left = _pt(landmarks, _EYE_L, width, height)
+    right = _pt(landmarks, _EYE_R, width, height)
+    return degrees(atan2(right[1] - left[1], right[0] - left[0]))
 
 
 def _bounding_box(landmarks, width, height):
-    """Return landmark bounding box."""
-    xs = [landmark.x * width for landmark in landmarks]
-    ys = [landmark.y * height for landmark in landmarks]
+    xs = [lm.x * width for lm in landmarks]
+    ys = [lm.y * height for lm in landmarks]
 
-    min_x = int(max(min(xs), 0))
-    min_y = int(max(min(ys), 0))
-    max_x = int(min(max(xs), width))
-    max_y = int(min(max(ys), height))
+    min_x, max_x = int(max(min(xs), 0)), int(min(max(xs), width))
+    min_y, max_y = int(max(min(ys), 0)), int(min(max(ys), height))
 
-    return {
-        "x": min_x,
-        "y": min_y,
-        "width": max_x - min_x,
-        "height": max_y - min_y,
-    }
+    return {"x": min_x, "y": min_y, "width": max_x - min_x, "height": max_y - min_y}
 
 
 def _extract_features(landmarks, width, height):
-    """Extract face-shape features."""
     top = _pt(landmarks, _TOP, width, height)
     chin = _pt(landmarks, _CHIN, width, height)
 
-    forehead_left = _pt(landmarks, _FOREHEAD_L, width, height)
-    forehead_right = _pt(landmarks, _FOREHEAD_R, width, height)
+    fl = _pt(landmarks, _FOREHEAD_L, width, height)
+    fr = _pt(landmarks, _FOREHEAD_R, width, height)
+    cl = _pt(landmarks, _CHEEK_L, width, height)
+    cr = _pt(landmarks, _CHEEK_R, width, height)
 
-    cheek_left = _pt(landmarks, _CHEEK_L, width, height)
-    cheek_right = _pt(landmarks, _CHEEK_R, width, height)
+    jl = _avg_pt(landmarks, _JAW_LEFT_CLUSTER, width, height)
+    jr = _avg_pt(landmarks, _JAW_RIGHT_CLUSTER, width, height)
+    chl = _avg_pt(landmarks, _CHIN_LEFT_CLUSTER, width, height)
+    chr_ = _avg_pt(landmarks, _CHIN_RIGHT_CLUSTER, width, height)
 
-    jaw_left = _avg_pt(landmarks, _JAW_LEFT_CLUSTER, width, height)
-    jaw_right = _avg_pt(landmarks, _JAW_RIGHT_CLUSTER, width, height)
+    face_len = _dist(top, chin)
+    fw = _dist(fl, fr)
+    cw = _dist(cl, cr)
+    jw = _dist(jl, jr)
+    chin_w = _dist(chl, chr_)
 
-    chin_left = _avg_pt(landmarks, _CHIN_LEFT_CLUSTER, width, height)
-    chin_right = _avg_pt(landmarks, _CHIN_RIGHT_CLUSTER, width, height)
-
-    face_length = _dist(top, chin)
-    forehead_width = _dist(forehead_left, forehead_right)
-    cheekbone_width = _dist(cheek_left, cheek_right)
-    jaw_width = _dist(jaw_left, jaw_right)
-    chin_width = _dist(chin_left, chin_right)
-
-    if cheekbone_width <= 0 or jaw_width <= 0 or forehead_width <= 0:
+    if cw <= 0 or jw <= 0 or fw <= 0:
         return None
 
     return {
-        "face_length": face_length,
-        "forehead_width": forehead_width,
-        "cheekbone_width": cheekbone_width,
-        "jaw_width": jaw_width,
-        "chin_width": chin_width,
-        "length_to_cheek": face_length / cheekbone_width,
-        "forehead_to_jaw": forehead_width / jaw_width,
-        "jaw_to_forehead": jaw_width / forehead_width,
-        "cheek_to_forehead": cheekbone_width / forehead_width,
-        "cheek_to_jaw": cheekbone_width / jaw_width,
-        "chin_to_jaw": chin_width / jaw_width,
-        "chin_to_cheek": chin_width / cheekbone_width,
+        "length_to_cheek": face_len / cw,
+        "forehead_to_jaw": fw / jw,
+        "jaw_to_forehead": jw / fw,
+        "cheek_to_forehead": cw / fw,
+        "cheek_to_jaw": cw / jw,
+        "chin_to_jaw": chin_w / jw,
     }
 
 
-def _classify(features):
-    """Classify a face shape."""
-    length_to_cheek = features["length_to_cheek"]
-    forehead_to_jaw = features["forehead_to_jaw"]
-    jaw_to_forehead = features["jaw_to_forehead"]
-    cheek_to_forehead = features["cheek_to_forehead"]
-    cheek_to_jaw = features["cheek_to_jaw"]
-    chin_to_jaw = features["chin_to_jaw"]
+def _classify(f):
+    shape = "Unknown"
 
-    if length_to_cheek > 1.55 and abs(forehead_to_jaw - 1.0) < 0.20:
-        return "Oblong"
+    if f["length_to_cheek"] > 1.55 and abs(f["forehead_to_jaw"] - 1.0) < 0.20:
+        shape = "Oblong"
+    elif f["forehead_to_jaw"] > 1.10 and f["chin_to_jaw"] < 0.85:
+        shape = "Heart"
+    elif f["jaw_to_forehead"] > 1.10 and f["cheek_to_jaw"] < 1.15:
+        shape = "Triangle"
+    elif 1.30 <= f["length_to_cheek"] <= 1.55:
+        shape = "Oval"
+    elif f["length_to_cheek"] < 1.35:
+        shape = "Round"
+    elif abs(f["forehead_to_jaw"] - 1.0) < 0.12:
+        shape = "Square"
+    elif f["cheek_to_forehead"] > 1.20 and f["cheek_to_jaw"] > 1.18:
+        shape = "Diamond"
 
-    if forehead_to_jaw > 1.10 and chin_to_jaw < 0.85 and length_to_cheek < 1.55:
-        return "Heart"
-
-    if jaw_to_forehead > 1.10 and cheek_to_jaw < 1.15:
-        return "Triangle"
-
-    if 1.30 <= length_to_cheek <= 1.55 and 0.85 <= forehead_to_jaw <= 1.15:
-        return "Oval"
-
-    if length_to_cheek < 1.35 and chin_to_jaw < 0.90 and forehead_to_jaw >= 0.85:
-        return "Round"
-
-    if (
-        length_to_cheek <= 1.40
-        and abs(forehead_to_jaw - 1.0) < 0.12
-        and cheek_to_jaw < 1.20
-        and chin_to_jaw >= 0.82
-    ):
-        return "Square"
-
-    if cheek_to_forehead > 1.20 and cheek_to_jaw > 1.18 and 1.20 <= length_to_cheek <= 1.55:
-        return "Diamond"
-
-    if length_to_cheek < 1.30:
-        return "Round"
-    if length_to_cheek <= 1.55:
-        return "Oval"
-    return "Oblong"
+    return shape
 
 
-def _smooth_shape(session_id, shape):
-    """Return rolling majority vote."""
-    history = _session_history[session_id]
-    history.append(shape)
-    return Counter(history).most_common(1)[0][0]
+def _smooth(session_id, shape):
+    hist = _session_history[session_id]
+    hist.append(shape)
+    return Counter(hist).most_common(1)[0][0]
 
 
-def _estimate_confidence(shape, features):
-    """Estimate confidence."""
+def _estimate_confidence(shape, f):
     base = {
         "Oval": 0.84,
         "Round": 0.82,
@@ -186,80 +141,63 @@ def _estimate_confidence(shape, features):
         "Unknown": 0.50,
     }.get(shape, 0.50)
 
-    length_to_cheek = features["length_to_cheek"]
-    forehead_to_jaw = features["forehead_to_jaw"]
-    jaw_to_forehead = features["jaw_to_forehead"]
-    cheek_to_forehead = features["cheek_to_forehead"]
-    cheek_to_jaw = features["cheek_to_jaw"]
-    chin_to_jaw = features["chin_to_jaw"]
+    if not f:
+        return base
 
-    if shape == "Heart" and forehead_to_jaw > 1.12 and chin_to_jaw < 0.76:
+    if shape == "Heart" and f["forehead_to_jaw"] > 1.12:
         base += 0.05
-    elif shape == "Triangle" and jaw_to_forehead > 1.12:
+    elif shape == "Triangle" and f["jaw_to_forehead"] > 1.12:
         base += 0.05
-    elif shape == "Diamond" and cheek_to_forehead > 1.20 and cheek_to_jaw > 1.18:
+    elif shape == "Diamond" and f["cheek_to_forehead"] > 1.20:
         base += 0.05
-    elif shape == "Oblong" and length_to_cheek > 1.65:
+    elif shape == "Oblong" and f["length_to_cheek"] > 1.65:
         base += 0.05
-    elif shape == "Oval" and 1.40 <= length_to_cheek <= 1.55:
-        base += 0.04
-    elif shape == "Square" and abs(forehead_to_jaw - 1.0) < 0.05:
-        base += 0.04
-    elif shape == "Round" and 1.02 <= length_to_cheek <= 1.18:
-        base += 0.04
 
     return min(round(base, 2), 0.95)
 
 
+def _no_face(session_id):
+    _session_history[session_id].clear()
+    return {
+        "face_detected": False,
+        "face_shape": "Unknown",
+        "confidence": 0.0,
+        "recommended_hairstyles": get_hairstyle_recommendations("Unknown"),
+        "face_box": None,
+    }
+
+
 def detect_face_shape(image, session_id="default-session"):
-    """Detect and classify face shape."""
+    """Detect face shape."""
     rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     results = _face_mesh.process(rgb)
 
     if not results.multi_face_landmarks:
-        _session_history[session_id].clear()
-        face_shape = "Unknown"
-        return {
-            "face_detected": False,
-            "face_shape": face_shape,
-            "confidence": 0.0,
-            "recommended_hairstyles": get_hairstyle_recommendations(face_shape),
-            "face_box": None,
-        }
+        return _no_face(session_id)
 
-    height, width = image.shape[:2]
+    h, w = image.shape[:2]
     landmarks = results.multi_face_landmarks[0].landmark
 
-    roll = _roll_degrees(landmarks, width, height)
+    roll = _roll_degrees(landmarks, w, h)
+    features = _extract_features(landmarks, w, h)
+
     if abs(roll) > _MAX_ROLL_DEGREES:
-        current_best = (
+        best = (
             Counter(_session_history[session_id]).most_common(1)[0][0]
             if _session_history[session_id]
             else "Unknown"
         )
-        face_shape = normalize_face_shape(current_best)
-        features = _extract_features(landmarks, width, height)
-        confidence = _estimate_confidence(face_shape, features) if features else 0.0
-
-        return {
-            "face_detected": True,
-            "face_shape": face_shape,
-            "confidence": round(confidence * 0.85, 2),
-            "recommended_hairstyles": get_hairstyle_recommendations(face_shape),
-            "face_box": _bounding_box(landmarks, width, height),
-        }
-
-    features = _extract_features(landmarks, width, height)
-    raw_shape = _classify(features) if features else "Unknown"
-    face_shape = normalize_face_shape(raw_shape)
-    face_shape = _smooth_shape(session_id, face_shape)
-    confidence = _estimate_confidence(face_shape, features) if features else 0.0
-    face_box = _bounding_box(landmarks, width, height)
+        shape = normalize_face_shape(best)
+        conf = _estimate_confidence(shape, features) * 0.85
+    else:
+        raw = _classify(features) if features else "Unknown"
+        shape = _smooth(session_id, normalize_face_shape(raw))
+        conf = _estimate_confidence(shape, features)
 
     return {
         "face_detected": True,
-        "face_shape": face_shape,
-        "confidence": confidence,
-        "recommended_hairstyles": get_hairstyle_recommendations(face_shape),
-        "face_box": face_box,
+        "face_shape": shape,
+        "confidence": round(conf, 2),
+        "recommended_hairstyles": get_hairstyle_recommendations(shape),
+        "face_box": _bounding_box(landmarks, w, h),
     }

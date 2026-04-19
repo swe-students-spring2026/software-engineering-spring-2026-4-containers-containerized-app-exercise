@@ -1,6 +1,5 @@
 """Map face shapes to hairstyle recommendations."""
 
-
 FACE_SHAPE_RECOMMENDATIONS = {
     "Oval": {
         "male": [
