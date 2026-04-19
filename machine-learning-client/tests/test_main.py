@@ -95,7 +95,9 @@ def test_process_active_session_saves_focused_snapshot(monkeypatch):
         notifications.append((session_id, notification_type, message))
 
     monkeypatch.setattr(main, "save_snapshot", fake_save_snapshot)
-    monkeypatch.setattr(main, "update_session_notification", fake_update_session_notification)
+    monkeypatch.setattr(
+        main, "update_session_notification", fake_update_session_notification
+    )
 
     main.process_active_session(detector="fake-detector", session=session)
 
@@ -133,7 +135,9 @@ def test_process_active_session_sets_distracted_notification(monkeypatch):
     def fake_update_session_notification(session_id, notification_type, message):
         notifications.append((session_id, notification_type, message))
 
-    monkeypatch.setattr(main, "update_session_notification", fake_update_session_notification)
+    monkeypatch.setattr(
+        main, "update_session_notification", fake_update_session_notification
+    )
 
     main.process_active_session(detector="fake-detector", session=session)
 
@@ -164,7 +168,9 @@ def test_process_active_session_sets_absent_notification(monkeypatch):
     def fake_update_session_notification(session_id, notification_type, message):
         notifications.append((session_id, notification_type, message))
 
-    monkeypatch.setattr(main, "update_session_notification", fake_update_session_notification)
+    monkeypatch.setattr(
+        main, "update_session_notification", fake_update_session_notification
+    )
 
     main.process_active_session(detector="fake-detector", session=session)
 
@@ -187,7 +193,9 @@ def test_process_active_session_returns_when_no_frame(monkeypatch):
 
     monkeypatch.setattr(main, "save_snapshot", fake_save_snapshot)
 
-    main.process_active_session(detector="fake-detector", session={"_id": "s1", "user_id": "u1"})
+    main.process_active_session(
+        detector="fake-detector", session={"_id": "s1", "user_id": "u1"}
+    )
 
     assert called["save_snapshot"] is False
 
@@ -200,7 +208,9 @@ def test_main_calls_process_when_active_session_exists(monkeypatch):
             self.mtcnn = mtcnn
 
     monkeypatch.setattr(main, "FER", FakeFer)
-    monkeypatch.setattr(main, "get_active_session", lambda: {"_id": "s1", "user_id": "u1"})
+    monkeypatch.setattr(
+        main, "get_active_session", lambda: {"_id": "s1", "user_id": "u1"}
+    )
 
     def fake_process(detector, session):
         calls["processed"] += 1

@@ -1,11 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homepage</title>
-</head>
-<body>
-    <h1>Welcome to the Homepage</h1>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Intro - Terminal Titans{% endblock %}
+
+{% block content %}
+<div style="text-align: center;">
+    <h1 class="auth-title">Welcome to Terminal Titans</h1>
+    <div class="btn-group">
+        <a href="{{ url_for('login') }}" class="btn-primary">Sign In</a>
+        <a href="{{ url_for('signup') }}" class="btn-outline">Create Account</a>
+    </div>
+</div>
+{% endblock %}
