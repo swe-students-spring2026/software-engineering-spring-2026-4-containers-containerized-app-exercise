@@ -5,13 +5,16 @@ name = "pypi"
 
 [packages]
 fer = "*"
-setuptools = "*"
+setuptools = "<70.0.0"
 pymongo = {extras = ["srv"], version = "*"}
+python-dotenv = "*"
 
 [dev-packages]
-pytest = "*"
 pylint = "*"
 black = "*"
+pytest = "*"
+pytest-cov = "*"
+mongomock = "*"
 
 [requires]
 python_version = "3.10"
