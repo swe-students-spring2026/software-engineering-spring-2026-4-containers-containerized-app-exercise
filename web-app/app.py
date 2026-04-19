@@ -122,7 +122,7 @@ def index():
     """
     if current_user.is_authenticated:
         return redirect(url_for("dashboard"))
-    return render_template("templates/index.html")
+    return render_template("login.html")
 
 
 @app.route("/dashboard")
@@ -196,7 +196,10 @@ def dashboard():
         stats = calculate_stats(past_sessions[0]["_id"])
     for ps in past_sessions:
         ps["stats"] = calculate_stats(ps["_id"])
-    return redirect(url_for("index"))
+    return render_template(
+        "index.html",
+
+    )
 
 
 @app.route("/session/start", methods=["POST"])
@@ -256,7 +259,7 @@ def signup():
         username = request.form.get("username", "").strip()
         email = request.form.get("email", "").strip()
         password = request.form.get("password", "")
-
+        confirm_password = request.form.get("confirm_password", "")
         error = None
         if not username:
             error = "Username is required."
@@ -264,6 +267,8 @@ def signup():
             error = "Password is required."
         elif len(password) < 6:
             error = "Password must be at least 6 characters."
+        elif password!=confirm_password:
+            error="Passwords do not match"
         elif users_col.find_one({"email": email}):
             error = "An account with that email already exists."
         elif users_col.find_one({"username": username}):
@@ -272,10 +277,10 @@ def signup():
         if error:
             flash(error, "error")
             return render_template("signup.html", username=username, email=email)
-
         # hash password
         new_user = {
             "username": username,
+            "email":email,
             "password_hash": generate_password_hash(password),
             "created_at": datetime.datetime.utcnow(),
             "role": None,
