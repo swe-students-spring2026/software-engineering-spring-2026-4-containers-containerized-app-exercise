@@ -13,6 +13,7 @@ def create_app(*args, **kwargs):
 
     return _create_app(*args, **kwargs)
 
+
 __all__ = [
     "Settings",
     "load_settings",

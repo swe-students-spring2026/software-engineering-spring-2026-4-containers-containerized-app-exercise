@@ -112,8 +112,7 @@ def _parse_zero_shot_results(results: Any) -> list[Prediction]:
             if isinstance(item, dict) and "label" in item and "score" in item:
                 parsed.append(
                     Prediction(
-                        label=str(item["label"]),
-                        confidence=float(item["score"])
+                        label=str(item["label"]), confidence=float(item["score"])
                     )
                 )
         if parsed:

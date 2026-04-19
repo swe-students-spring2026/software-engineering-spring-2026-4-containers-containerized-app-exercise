@@ -20,10 +20,7 @@ def test_load_settings_defaults(monkeypatch):
     assert settings.labels == DEFAULT_LABELS
     assert settings.top_k == 3
     assert settings.mongo_uri == "mongodb://localhost:27017"
-    assert (
-        settings.hf_model_id
-        == "ilyesdjerfaf/vit-base-patch16-224-in21k-quickdraw"
-    )
+    assert settings.hf_model_id == "ilyesdjerfaf/vit-base-patch16-224-in21k-quickdraw"
     assert settings.hf_task == "image-classification"
     assert settings.hf_device == -1
 

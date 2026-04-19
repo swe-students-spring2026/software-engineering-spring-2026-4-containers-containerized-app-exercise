@@ -72,7 +72,7 @@ def create_app(
             top_k = _parse_top_k(request.args.get("top_k"), runtime_settings.top_k)
             source = request.args.get("source", "web-app")
             instruction = request.args.get("instruction", "unknown")
-            image_b64 = base64.b64encode(image_bytes).decode('utf-8')
+            image_b64 = base64.b64encode(image_bytes).decode("utf-8")
             event = service.process_image(
                 raw_image=image_bytes,
                 source=source,
@@ -80,7 +80,7 @@ def create_app(
                 metadata={
                     "content_type": request.content_type or "unknown",
                     "image_b64": image_b64,
-                    "instruction": instruction
+                    "instruction": instruction,
                 },
             )
             return jsonify(event), 200
