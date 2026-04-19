@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+
+    <h2 class="mb-4 fw-bold">Emotion Scan Dashboard</h2>
+
+    <!-- Summary Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm text-center p-3">
+                <h6 class="text-muted">Scans Shown</h6>
+                <h2 class="fw-bold">{{ activities | length }}</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm text-center p-3">
+                <h6 class="text-muted">Filtering By</h6>
+                <h4 class="fw-bold text-primary">{{ emotion_filter | capitalize }}</h4>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm text-center p-3">
+                <h6 class="text-muted">Mode</h6>
+                {% if db_connected %}
+                    <h4 class="fw-bold text-success">Live DB</h4>
+                {% else %}
+                    <h4 class="fw-bold text-warning">Offline (No DB)</h4>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Dropdown -->
+    <div class="card shadow-sm mb-4 p-3">
+        <form method="GET" action="/" class="d-flex align-items-center gap-3">
+            <label class="fw-bold mb-0">Filter by Predicted Emotion:</label>
+            <select name="emotion" class="form-select w-auto" onchange="this.form.submit()">
+                <option value="all" {% if emotion_filter == 'all' %}selected{% endif %}>All</option>
+                {% for e in emotions %}
+                <option value="{{ e }}" {% if emotion_filter == e %}selected{% endif %}>
+                    {{ e | capitalize }}
+                </option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- Scans Table -->
+        <div class="col-md-8">
+            <div class="card shadow-sm h-100">
+                <div class="card-header fw-bold">Recent Scans</div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Target</th>
+                                <th>Predicted</th>
+                                <th>Match Score</th>
+                                <th>Result</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if activities %}
+                                {% for item in activities %}
+                                <tr>
+                                    <td>{{ item.timestamp }}</td>
+                                    <td>{{ item.target_emotion | capitalize }}</td>
+                                    <td>{{ item.predicted_emotion | capitalize }}</td>
+                                    <td>{{ item.match_score | round(1) }}%</td>
+                                    <td>
+                                        {% if item.passed %}
+                                            <span class="badge bg-success">Pass</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Fail</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-muted">
+                                        No completed scans found.
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100 p-3">
+                <h6 class="fw-bold mb-3">Predicted Emotion Distribution</h6>
+                <canvas id="emotionChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const emotionCounts = JSON.parse('{{ emotion_counts | tojson | safe }}');
+    const labels = JSON.parse('{{ emotions | tojson | safe }}');
+    const data = labels.map(e => emotionCounts[e] || 0);
+
+    const ctx = document.getElementById('emotionChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Scan Count',
+                data: data,
+                backgroundColor: [
+                    '#4CAF50', '#2196F3', '#f44336',
+                    '#FF9800', '#9E9E9E', '#9C27B0', '#00BCD4'
+                ],
+                borderRadius: 6,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+        }
+    });
+</script>
+{% endblock %}

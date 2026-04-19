@@ -123,6 +123,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+machine-learning-client/.env.example
 
 # Spyder project settings
 .spyderproject
@@ -147,3 +148,5 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+web-app/practice_captures

@@ -6,6 +6,15 @@ name = "pypi"
 [packages]
 pylint = "*"
 black = "*"
+gunicorn = "*"
+pytest = "*"
+pytest-flask = "*"
+pytest-cov = "*"
+tomli = "*"
+typing-extensions = "*"
+flask = "*"
+pymongo = "*"
+python-dotenv = "*"
 
 [dev-packages]
 

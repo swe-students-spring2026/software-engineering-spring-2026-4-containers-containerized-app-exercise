@@ -6,8 +6,19 @@ name = "pypi"
 [packages]
 pylint = "*"
 black = "*"
+python-dotenv = "*"
+opencv-python-headless = "*"
+pillow = "*"
+pymongo = "*"
+deepface = "*"
+tf-keras = "*"
 
 [dev-packages]
+pytest-cov = "*"
+tomli = "*"
+pytest = "*"
+pylint = "*"
+black = "*"
 
 [requires]
-python_version = "3.10"
+python_version = "3.12"
