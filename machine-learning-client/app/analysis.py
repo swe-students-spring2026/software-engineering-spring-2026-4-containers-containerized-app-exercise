@@ -14,7 +14,7 @@ def count_filler_words(speech: str):
     """
     count = 0
     for filler_word in analysis_db.FILLER_WORDS:
-        pattern = rf'\b{re.escape(filler_word)}\b'
+        pattern = rf"\b{re.escape(filler_word)}\b"
         count += len(re.findall(pattern, speech.lower()))
     return count
 
