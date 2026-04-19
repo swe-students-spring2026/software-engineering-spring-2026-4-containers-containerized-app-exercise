@@ -116,5 +116,6 @@ if __name__ == "__main__":
         else:
             print("No image captured (camera unavailable).")
 
+        # capture frequency from .env
         interval = int(os.getenv("CAPTURE_INTERVAL_SECONDS", "10"))
         time.sleep(interval)
