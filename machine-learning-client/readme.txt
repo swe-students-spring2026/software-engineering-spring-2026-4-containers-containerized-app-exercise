@@ -1,37 +1,19 @@
-Machine Learning Client (Doodle Recognition)
+Machine Learning API Client
+===========================
 
-Main features:
-- pretrained Quick Draw image recognition
-- top-k prediction output for a doodle image
-- MongoDB persistence for prediction metadata
-- HTTP API endpoint for web-app integration
+Provides a Doodle Recognition HTTP API backed by a Hugging Face pre-trained model and MongoDB.
 
-Default pretrained model settings:
-- HF_MODEL_ID=ilyesdjerfaf/vit-base-patch16-224-in21k-quickdraw
-- HF_TASK=image-classification
-- HF_DEVICE=-1 (CPU)
+Features:
+- Quick Draw image classification (Top-K)
+- MongoDB prediction history (Save, Fetch, Delete)
+- Flask HTTP API
 
-1. Install dependencies
-	 pipenv install --dev --python $(which python) --skip-lock
+Setup & Run:
+1. `pipenv install --dev`
+2. `cp .env.example .env`
+3. `pipenv run python -m ml_client.api`
 
-2. Configure environment
-	 cp .env.example .env
-
-3. Start API server (for web app integration)
-	 pipenv run python -m ml_client.api
-
-API endpoints:
-- GET /health
-- POST /predict
-
-Run tests
-
-pipenv run pytest
-
-Docker
-
-Build image:
-docker build -t doodle-ml-client .
-
-Run help:
-docker run --rm doodle-ml-client --help
+Testing & Quality:
+- Tests: `pipenv run pytest`
+- Lint: `pipenv run pylint **/*.py`
+- Format: `pipenv run black .`
