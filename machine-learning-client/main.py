@@ -8,7 +8,12 @@ import cv2  # pylint: disable=import-error
 from dotenv import load_dotenv
 from fer.fer import FER  # pylint: disable=import-error
 
-from db import SESSIONS_COLLECTION, get_collection, save_snapshot
+from db import (
+    SESSIONS_COLLECTION,
+    get_collection,
+    save_snapshot,
+    set_session_notification,
+)
 
 load_dotenv()
 
@@ -88,20 +93,28 @@ def store_data(img_frame, emotion, score, classification):
         {"$inc": {"snapshot_count": 1}},
     )
     print(f"Snapshot stored successfully for session {active_session['_id']}")
-
+    return active_session["_id"] 
 
 if __name__ == "__main__":
     print("FocusFrame ML Client starting...")
     while True:
         frame, emotion_data = get_face_emotion()
-        if emotion_data:
-            emo, conf = emotion_data
-            cl = distraction_classification(emotion_data)
-            print(f"Detected {emo} ({conf:.2f}) -> {cl}")
-            store_data(frame, emo, conf, cl)
-        else:
-            print("No face detected or capture failed.")
 
-        # capture frequency from .env
-        interval = int(os.getenv("CAPTURE_INTERVAL_SECONDS", "30"))
+        if frame is not None:
+            if emotion_data is not None:
+                emo, conf = emotion_data
+                cl = distraction_classification(emotion_data)
+            else:
+                emo, conf = None, 0.0
+                cl = "absent"
+
+            print(f"Classification: {cl} (emotion={emo}, conf={conf})")
+            session_id = store_data(frame, emo, conf, cl)
+
+            if session_id is not None and cl in ("distracted", "absent"):
+                set_session_notification(session_id, cl)
+        else:
+            print("No image captured (camera unavailable).")
+
+        interval = int(os.getenv("CAPTURE_INTERVAL_SECONDS", "10"))
         time.sleep(interval)

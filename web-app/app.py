@@ -125,6 +125,16 @@ def index():
         return redirect(url_for("dashboard"))
     return render_template("login.html")
 
+def get_recent_notification(active_session, max_age_seconds=30):
+    if not active_session:
+        return None
+    notif = active_session.get("notification")
+    if not notif or not notif.get("timestamp"):
+        return None
+    age = (datetime.datetime.utcnow() - notif["timestamp"]).total_seconds()
+    if age > max_age_seconds:
+        return None
+    return notif
 
 @app.route("/dashboard")
 @login_required
@@ -232,11 +242,14 @@ def dashboard():
     }
     chart_b64 = generate_focus_chart(chart_totals)
 
+    notification = get_recent_notification(active_session)
+    distraction_message = notification["message"] if notification else None
+
     return render_template(
         "index.html",
         active_session=active_session,
         username=current_user.username,
-        distraction_message="You seem distracted! Focus!",
+        distraction_message=distraction_message,
         focused_time=focused_time,
         absent_time=absent_time,
         distracted_time=distracted_time,

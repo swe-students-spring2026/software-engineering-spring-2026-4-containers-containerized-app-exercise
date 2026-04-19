@@ -29,3 +29,28 @@ def save_snapshot(snapshot_data):
 def save_record(record):
     """Alias for save_snapshot."""
     return save_snapshot(record)
+
+def set_session_notification(session_id, classification):
+    import datetime 
+
+    messages = {
+        "distracted": "You seem distracted! Get back to studying.",
+        "absent": "We lost sight of you — come back to finish your session.",
+    }
+    message = messages.get(classification)
+    if message is None:
+        return
+
+    sessions = get_collection(SESSIONS_COLLECTION)
+    sessions.update_one(
+        {"_id": session_id},
+        {
+            "$set": {
+                "notification": {
+                    "type": classification,
+                    "message": message,
+                    "timestamp": datetime.datetime.now(datetime.timezone.utc),
+                }
+            }
+        },
+    )
