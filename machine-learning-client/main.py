@@ -76,7 +76,7 @@ def store_data(img_frame, emotion, score, classification):
         "emotion": emotion,
         "confidence": score,
         "classification": classification,
-        "image": image_bytes
+        "image": image_bytes,
     }
 
     # 4. Save to DB
