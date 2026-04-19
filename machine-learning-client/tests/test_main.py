@@ -1,256 +1,122 @@
 """Unit tests for ML client main logic."""
 
-# pylint: disable=missing-function-docstring,missing-class-docstring
-# pylint: disable=too-few-public-methods,unused-argument
-
 import datetime
+from unittest.mock import MagicMock, patch
+
 import pytest
 import main  # pylint: disable=import-error
 
 
-class FakeDetectorNoFace:
-    def detect_emotions(self, frame):
-        return []
+def test_distraction_classification():
+    """Test the distraction_classification function logic."""
+    assert main.distraction_classification(None) == "absent"
+    
+    assert main.distraction_classification(("happy", 0.9)) == "focused"
+    assert main.distraction_classification(("neutral", 0.9)) == "focused"
+    assert main.distraction_classification(("angry", 0.9)) == "focused"
+    
+    assert main.distraction_classification(("sad", 0.9)) == "distracted"
+    assert main.distraction_classification(("fear", 0.9)) == "distracted"
+    assert main.distraction_classification(("disgust", 0.9)) == "distracted"
+    assert main.distraction_classification(("surprise", 0.9)) == "distracted"
+    
+    assert main.distraction_classification(("unknown_emotion", 0.9)) == "unknown"
 
 
-class FakeDetectorFace:
-    def detect_emotions(self, frame):
-        return [
-            {
-                "emotions": {
-                    "angry": 0.01,
-                    "disgust": 0.01,
-                    "fear": 0.02,
-                    "happy": 0.05,
-                    "sad": 0.03,
-                    "surprise": 0.04,
-                    "neutral": 0.84,
-                }
-            }
-        ]
+@patch("main.FER")
+@patch("main.cv2.VideoCapture")
+def test_get_face_emotion_success(mock_video_capture, mock_fer):
+    """Test get_face_emotion when face is successfully detected."""
+    # Setup mock VideoCapture
+    mock_cap = MagicMock()
+    mock_cap.isOpened.return_value = True
+    mock_cap.read.return_value = (True, "fake_img_data")
+    mock_video_capture.return_value = mock_cap
+    
+    # Setup mock FER detector
+    mock_detector = MagicMock()
+    mock_detector.top_emotion.return_value = ("happy", 0.95)
+    mock_fer.return_value = mock_detector
+    
+    img_data, result = main.get_face_emotion()
+    
+    assert img_data == "fake_img_data"
+    assert result == ("happy", 0.95)
+    mock_detector.detect_emotions.assert_called_once_with("fake_img_data")
+    mock_detector.top_emotion.assert_called_once_with("fake_img_data")
 
 
-def test_classify_state_absent():
-    assert main.classify_state(False, None) == "absent"
+@patch("main.FER")
+@patch("main.cv2.VideoCapture")
+@patch("main.os.path.exists")
+@patch("main.cv2.imread")
+def test_get_face_emotion_fallback(mock_imread, mock_exists, mock_video_capture, mock_fer):
+    """Test get_face_emotion when VideoCapture fails and uses fallback."""
+    # Setup mock VideoCapture to fail
+    mock_cap = MagicMock()
+    mock_cap.isOpened.return_value = False
+    mock_video_capture.return_value = mock_cap
+    
+    # Setup mock fallback image
+    mock_exists.return_value = True
+    mock_imread.return_value = "fallback_img_data"
+    
+    # Setup mock FER detector
+    mock_detector = MagicMock()
+    mock_detector.top_emotion.return_value = ("neutral", 0.88)
+    mock_fer.return_value = mock_detector
+    
+    img_data, result = main.get_face_emotion()
+    
+    assert img_data == "fallback_img_data"
+    assert result == ("neutral", 0.88)
+    mock_detector.detect_emotions.assert_called_once_with("fallback_img_data")
 
 
-def test_classify_state_focused():
-    assert main.classify_state(True, "neutral") == "focused"
-    assert main.classify_state(True, "happy") == "focused"
-
-
-def test_classify_state_distracted():
-    assert main.classify_state(True, "sad") == "distracted"
-    assert main.classify_state(True, "angry") == "distracted"
-    assert main.classify_state(True, "fear") == "distracted"
-    assert main.classify_state(True, "disgust") == "distracted"
-    assert main.classify_state(True, "surprise") == "distracted"
-
-
-def test_analyze_frame_no_face():
-    detector = FakeDetectorNoFace()
-    result = main.analyze_frame(detector, frame="fake-frame")
-
-    assert result["face_detected"] is False
-    assert result["dominant_emotion"] is None
-    assert result["confidence"] == 0.0
-    assert result["all_emotions"] == {}
-
-
-def test_analyze_frame_with_face():
-    detector = FakeDetectorFace()
-    result = main.analyze_frame(detector, frame="fake-frame")
-
-    assert result["face_detected"] is True
-    assert result["dominant_emotion"] == "neutral"
-    assert result["confidence"] == 0.84
-    assert "happy" in result["all_emotions"]
-
-
-def test_process_active_session_saves_focused_snapshot(monkeypatch):
-    saved = {}
-
-    session = {"_id": "session123", "user_id": "user456"}
-
-    monkeypatch.setattr(main, "capture_image", lambda: "fake-frame")
-    monkeypatch.setattr(main, "save_image_locally", lambda frame: "captured/test.jpg")
-    monkeypatch.setattr(main, "encode_image_base64", lambda frame: "encoded-image")
-    monkeypatch.setattr(
-        main,
-        "analyze_frame",
-        lambda detector, frame: {
-            "face_detected": True,
-            "dominant_emotion": "neutral",
-            "confidence": 0.91,
-            "all_emotions": {"neutral": 0.91},
-        },
+@patch("main.get_collection")
+@patch("main.save_snapshot")
+@patch("main.cv2.imencode")
+def test_store_data_active_session(mock_imencode, mock_save_snapshot, mock_get_collection):
+    """Test store_data when an active session exists."""
+    # Setup active session mock
+    mock_sessions_col = MagicMock()
+    mock_active_session = {"_id": "session123", "user_id": "user456"}
+    mock_sessions_col.find_one.return_value = mock_active_session
+    mock_get_collection.return_value = mock_sessions_col
+    
+    # Setup imencode mock
+    mock_buffer = MagicMock()
+    mock_buffer.tobytes.return_value = b"fake_image_bytes"
+    mock_imencode.return_value = (True, mock_buffer)
+    
+    main.store_data("fake_frame", "happy", 0.95, "focused")
+    
+    # Verify save_snapshot was called correctly
+    assert mock_save_snapshot.call_count == 1
+    snapshot_arg = mock_save_snapshot.call_args[0][0]
+    assert snapshot_arg["user_id"] == "user456"
+    assert snapshot_arg["session_id"] == "session123"
+    assert snapshot_arg["emotion"] == "happy"
+    assert snapshot_arg["confidence"] == 0.95
+    assert snapshot_arg["classification"] == "focused"
+    assert snapshot_arg["image"] == b"fake_image_bytes"
+    assert isinstance(snapshot_arg["timestamp"], datetime.datetime)
+    
+    # Verify session snapshot_count was incremented
+    mock_sessions_col.update_one.assert_called_once_with(
+        {"_id": "session123"},
+        {"$inc": {"snapshot_count": 1}}
     )
 
-    def fake_save_snapshot(snapshot):
-        saved["snapshot"] = snapshot
 
-    notifications = []
-
-    def fake_update_session_notification(session_id, notification_type, message):
-        notifications.append((session_id, notification_type, message))
-
-    monkeypatch.setattr(main, "save_snapshot", fake_save_snapshot)
-    monkeypatch.setattr(
-        main, "update_session_notification", fake_update_session_notification
-    )
-
-    main.process_active_session(detector="fake-detector", session=session)
-
-    snapshot = saved["snapshot"]
-    assert snapshot["session_id"] == "session123"
-    assert snapshot["user_id"] == "user456"
-    assert snapshot["image_path"] == "captured/test.jpg"
-    assert snapshot["image_data"] == "encoded-image"
-    assert snapshot["emotion"]["dominant"] == "neutral"
-    assert snapshot["classification"] == "focused"
-    assert snapshot["face_detected"] is True
-    assert isinstance(snapshot["timestamp"], datetime.datetime)
-    assert not notifications
-
-
-def test_process_active_session_sets_distracted_notification(monkeypatch):
-    session = {"_id": "session123", "user_id": "user456"}
-    notifications = []
-
-    monkeypatch.setattr(main, "capture_image", lambda: "fake-frame")
-    monkeypatch.setattr(main, "save_image_locally", lambda frame: "captured/test.jpg")
-    monkeypatch.setattr(main, "encode_image_base64", lambda frame: "encoded-image")
-    monkeypatch.setattr(
-        main,
-        "analyze_frame",
-        lambda detector, frame: {
-            "face_detected": True,
-            "dominant_emotion": "sad",
-            "confidence": 0.77,
-            "all_emotions": {"sad": 0.77},
-        },
-    )
-    monkeypatch.setattr(main, "save_snapshot", lambda snapshot: None)
-
-    def fake_update_session_notification(session_id, notification_type, message):
-        notifications.append((session_id, notification_type, message))
-
-    monkeypatch.setattr(
-        main, "update_session_notification", fake_update_session_notification
-    )
-
-    main.process_active_session(detector="fake-detector", session=session)
-
-    assert notifications == [
-        ("session123", "distracted", "You seem distracted! Get back to studying.")
-    ]
-
-
-def test_process_active_session_sets_absent_notification(monkeypatch):
-    session = {"_id": "session123", "user_id": "user456"}
-    notifications = []
-
-    monkeypatch.setattr(main, "capture_image", lambda: "fake-frame")
-    monkeypatch.setattr(main, "save_image_locally", lambda frame: "captured/test.jpg")
-    monkeypatch.setattr(main, "encode_image_base64", lambda frame: "encoded-image")
-    monkeypatch.setattr(
-        main,
-        "analyze_frame",
-        lambda detector, frame: {
-            "face_detected": False,
-            "dominant_emotion": None,
-            "confidence": 0.0,
-            "all_emotions": {},
-        },
-    )
-    monkeypatch.setattr(main, "save_snapshot", lambda snapshot: None)
-
-    def fake_update_session_notification(session_id, notification_type, message):
-        notifications.append((session_id, notification_type, message))
-
-    monkeypatch.setattr(
-        main, "update_session_notification", fake_update_session_notification
-    )
-
-    main.process_active_session(detector="fake-detector", session=session)
-
-    assert notifications == [
-        (
-            "session123",
-            "absent",
-            "We can't see your face. Are you away from your study session?",
-        )
-    ]
-
-
-def test_process_active_session_returns_when_no_frame(monkeypatch):
-    called = {"save_snapshot": False}
-
-    monkeypatch.setattr(main, "capture_image", lambda: None)
-
-    def fake_save_snapshot(snapshot):
-        called["save_snapshot"] = True
-
-    monkeypatch.setattr(main, "save_snapshot", fake_save_snapshot)
-
-    main.process_active_session(
-        detector="fake-detector", session={"_id": "s1", "user_id": "u1"}
-    )
-
-    assert called["save_snapshot"] is False
-
-
-def test_main_calls_process_when_active_session_exists(monkeypatch):
-    calls = {"processed": 0, "slept": 0}
-
-    class FakeFer:
-        def __init__(self, mtcnn=False):
-            self.mtcnn = mtcnn
-
-    monkeypatch.setattr(main, "FER", FakeFer)
-    monkeypatch.setattr(
-        main, "get_active_session", lambda: {"_id": "s1", "user_id": "u1"}
-    )
-
-    def fake_process(detector, session):
-        calls["processed"] += 1
-
-    def fake_sleep(seconds):
-        calls["slept"] += 1
-        raise KeyboardInterrupt
-
-    monkeypatch.setattr(main, "process_active_session", fake_process)
-    monkeypatch.setattr(main.time, "sleep", fake_sleep)
-
-    with pytest.raises(KeyboardInterrupt):
-        main.main()
-
-    assert calls["processed"] == 1
-    assert calls["slept"] == 1
-
-
-def test_main_skips_process_when_no_active_session(monkeypatch):
-    calls = {"processed": 0, "slept": 0}
-
-    class FakeFer:
-        def __init__(self, mtcnn=False):
-            self.mtcnn = mtcnn
-
-    monkeypatch.setattr(main, "FER", FakeFer)
-    monkeypatch.setattr(main, "get_active_session", lambda: None)
-
-    def fake_process(detector, session):
-        calls["processed"] += 1
-
-    def fake_sleep(seconds):
-        calls["slept"] += 1
-        raise KeyboardInterrupt
-
-    monkeypatch.setattr(main, "process_active_session", fake_process)
-    monkeypatch.setattr(main.time, "sleep", fake_sleep)
-
-    with pytest.raises(KeyboardInterrupt):
-        main.main()
-
-    assert calls["processed"] == 0
-    assert calls["slept"] == 1
+@patch("main.get_collection")
+@patch("main.save_snapshot")
+def test_store_data_no_active_session(mock_save_snapshot, mock_get_collection):
+    """Test store_data when no active session exists."""
+    mock_sessions_col = MagicMock()
+    mock_sessions_col.find_one.return_value = None
+    mock_get_collection.return_value = mock_sessions_col
+    
+    main.store_data("fake_frame", "happy", 0.95, "focused")
+    
+    mock_save_snapshot.assert_not_called()
