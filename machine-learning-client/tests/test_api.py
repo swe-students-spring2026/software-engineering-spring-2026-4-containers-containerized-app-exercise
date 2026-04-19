@@ -53,7 +53,11 @@ def _settings() -> Settings:
 def test_health_endpoint_returns_ok():
     """Health endpoint should return healthy status and model version."""
 
-    app = create_app(settings=_settings(), predictor=StubPredictor(), repository=StubRepository())
+    app = create_app(
+        settings=_settings(),
+        predictor=StubPredictor(),
+        repository=StubRepository(),
+    )
     client = app.test_client()
 
     response = client.get("/health")
@@ -67,7 +71,11 @@ def test_health_endpoint_returns_ok():
 def test_predict_endpoint_returns_predictions_and_event_id():
     """Predict endpoint returns persisted event payload for valid image bytes."""
 
-    app = create_app(settings=_settings(), predictor=StubPredictor(), repository=StubRepository())
+    app = create_app(
+        settings=_settings(),
+        predictor=StubPredictor(),
+        repository=StubRepository(),
+    )
     client = app.test_client()
 
     response = client.post(
@@ -87,7 +95,11 @@ def test_predict_endpoint_returns_predictions_and_event_id():
 def test_predict_endpoint_rejects_empty_body():
     """Predict endpoint should reject requests that have no image bytes."""
 
-    app = create_app(settings=_settings(), predictor=StubPredictor(), repository=StubRepository())
+    app = create_app(
+        settings=_settings(),
+        predictor=StubPredictor(),
+        repository=StubRepository(),
+    )
     client = app.test_client()
 
     response = client.post("/predict", data=b"")
@@ -99,7 +111,11 @@ def test_predict_endpoint_rejects_empty_body():
 def test_predict_endpoint_validates_top_k():
     """Predict endpoint should validate top_k query parameter."""
 
-    app = create_app(settings=_settings(), predictor=StubPredictor(), repository=StubRepository())
+    app = create_app(
+        settings=_settings(),
+        predictor=StubPredictor(),
+        repository=StubRepository(),
+    )
     client = app.test_client()
 
     response = client.post("/predict?top_k=0", data=b"image")

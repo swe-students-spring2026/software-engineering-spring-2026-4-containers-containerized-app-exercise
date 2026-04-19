@@ -5,6 +5,7 @@ import os
 
 from dotenv import load_dotenv
 
+# pylint: disable=too-many-instance-attributes
 @dataclass(frozen=True)
 class Settings:
     """Configuration values loaded from environment variables."""
