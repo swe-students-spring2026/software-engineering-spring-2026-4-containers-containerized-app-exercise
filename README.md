@@ -3,6 +3,7 @@
 ![Lint-free](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/lint.yml/badge.svg)
 [![ML Client CI](https://github.com/swe-students-spring2026/4-containers-team_watermelon/actions/workflows/ml-client-ci.yml/badge.svg?branch=main)](https://github.com/swe-students-spring2026/4-containers-team_watermelon/actions/workflows/ml-client-ci.yml)
 
+
 ## Project Description
 
 This project is a containerized actor training platform built with three connected subsystems: a Flask web app, a machine learning client, and a MongoDB database.
