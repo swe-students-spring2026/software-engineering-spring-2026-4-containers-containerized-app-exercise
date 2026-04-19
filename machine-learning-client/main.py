@@ -1,11 +1,16 @@
 """Module for emotion detection using FER and capturing data autonomously."""
 
+import datetime
 import os
 import time
-import datetime
-from fer.fer import FER  # pylint: disable=import-error
+
 import cv2  # pylint: disable=import-error
-from db import get_collection, save_snapshot, SESSIONS_COLLECTION
+from dotenv import load_dotenv
+from fer.fer import FER  # pylint: disable=import-error
+
+from db import SESSIONS_COLLECTION, get_collection, save_snapshot
+
+load_dotenv()
 
 
 def get_face_emotion():
@@ -18,11 +23,11 @@ def get_face_emotion():
 
     if cap.isOpened():
         time.sleep(3)
-        ret, frame = cap.read()
+        ret, cap_frame = cap.read()
         cap.release()
 
         if ret:
-            img_data = frame
+            img_data = cap_frame
     else:
         # when there is an error, use a fallback image
         fallback_path = os.path.join(os.getcwd(), "img.png")
@@ -40,13 +45,12 @@ def distraction_classification(data):
     """Classifies distraction based on emotion data."""
     if data is None:
         return "absent"
-    emotion, score = data
+    emotion, _ = data
     if emotion in ["happy", "neutral", "angry"]:
         return "focused"
-    elif emotion in ["sad", "fear", "disgust", "surprise"]:
+    if emotion in ["sad", "fear", "disgust", "surprise"]:
         return "distracted"
-    else:
-        return "unknown"
+    return "unknown"
 
 
 def store_data(img_frame, emotion, score, classification):
@@ -96,5 +100,6 @@ if __name__ == "__main__":
         else:
             print("No face detected or capture failed.")
 
-        # Capture frequency (can be updated from .env later)
-        time.sleep(10)
+        # capture frequency from .env
+        interval = int(os.getenv("CAPTURE_INTERVAL", "10"))
+        time.sleep(interval)
