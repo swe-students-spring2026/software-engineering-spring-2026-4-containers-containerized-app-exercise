@@ -1,6 +1,6 @@
 """Audio analysis utilities for environmental sound detection."""
 
-# pylint: disable=too-many-instance-attributes,too-few-public-methods,too-many-locals
+# pylint: disable=too-many-instance-attributes,too-few-public-methods,too-many-locals,too-many-branches,too-many-statements
 
 from __future__ import annotations
 
@@ -362,7 +362,9 @@ class HuggingFaceAudioAnalyzer:  # pylint: disable=too-many-instance-attributes
         self,
         audio_path: str,
         progress_callback: Callable[[int, str], None] | None = None,
-    ) -> dict[str, Any]:  # pylint: disable=too-many-locals
+    ) -> dict[
+        str, Any
+    ]:  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
         """Run inference for one audio file and return normalized predictions."""
 
         def report_progress(percent: int, stage: str):

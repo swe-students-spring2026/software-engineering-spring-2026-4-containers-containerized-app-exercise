@@ -48,7 +48,7 @@ def _counter_rows(counter: Counter, total: int, limit: int = 10):
     return rows
 
 
-def _build_stats(predictions):
+def _build_stats(predictions):  # pylint: disable=too-many-locals
     sound_counter = Counter()
     category_counter = Counter()
     alert_confidence_sum = 0.0
@@ -63,7 +63,9 @@ def _build_stats(predictions):
 
         detections = prediction.get("detections") or []
         if detections:
-            max_end = max(float(item.get("end_time", 0.0) or 0.0) for item in detections)
+            max_end = max(
+                float(item.get("end_time", 0.0) or 0.0) for item in detections
+            )
             analyzed_duration_seconds += max_end
 
         for item in detections:
@@ -179,7 +181,9 @@ def dashboard():
 
     done_job_ids = [job["_id"] for job in done_jobs]
     if done_job_ids:
-        all_predictions = list(predictions_collection.find({"job_id": {"$in": done_job_ids}}))
+        all_predictions = list(
+            predictions_collection.find({"job_id": {"$in": done_job_ids}})
+        )
     else:
         all_predictions = []
 
@@ -191,7 +195,9 @@ def dashboard():
     if selected_job_id:
         try:
             selected_object_id = ObjectId(selected_job_id)
-            selected_job = analysis_jobs_collection.find_one({"_id": selected_object_id})
+            selected_job = analysis_jobs_collection.find_one(
+                {"_id": selected_object_id}
+            )
         except Exception:  # pylint: disable=broad-except
             selected_job = None
 
@@ -200,7 +206,9 @@ def dashboard():
 
     clip_stats = None
     if selected_job is not None:
-        selected_prediction = predictions_collection.find_one({"job_id": selected_job["_id"]})
+        selected_prediction = predictions_collection.find_one(
+            {"job_id": selected_job["_id"]}
+        )
         if selected_prediction is not None:
             clip_stats = _build_stats([selected_prediction])
 
@@ -236,7 +244,11 @@ def playback(gridfs_id):
     if range_header:
         byte_range = range_header.replace("bytes=", "").split("-")
         start = int(byte_range[0]) if byte_range[0] else 0
-        end = int(byte_range[1]) if len(byte_range) > 1 and byte_range[1] else file.length - 1
+        end = (
+            int(byte_range[1])
+            if len(byte_range) > 1 and byte_range[1]
+            else file.length - 1
+        )
         end = min(end, file.length - 1)
         chunk_size = end - start + 1
 
