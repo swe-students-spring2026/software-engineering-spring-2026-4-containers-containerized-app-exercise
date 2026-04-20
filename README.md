@@ -14,6 +14,7 @@ A containerized machine learning application composed of three distinct subsyste
 ## Team Members
 * [ZhiHui Chen](https://github.com/Zhi-Hui-C)
 * [Yash Pazhianur](https://github.com/yashpaz123)
+* [Jeffrey Solano] (https://github.com/jeffnoso)
 
 ## Configuration & Usage
 
