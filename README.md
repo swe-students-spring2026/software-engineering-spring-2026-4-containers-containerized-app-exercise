@@ -1,5 +1,7 @@
-![Web App Lint](https://github.com/swe-students-spring2026/4-containers-team_not_found-1/actions/workflows/lint.yml/badge.svg)
+![Lint Status](https://github.com/swe-students-spring2026/4-containers-team_not_found-1/actions/workflows/lint.yml/badge.svg)
 ![ML Client CI](https://github.com/swe-students-spring2026/4-containers-team_not_found-1/actions/workflows/ml-client.yml/badge.svg)
+![Web App CI](https://github.com/swe-students-spring2026/4-containers-team_not_found-1/actions/workflows/web-app.yml/badge.svg)
+![Event Logger CI](https://github.com/swe-students-spring2026/4-containers-team_not_found-1/actions/workflows/event-logger.yml/badge.svg)
 
 # Doodle Not Found (Team: team_not_found)
 
@@ -15,16 +17,8 @@ A containerized machine learning application composed of three distinct subsyste
 
 ## Configuration & Usage
 
-### 1. Set Up the Environment
-Dummy data is already provided in the `.env.example` file. 
-
-To configure your exact setup, copy the example environment file for the Machine Learning Client:
-```bash
-cp machine-learning-client/.env.example machine-learning-client/.env
-```
-
-### 2. Start Services (Docker)
-All pieces of the project are systematically orchestrated using `docker-compose`. 
+### 1. Start Services (Docker)
+All pieces of the project are systematically orchestrated using `docker-compose`. There is no need to make any `.env` files—all default configurations are already baked into the `docker-compose.yml` and Dockerfiles!
 
 Ensure you have Docker Desktop running, then execute:
 ```bash
@@ -35,7 +29,7 @@ This single startup command securely initializes:
 - The `ml-client` API mounted to port `8000`
 - The `web-app` proxy serving the site at port `5000`
 
-### 3. Start Drawing
+### 2. Start Drawing
 Once the instances are running, open your web browser to view the application:
 [http://localhost:5001](http://localhost:5001)
 
